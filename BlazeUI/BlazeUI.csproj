@@ -1,0 +1,52 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+        <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Avalonia" Version="11.3.6"/>
+        <PackageReference Include="Avalonia.Desktop" Version="11.3.6"/>
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.6"/>
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.6"/>
+        <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
+        <PackageReference Include="Avalonia.Diagnostics" Version="11.3.6">
+            <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
+            <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
+        </PackageReference>
+        <AvaloniaResource Include="Assets/*"/>
+        <None Remove="assets\pieces\black_bishop.png" />
+        <AvaloniaResource Include="assets\pieces\black_bishop.png" />
+        <None Remove="assets\pieces\black_king.png" />
+        <AvaloniaResource Include="assets\pieces\black_king.png" />
+        <None Remove="assets\pieces\black_knight.png" />
+        <AvaloniaResource Include="assets\pieces\black_knight.png" />
+        <None Remove="assets\pieces\black_pawn.png" />
+        <AvaloniaResource Include="assets\pieces\black_pawn.png" />
+        <None Remove="assets\pieces\black_queen.png" />
+        <AvaloniaResource Include="assets\pieces\black_queen.png" />
+        <None Remove="assets\pieces\black_rook.png" />
+        <AvaloniaResource Include="assets\pieces\black_rook.png" />
+        <None Remove="assets\pieces\white_bishop.png" />
+        <AvaloniaResource Include="assets\pieces\white_bishop.png" />
+        <None Remove="assets\pieces\white_king.png" />
+        <AvaloniaResource Include="assets\pieces\white_king.png" />
+        <None Remove="assets\pieces\white_knight.png" />
+        <AvaloniaResource Include="assets\pieces\white_knight.png" />
+        <None Remove="assets\pieces\white_pawn.png" />
+        <AvaloniaResource Include="assets\pieces\white_pawn.png" />
+        <None Remove="assets\pieces\white_queen.png" />
+        <AvaloniaResource Include="assets\pieces\white_queen.png" />
+        <None Remove="assets\pieces\white_rook.png" />
+        <AvaloniaResource Include="assets\pieces\white_rook.png" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="assets\pieces\" />
+    </ItemGroup>
+
+</Project>

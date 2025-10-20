@@ -1,0 +1,24 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="BlazeUI.App"
+             RequestedThemeVariant="Default">
+             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+
+    <Application.Styles>
+        <FluentTheme />
+        <StyleInclude Source="Styles/AppDefaultStyles.axaml"></StyleInclude>
+    </Application.Styles>
+             
+             <Application.Resources>
+                 <SolidColorBrush x:Key="SecondaryBackground">#1c1d1f</SolidColorBrush>
+                 <SolidColorBrush x:Key="SecondaryBorder">#404247</SolidColorBrush>
+                 
+                 <LinearGradientBrush x:Key="PrimaryBackgroundGradient" StartPoint="0%, 0%" EndPoint="0%, 25%">
+                     <GradientStop Offset="0" Color="#242628"></GradientStop>
+                     <GradientStop Offset="1" Color="#1c1d1f"></GradientStop>
+                 </LinearGradientBrush>
+                 
+                 <SolidColorBrush x:Key="PrimaryText">#d6d6d6</SolidColorBrush>
+                 <SolidColorBrush x:Key="HoverBackground">#2e2d2d</SolidColorBrush>
+             </Application.Resources>
+</Application>
