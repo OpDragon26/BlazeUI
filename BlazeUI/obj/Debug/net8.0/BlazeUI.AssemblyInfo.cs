@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BlazeUI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+eca688b9317d92f93371ab9f25f24dec55b769c9")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ba5d9b5e204f55390d23e2990aa1bdc7d3169adc")]
 [assembly: System.Reflection.AssemblyProductAttribute("BlazeUI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BlazeUI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
