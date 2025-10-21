@@ -1,9 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Shapes;
-using Avalonia.Data;
 using Avalonia.Media;
-using Avalonia.Media.Imaging;
 
 namespace BlazeUI;
 
@@ -28,9 +26,6 @@ public partial class MainWindow : Window
         }
 
         // place pieces
-        var Board = this.FindControl<Grid>("pieces");
-        MoveableImage pawn = new MoveableImage { PieceGrid = Board, Source = new Bitmap("/home/opdragon25/Documents/CSharp/BlazeUI/BlazeUI/assets/pieces/white_pawn.png")};
-        Grid.SetColumn(pawn, 3);
-        Board!.Children.Add(pawn);
+        GridBoard PieceBoard = new GridBoard(this.FindControl<Grid>("pieces")!);
     }
 }

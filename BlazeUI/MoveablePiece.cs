@@ -7,13 +7,13 @@ using Avalonia.VisualTree;
 
 namespace BlazeUI;
 
-public class MoveableImage : Image
+public class MoveablePiece : Image
 {
-    public Grid? PieceGrid;
+    public required GridBoard PieceGrid;
     private bool _pressed;
     private Point _position;
     private TranslateTransform? _translate;
-    (int X, int Y) _start;
+    private (int X, int Y) _start;
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
@@ -22,9 +22,8 @@ public class MoveableImage : Image
         Point _relPosition = e.GetPosition(this);
 
         _position = new(_position.X - _relPosition.X + Bounds.Width / 2, _position.Y - _relPosition.Y + Bounds.Height / 2);
-        
         _start = GetPositionOnGrid(_position);
-
+        
         base.OnPointerPressed(e);
     }
 
@@ -54,8 +53,7 @@ public class MoveableImage : Image
 
     private (int X, int Y) GetPositionOnGrid(Point position)
     {
-        double squareSize = PieceGrid!.Bounds.Width / 8;
-
+        double squareSize = PieceGrid.InnerGrid.Bounds.Width / 8;
         int x = (int)(position.X / squareSize);
         int y = (int)(position.Y / squareSize);
         return (x, y);
@@ -65,13 +63,13 @@ public class MoveableImage : Image
     {
         (int X, int Y) pos = GetPositionOnGrid(position);
         
-        if (InvalidSquare(pos))
-            pos = _start;
-            
-        Grid.SetColumn(this, pos.X);
-        Grid.SetRow(this, pos.Y);
         _translate = null;
         RenderTransform = null;
+
+        if (!InvalidSquare(pos))
+        {
+            PieceGrid.MovePiece(_start, pos);
+        }
     }
 
     private bool InvalidSquare((int x, int y) pos)
