@@ -6,7 +6,7 @@ namespace BlazeUI.Blaze;
 
 public class Match
 {
-    internal readonly Board board;
+    public readonly Board board;
     internal int depth;
     private readonly int depthFloor;
     private const int depthCeiling = 8;
@@ -14,7 +14,7 @@ public class Match
     
     private bool inBook;
     internal int ply;
-    internal List<PGNNode> game = new();
+    public List<PGNNode> game = new();
     
     internal Match(Board board, int depth, bool dynamicDepth = true, bool useBook = true)
     {
@@ -43,6 +43,22 @@ public class Match
         board.MakeMove(move);
         
         node = new PGNNode(new(board), move, time);
+        game.Add(node);
+        
+        ply++;
+        return true;
+    }
+    
+    public bool TryMake(Move move, long time = -1)
+    {
+        Move[] legalMoves = Search.SearchBoard(board, false).ToArray();
+
+        if (!legalMoves.Contains(move))
+            return false;
+        
+        board.MakeMove(move);
+        
+        PGNNode node = new PGNNode(new(board), move, time);
         game.Add(node);
         
         ply++;

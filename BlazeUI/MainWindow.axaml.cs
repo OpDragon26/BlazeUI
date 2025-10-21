@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Shapes;
+using Avalonia.Interactivity;
 using Avalonia.Media;
 using BlazeUI.Blaze;
 
@@ -8,9 +9,7 @@ namespace BlazeUI;
 
 public partial class MainWindow : Window
 {
-    private static readonly SolidColorBrush LightSquare = new(new Color(255, 238, 238, 210));
-    private static readonly SolidColorBrush DarkSquare = new(new Color(255, 118, 150, 86));
-
+    private readonly GridBoard? _pieceBoard;
     public MainWindow()
     {
         InitializeComponent();
@@ -22,12 +21,26 @@ public partial class MainWindow : Window
             for (int rank = 0; rank < 8; rank++)
             {
                 BoardBackground!.Children.Add(new Rectangle
-                    { [Shape.FillProperty] = (file + rank) % 2 == 0 ? LightSquare : DarkSquare });
+                    { [Shape.FillProperty] = (file + rank) % 2 == 0 ? Colors.LightSquare : Colors.DarkSquare });
             }
         }
 
-        // place pieces
-        GridBoard PieceBoard = new GridBoard(this.FindControl<Grid>("pieces")!);
-        PieceBoard.LoadBoard(new Board(Presets.StartingBoard), Side.Black);
+        // load match
+        _pieceBoard = new GridBoard(this.FindControl<Grid>("pieces")!, this.FindControl<Grid>("highlight")!);
+        //PieceBoard.SetMatch(new(new (Presets.StartingBoard), 6), Side.White);
+        _pieceBoard.SetMatch(null, Side.White);
+        //PieceBoard.HighLight(new Board(Presets.StartingBoard).GetBitboard(0), Side.White);
     }
+
+    private void StartNewGame(object sender, RoutedEventArgs e)
+    {
+        _pieceBoard!.SetMatch(new(new(Presets.StartingBoard), 6), Side.White);
+    }
+}
+
+public static class Colors
+{
+    public static readonly SolidColorBrush LightSquare = new(new Color(255, 238, 238, 210));
+    public static readonly SolidColorBrush DarkSquare = new(new Color(255, 118, 150, 86));
+    public static readonly SolidColorBrush HighLight =  new(new Color(128, 199, 24, 24));
 }

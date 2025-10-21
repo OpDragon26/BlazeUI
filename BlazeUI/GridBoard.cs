@@ -1,29 +1,70 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Avalonia.Controls;
+using Avalonia.Controls.Shapes;
 using Avalonia.Media.Imaging;
+using Avalonia.Threading;
+using BlazeUI.Blaze;
 
 namespace BlazeUI;
 
-public class GridBoard(Grid grid)
+public class GridBoard(Grid grid, Grid highlightGrid)
 {
     public readonly Grid InnerGrid = grid;
-    readonly List<PieceItem> _pieces = new();
+    private readonly List<PieceItem> _pieces = new();
+    private EmbeddedMatch? _match;
+    private Side _side;
+    
+    private DispatcherTimer? _timer;
 
+    private void StartPolling()
+    {
+        if (_match == null)
+            return;
+        
+        _timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16) };
+        _match.WaitStartSearch();
+        _timer.Tick += Poll;
+        _timer.Start();
+    }
+
+    private void Poll(object? sender, EventArgs e)
+    {
+        if (_match!.Poll(out var node))
+        {
+            _timer!.Stop();
+            LoadBoard(node.board, _side);
+        }
+    }
+    
     public void MovePiece((int x, int y) from, (int x, int y) to)
     {
         int index = FindIndexOfPiece(from);
         if (index == -1)
             return;
+
+        if (_match == null)
+        {
+            PieceItem piece = _pieces[index];
         
-        PieceItem piece = _pieces[index];
+            RemovePiece(to, other => other.pos != from);
         
-        RemovePiece(to, other => other.pos != from);
+            Grid.SetColumn(piece.piece, to.x);
+            Grid.SetRow(piece.piece, to.y);
+            piece.pos = to;
+            return;
+        }
         
-        Grid.SetColumn(piece.piece, to.x);
-        Grid.SetRow(piece.piece, to.y);
-        piece.pos = to;
+        if (_match.board.side != (int)_side)
+            return;
+
+        Move move = new Move(Move.GetSquare(PerspectiveConverter.Objective(from, _side)) + Move.GetSquare(PerspectiveConverter.Objective(to, _side)), _match.board);
+        //Console.WriteLine(move.GetUCI());
+        if (!_match.TryMake(move))
+            return;
+        LoadBoard(_match.board, _side);
+        StartPolling();
+
     }
 
     private void AddPiece(MoveablePiece piece, (int x, int y) at)
@@ -34,7 +75,7 @@ public class GridBoard(Grid grid)
         _pieces.Add(new PieceItem(piece, at));
     }
 
-    public void LoadBoard(Blaze.Board board, Blaze.Side perspective)
+    private void LoadBoard(Board board, Side perspective)
     {
         Clear();
 
@@ -42,15 +83,23 @@ public class GridBoard(Grid grid)
         {
             for (int rank = 0; rank < 8; rank++)
             {
-                if (board.GetPiece(file, rank) == Blaze.Pieces.Empty)
+                if (board.GetPiece(file, rank) == Pieces.Empty)
                     continue;
                 
-                (int x, int y) objectivePos = PerspectiveConverter.ToObjective((file, rank), perspective);
+                (int x, int y) objectivePos = PerspectiveConverter.Objective((file, rank), perspective);
 
                 MoveablePiece piece = new MoveablePiece { PieceGrid = this , Source = GetPieceBitmap(board.GetPiece(file, rank))};
                 AddPiece(piece, objectivePos);
             }
         }
+    }
+
+    public void SetMatch(EmbeddedMatch? match, Side perspective)
+    {
+        _side = perspective;
+        _match = match;
+        
+        LoadBoard(match == null ? new(Presets.StartingBoard) : match.board, perspective);
     }
 
     private void RemovePiece((int x, int y) at)
@@ -79,7 +128,42 @@ public class GridBoard(Grid grid)
 
     private void Clear()
     {
-        _pieces.ForEach(item => RemovePiece(item.pos));
+        InnerGrid.Children.Clear();
+        _pieces.Clear();
+    }
+
+    private void ClearHighlight()
+    {
+        highlightGrid.Children.Clear();
+    }
+
+    public void HighLight(ulong bitboard, Side perspective)
+    {
+        ClearHighlight();
+        
+        for (int x = 0; x < 8; x++)
+        {
+            for (int y = 0; y < 8; y++)
+            {
+                // objective coordinates on the bitboard
+                (int x, int y) pos = (x, y);
+                (int file, int rank) subjective = PerspectiveConverter.Objective(pos, perspective);
+
+                if ((bitboard & BitboardUtils.GetSquare(pos)) != 0)
+                {
+                    // if the given square is highlighted
+                    HighlightSingle(subjective);
+                }
+            }
+        }
+    }
+
+    private void HighlightSingle((int file, int rank) pos)
+    {
+        Rectangle highlight = new Rectangle { [Shape.FillProperty] = Colors.HighLight };
+        highlightGrid.Children.Add(highlight);
+        Grid.SetColumn(highlight, pos.file);
+        Grid.SetRow(highlight, pos.rank);
     }
 
     private int FindIndexOfPiece((int x, int y) at)
@@ -99,7 +183,9 @@ public class GridBoard(Grid grid)
 
     private static Bitmap GetPieceBitmap(uint piece)
     {
-        return new Bitmap(AbsolutePath + $"{((piece & Blaze.Pieces.ColorMask) == 0 ? "white" : "black")}_{PieceName[piece & Blaze.Pieces.TypeMask]}.png");
+        string pieceFile = $"{((piece & Pieces.ColorMask) == 0 ? "white" : "black")}_{PieceName[piece & Pieces.TypeMask]}.png";
+        //Console.WriteLine($"{Convert.ToString(piece, toBase:2).PadLeft(4, '0')} -> {pieceFile}");
+        return new Bitmap(AbsolutePath + pieceFile);
     }
     
     private static readonly string AbsolutePath = "/home/opdragon25/Documents/CSharp/AvaloniaChessUI/BlazeUI/assets/pieces/";
@@ -116,40 +202,8 @@ public class GridBoard(Grid grid)
 
 static class PerspectiveConverter
 {
-    public static (int file, int rank) FromObjective((int x, int y) objective, Blaze.Side sideTo)
+    public static (int x, int y) Objective((int x, int y) objective, Side side)
     {
-        if (sideTo == Blaze.Side.White)
-        {
-            int file = 7 - objective.x;
-            int rank = objective.y;
-
-            return (file, rank);
-        }
-        else
-        {
-            int file = objective.x;
-            int rank = 7 - objective.y;
-
-            return (file, rank);
-        }
+        return side != Side.White ? (7 - objective.x, objective.y) : (objective.x, 7 - objective.y);
     }
-
-    public static (int x, int y) ToObjective((int file, int rank) relative, Blaze.Side sideFrom)
-    {
-        if (sideFrom == Blaze.Side.White)
-        {
-            int x = relative.file;
-            int y = 7 - relative.rank;
-
-            return (x, y);
-        }
-        else
-        {
-            int x = 7 - relative.file;
-            int y = relative.rank;
-
-            return (x, y);
-        }
-    }
-
 }
