@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Shapes;
 using Avalonia.Media;
+using BlazeUI.Blaze;
 
 namespace BlazeUI;
 
@@ -27,5 +28,6 @@ public partial class MainWindow : Window
 
         // place pieces
         GridBoard PieceBoard = new GridBoard(this.FindControl<Grid>("pieces")!);
+        PieceBoard.LoadBoard(new Board(Presets.StartingBoard), Side.Black);
     }
 }

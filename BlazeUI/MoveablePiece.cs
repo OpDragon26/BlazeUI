@@ -23,12 +23,16 @@ public class MoveablePiece : Image
 
         _position = new(_position.X - _relPosition.X + Bounds.Width / 2, _position.Y - _relPosition.Y + Bounds.Height / 2);
         _start = GetPositionOnGrid(_position);
+
+        ZIndex = 10;
         
         base.OnPointerPressed(e);
     }
 
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {
+        ZIndex = 0;
+        
         _pressed = false;
         SnapToGrid(e.GetPosition(this.GetVisualParent()));
 
@@ -68,6 +72,7 @@ public class MoveablePiece : Image
 
         if (!InvalidSquare(pos))
         {
+            //Console.WriteLine($"Moving from {_start} to {pos}");
             PieceGrid.MovePiece(_start, pos);
         }
     }
