@@ -1,0 +1,36 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Design.PreviewWith>
+        <Border Padding="20">
+            <!-- Add Controls for Previewer Here -->
+        </Border>
+    </Design.PreviewWith>
+    
+    <!-- Add Styles Here -->
+    <Style Selector="Grid.OverlayBackground">
+        <Setter Property="Background" Value="{DynamicResource OverlayCover}"></Setter>
+    </Style>
+    
+    <Style Selector="Border.OverlayPopup">
+        <Setter Property="CornerRadius" Value="10"></Setter>
+        <Setter Property="ClipToBounds" Value="True"></Setter>
+    </Style>
+    
+    <Style Selector="Border.PopupCardTop">
+        <Setter Property="BorderThickness" Value="0,0,0,2"></Setter>
+        <Setter Property="BorderBrush" Value="{DynamicResource SecondaryBorder}"></Setter>
+        <Setter Property="Background" Value="{DynamicResource SecondaryCardBackground}"></Setter>
+    </Style>
+    
+    <Style Selector="Border.PopupCardBody">
+        <Setter Property="Background" Value="{DynamicResource PrimaryCardBackground}"></Setter>
+    </Style>
+    
+    <Style Selector="TextBlock.PopupCardTitle">
+        <Setter Property="VerticalAlignment" Value="Center"></Setter>
+        <Setter Property="HorizontalAlignment" Value="Center"></Setter>
+        
+        <Setter Property="FontSize" Value="20"></Setter>
+        <Setter Property="FontWeight" Value="ExtraLight"></Setter>
+    </Style>
+</Styles>

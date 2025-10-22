@@ -15,15 +15,12 @@
                 <Grid RowDefinitions="50,*" Background="{DynamicResource PrimaryBackgroundGradient}">
                         <Border Grid.Row="0" BorderBrush="{DynamicResource SecondaryBorder}" BorderThickness="0,0,0,2">
                                 <!-- Top row -->
-                                <Grid ColumnDefinitions="*,Auto" x:Name="TopRow">
-                                        <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="75,0,0,0">
-                                                <Button Content="PLAY" Click="StartNewGame" Classes="HeaderButton"></Button>
-                                                <Button Content="SETTINGS" Classes="HeaderButton"></Button>
-                                                <Button Content="ANALYSIS" Classes="HeaderButton"></Button>
-                                                <Button Content="DEBUG TERMINAL" Classes="HeaderButton"></Button>
-                                        </StackPanel>
-                                        <TextBlock Grid.Column="1" Classes="UninitializedWarning" x:Name="UninitializedWarning" Text="WARNING! Engine is uninitialized"></TextBlock>
-                                </Grid>
+                                <StackPanel Orientation="Horizontal" Margin="75,0,0,0">
+                                        <Button Content="PLAY" Click="PlayButtonClick" Classes="HeaderButton"></Button>
+                                        <Button Content="SETTINGS" Classes="HeaderButton"></Button>
+                                        <Button Content="ANALYSIS" Classes="HeaderButton"></Button>
+                                        <Button Content="DEBUG TERMINAL" Classes="HeaderButton"></Button>
+                                </StackPanel>
                         </Border>
                 
                         <!-- Main body -->
@@ -60,7 +57,7 @@
                                                 
                                         </StackPanel>
                                         
-                                        <!-- Top row: friendly depth, material --> 
+                                        <!-- Bottom row: friendly depth, material --> 
                                         <StackPanel Grid.Row="2">
                                                 
                                         </StackPanel>
@@ -71,6 +68,20 @@
                                         <Border Background="{DynamicResource SecondaryBackground}" BorderBrush="{DynamicResource SecondaryBorder}" CornerRadius="20" BorderThickness="2">
                                     
                                         </Border> 
+                                </Border>
+                        </Grid>
+                </Grid>
+                <Grid ColumnDefinitions="*,600,*" RowDefinitions="*,250,*" Classes="OverlayBackground" ZIndex="-5" x:Name="OverlayGrid">
+                        <Grid Grid.Row="1" Grid.Column="1" x:Name="InitOverlay">
+                                <Border Classes="OverlayPopup" x:Name="InitializingPopup">
+                                        <Grid RowDefinitions="50,*">
+                                                <Border Grid.Row="0" Classes="PopupCardTop">
+                                                        <TextBlock Classes="PopupCardTitle">Initializing Engine</TextBlock>
+                                                </Border>
+                                                <Border Grid.Row="1" Classes="PopupCardBody">
+                                                        
+                                                </Border>
+                                        </Grid>
                                 </Border>
                         </Grid>
                 </Grid>

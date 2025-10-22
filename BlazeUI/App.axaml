@@ -4,21 +4,30 @@
              RequestedThemeVariant="Default">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
-    <Application.Styles>
-        <FluentTheme />
-        <StyleInclude Source="Styles/AppDefaultStyles.axaml"></StyleInclude>
-    </Application.Styles>
+        <Application.Styles>
+                <FluentTheme />
+                <StyleInclude Source="Styles/AppDefaultStyles.axaml"></StyleInclude>
+                <StyleInclude Source="Styles/OverlayDefaultStyles.axaml"></StyleInclude>
+        </Application.Styles>
              
-             <Application.Resources>
-                 <SolidColorBrush x:Key="SecondaryBackground">#1c1d1f</SolidColorBrush>
-                 <SolidColorBrush x:Key="SecondaryBorder">#404247</SolidColorBrush>
+                <Application.Resources>
+                        <!-- Main -->
+                        
+                        <SolidColorBrush x:Key="SecondaryBackground">#1c1d1f</SolidColorBrush>
+                        <SolidColorBrush x:Key="SecondaryBorder">#404247</SolidColorBrush>
                  
-                 <LinearGradientBrush x:Key="PrimaryBackgroundGradient" StartPoint="0%, 0%" EndPoint="0%, 25%">
-                     <GradientStop Offset="0" Color="#242628"></GradientStop>
-                     <GradientStop Offset="1" Color="#1c1d1f"></GradientStop>
-                 </LinearGradientBrush>
+                        <LinearGradientBrush x:Key="PrimaryBackgroundGradient" StartPoint="0%, 0%" EndPoint="0%, 25%">
+                                <GradientStop Offset="0" Color="#242628"></GradientStop>
+                                <GradientStop Offset="1" Color="#1c1d1f"></GradientStop>
+                        </LinearGradientBrush>
                  
-                 <SolidColorBrush x:Key="PrimaryText">#d6d6d6</SolidColorBrush>
-                 <SolidColorBrush x:Key="HoverBackground">#2e2d2d</SolidColorBrush>
-             </Application.Resources>
+                        <SolidColorBrush x:Key="PrimaryText">#d6d6d6</SolidColorBrush>
+                        <SolidColorBrush x:Key="HoverBackground">#2e2d2d</SolidColorBrush>
+                        
+                        <!-- Overlay -->
+                        
+                        <SolidColorBrush x:Key="PrimaryCardBackground">#1e1f21</SolidColorBrush>
+                        <SolidColorBrush x:Key="SecondaryCardBackground">#292b2e</SolidColorBrush>
+                        <SolidColorBrush x:Key="OverlayCover">#C0000000</SolidColorBrush>
+                </Application.Resources>
 </Application>

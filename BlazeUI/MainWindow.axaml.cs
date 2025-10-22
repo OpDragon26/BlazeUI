@@ -1,11 +1,9 @@
 using System;
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Shapes;
 using Avalonia.Interactivity;
 using Avalonia.Media;
-using Avalonia.Media.TextFormatting.Unicode;
 using Avalonia.Threading;
 using BlazeUI.Blaze;
 
@@ -14,12 +12,17 @@ namespace BlazeUI;
 public partial class MainWindow : Window
 {
     private readonly GridBoard? _pieceBoard;
+    private readonly OverlayHandler? _overlay;
     private DispatcherTimer? _timer;
     
     public MainWindow()
     {
         InitializeComponent();
 
+        // init overlay
+        _overlay = new OverlayHandler(OverlayGrid);
+        InitOverlays();
+        
         // init board
         var BoardBackground = this.FindControl<UniformGrid>("board");
         for (int file = 0; file < 8; file++)
@@ -30,19 +33,31 @@ public partial class MainWindow : Window
                     { [Shape.FillProperty] = (file + rank) % 2 == 0 ? Colors.LightSquare : Colors.DarkSquare });
             }
         }
-
+        
         // load match
-        _pieceBoard = new GridBoard(this.FindControl<Grid>("pieces")!, this.FindControl<Grid>("highlight")!);
-        //PieceBoard.SetMatch(new(new (Presets.StartingBoard), 6), Side.White);
+        _pieceBoard = new GridBoard(this.FindControl<Grid>("pieces")!, this.FindControl<Grid>("highlight")!, this);
         _pieceBoard.SetMatch(null, Side.White);
-        //PieceBoard.HighLight(new Board(Presets.StartingBoard).GetBitboard(0), Side.White);
+        StartNewGame();
+    }
+
+    private void InitOverlays()
+    {
+        _overlay!.AddOverlay(InitOverlay, "init");
+        _overlay!.Init();
+    }
+
+    private void PlayButtonClick(object sender, RoutedEventArgs e)
+    {
+        StartNewGame();
     }
     
-    private void StartNewGame(object sender, RoutedEventArgs e)
+    private void StartNewGame()
     {
-        UninitializedWarning.Foreground = Brushes.White;
-        UninitializedWarning.Text = "Initializing Blaze Engine...";
-        
+        if (Bitboards.init)
+            _pieceBoard!.SetMatch(new(new(Presets.StartingBoard), 6), Side.White);
+        if (Bitboards.begunInit)
+            return;
+        _overlay!.SetActive("init");
         _timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16) };
         Bitboards.StartInit();
         _timer.Tick += Poll;
@@ -54,7 +69,7 @@ public partial class MainWindow : Window
         if (Bitboards.Poll())
         {
             _timer!.Stop();
-            TopRow.Children.Remove(UninitializedWarning);
+            _overlay!.RemoveActive();
             _pieceBoard!.SetMatch(new(new(Presets.StartingBoard), 6), Side.White);
         }
     }

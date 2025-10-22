@@ -8,7 +8,7 @@ using BlazeUI.Blaze;
 
 namespace BlazeUI;
 
-public class GridBoard(Grid grid, Grid highlightGrid)
+public class GridBoard(Grid grid, Grid highlightGrid, MainWindow mainWindow)
 {
     public readonly Grid InnerGrid = grid;
     private readonly List<PieceItem> _pieces = new();
@@ -104,6 +104,9 @@ public class GridBoard(Grid grid, Grid highlightGrid)
     {
         _side = perspective;
         _match = match;
+        
+        LockAll(true);
+        LockPieces(_side, false);
         
         LoadBoard(match == null ? new(Presets.StartingBoard) : match.board, perspective);
     }

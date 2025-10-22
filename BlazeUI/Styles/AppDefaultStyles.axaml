@@ -27,11 +27,4 @@
             <Setter Property="Foreground" Value="{DynamicResource PrimaryText}"></Setter>
         </Style>
     </Style>
-    
-    <Style Selector="TextBlock.UninitializedWarning">
-        <Setter Property="Foreground" Value="red"></Setter>
-        <Setter Property="VerticalAlignment" Value="Center"></Setter>
-        <Setter Property="Margin" Value="0,0,10,0"></Setter>
-        <Setter Property="FontSize" Value="20"></Setter>
-    </Style>
 </Styles>

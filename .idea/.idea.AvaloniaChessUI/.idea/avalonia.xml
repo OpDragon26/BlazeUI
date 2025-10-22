@@ -9,6 +9,7 @@
         <entry key="BlazeUI/App.axaml" value="BlazeUI/BlazeUI.csproj" />
         <entry key="BlazeUI/MainWindow.axaml" value="BlazeUI/BlazeUI.csproj" />
         <entry key="BlazeUI/Styles/AppDefaultStyles.axaml" value="BlazeUI/BlazeUI.csproj" />
+        <entry key="BlazeUI/Styles/PopupStyles.axaml" value="BlazeUI/BlazeUI.csproj" />
       </map>
     </option>
   </component>

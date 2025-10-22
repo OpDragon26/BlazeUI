@@ -187,12 +187,14 @@ public static class Bitboards
     public const ulong KingSafetyAppliesWhite = 0xC7C7000000000000; 
     public const ulong KingSafetyAppliesBlack = 0xC7C7;
 
-    private static bool init;
+    public static bool begunInit;
+    public static bool init;
     private static bool inProgress;
 
     public static void Init()
     {
-        if (init) return;
+        if (begunInit) return;
+        begunInit = true;
         List<ulong> enPassantBitboards = new List<ulong>();
         List<ulong> blockMoveList = new();
         Timer t = new Timer();
