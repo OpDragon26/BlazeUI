@@ -27,4 +27,31 @@
             <Setter Property="Foreground" Value="{DynamicResource PrimaryText}"></Setter>
         </Style>
     </Style>
+    
+    <Style Selector="Border.PromotionSelector">
+        <Setter Property="Background" Value="{DynamicResource SecondaryBorder}"></Setter>
+        <Setter Property="CornerRadius" Value="5"></Setter>
+        <Setter Property="Padding" Value="2"></Setter>
+    </Style>
+    
+    <Style Selector="StackPanel.PromotionSelectorPanel">
+        <Setter Property="Spacing" Value="5"></Setter>
+    </Style>
+    
+    <Style Selector="Button.PromotionSelectorButton">
+        <Setter Property="Background" Value="{DynamicResource SecondaryCardBackground}"></Setter>
+        <Style Selector="^:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource PrimaryCardBackground}"></Setter>
+        </Style>
+        <Style Selector="^:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource PrimaryCardBackground}"></Setter>
+        </Style>
+    </Style>
+    
+    <Style Selector="TextBlock.PromotionSelector">
+        <Setter Property="HorizontalAlignment" Value="Center"></Setter>
+        
+        <Setter Property="FontSize" Value="12"></Setter>
+        <Setter Property="FontWeight" Value="ExtraLight"></Setter>
+    </Style>
 </Styles>

@@ -8,7 +8,7 @@ using BlazeUI.Blaze;
 
 namespace BlazeUI;
 
-public class GridBoard(Grid grid, Grid highlightGrid, MainWindow mainWindow)
+public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotionHandler)
 {
     public readonly Grid InnerGrid = grid;
     private readonly List<PieceItem> _pieces = new();
@@ -211,7 +211,7 @@ public class GridBoard(Grid grid, Grid highlightGrid, MainWindow mainWindow)
         public (int x, int y) pos = pos;
     }
 
-    private static Bitmap GetPieceBitmap(uint piece)
+    public static Bitmap GetPieceBitmap(uint piece)
     {
         string pieceFile = $"{((piece & Pieces.ColorMask) == 0 ? "white" : "black")}_{PieceName[piece & Pieces.TypeMask]}.png";
         //Console.WriteLine($"{Convert.ToString(piece, toBase:2).PadLeft(4, '0')} -> {pieceFile}");

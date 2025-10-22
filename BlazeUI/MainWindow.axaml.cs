@@ -11,6 +11,7 @@ namespace BlazeUI;
 
 public partial class MainWindow : Window
 {
+    private readonly PromotionHandler _promotionHandler;
     private readonly GridBoard? _pieceBoard;
     private readonly OverlayHandler? _overlay;
     private DispatcherTimer? _timer;
@@ -38,9 +39,12 @@ public partial class MainWindow : Window
         }
         
         // load match
-        _pieceBoard = new GridBoard(this.FindControl<Grid>("pieces")!, this.FindControl<Grid>("highlight")!, this);
+        _promotionHandler = new PromotionHandler(PromotionGrid);
+        _promotionHandler.InitImages(Side.White);
+        _promotionHandler.RequestPromotion(3);
+        _pieceBoard = new GridBoard(this.FindControl<Grid>("pieces")!, this.FindControl<Grid>("highlight")!, _promotionHandler);
         _pieceBoard.SetMatch(null, Side.White);
-        StartNewGame();
+        //StartNewGame();
     }
 
     private void InitOverlays()

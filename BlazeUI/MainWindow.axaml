@@ -39,14 +39,29 @@
                                                 </Border.Height>
                                                 
                                                 <Grid>
-                                                        <Canvas Background="Transparent">
-                                                
-                                                        </Canvas>
-                                                        
                                                         <UniformGrid Rows="8" Columns="8" x:Name="board"></UniformGrid>
                                                         
                                                         <Grid RowDefinitions="*,*,*,*,*,*,*,*" ColumnDefinitions="*,*,*,*,*,*,*,*" x:Name="highlight"></Grid>
                                                         <Grid RowDefinitions="*,*,*,*,*,*,*,*" ColumnDefinitions="*,*,*,*,*,*,*,*" x:Name="pieces"></Grid>
+                                                        <Grid ColumnDefinitions="*,*,*,*,*,*,*,*" x:Name="PromotionGrid" RowDefinitions="Auto">
+                                                                <Border Classes="PromotionSelector">
+                                                                        <StackPanel Classes="PromotionSelectorPanel">
+                                                                                <Button Classes="PromotionSelectorButton"><Image x:Name="QueenPromotion">
+                                                                                        <Image.RenderTransform><ScaleTransform ScaleX="1.2" ScaleY="1.2"></ScaleTransform></Image.RenderTransform>
+                                                                                </Image></Button>
+                                                                                <Button Classes="PromotionSelectorButton"><Image x:Name="RookPromotion">
+                                                                                        <Image.RenderTransform><ScaleTransform ScaleX="1.2" ScaleY="1.2"></ScaleTransform></Image.RenderTransform>
+                                                                                </Image></Button>
+                                                                                <Button Classes="PromotionSelectorButton"><Image x:Name="KnightPromotion">
+                                                                                        <Image.RenderTransform><ScaleTransform ScaleX="1.2" ScaleY="1.2"></ScaleTransform></Image.RenderTransform>
+                                                                                </Image></Button>
+                                                                                <Button Classes="PromotionSelectorButton"><Image x:Name="BishopPromotion">
+                                                                                        <Image.RenderTransform><ScaleTransform ScaleX="1.2" ScaleY="1.2"></ScaleTransform></Image.RenderTransform>
+                                                                                </Image></Button>
+                                                                                <TextBlock Classes="PromotionSelector">ESC</TextBlock>
+                                                                        </StackPanel>
+                                                                </Border>
+                                                        </Grid>
                                                 </Grid>
                                                 
                                         </Border>
