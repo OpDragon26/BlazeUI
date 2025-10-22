@@ -201,7 +201,7 @@ public static class Bitboards
         Timer t = new Timer();
         t.Start();
         
-        Console.WriteLine("Initializing magic bitboards. This should take approximately 20 seconds");
+        Console.WriteLine("Initializing magic bitboards");
         
         // Create the masks for every square on the board
         progress = new(0, "Generating masks...");
@@ -385,44 +385,45 @@ public static class Bitboards
         {
             MagicLookupArrays.EnPassantLookupArray[(mask * MagicLookupArrays.EnPassantNumbers.magicNumber) >> MagicLookupArrays.EnPassantNumbers.push] = BitboardUtils.GetEnPassantMoves(mask);
         }
-
-        progress = new(15, "Generating pawn evaluations...");
+        
         // pawn eval combinations
-        List<ulong> rightPawns = BitboardUtils.Combinations(RightPawns, 8);
-        List<ulong> leftPawns = BitboardUtils.Combinations(LeftPawns, 8);
-        List<ulong> centerPawns = BitboardUtils.Combinations(CenterPawns, 8);
+        ulong[] rightPawns = BitboardUtils.Combinations(RightPawns, 8).Distinct().ToArray();
+        ulong[] leftPawns = BitboardUtils.Combinations(LeftPawns, 8).Distinct().ToArray();
+        ulong[] centerPawns = BitboardUtils.Combinations(CenterPawns, 8).Distinct().ToArray();
         
         MagicLookupArrays.RightPawnEvalNumber = (17067507152026048335, 37, 134217725); // MagicNumbers.GenerateMagicNumberParallel(rightPawns.Distinct().ToArray(),37 ,7, false);
         MagicLookupArrays.LeftPawnEvalNumber = (615594976254142229, 37, 134217609); // MagicNumbers.GenerateMagicNumberParallel(leftPawns.Distinct().ToArray(), 37, 7, false);
         MagicLookupArrays.CenterPawnEvalNumber = (15570990422680516493, 37, 134217566); // MagicNumbers.GenerateMagicNumberParallel(centerPawns.Distinct().ToArray(), 37, 7, false);
-        
+
         MagicLookupArrays.RightPawnEvalLookup = new Evaluation.PawnEvaluation[MagicLookupArrays.RightPawnEvalNumber.highest+ 1];
         MagicLookupArrays.LeftPawnEvalLookup = new Evaluation.PawnEvaluation[MagicLookupArrays.LeftPawnEvalNumber.highest + 1];
         MagicLookupArrays.CenterPawnEvalLookup = new Evaluation.PawnEvaluation[MagicLookupArrays.CenterPawnEvalNumber.highest + 1];
-
-        Parallel.For(0, 3, e =>
+        
+        progress = new(15, "Generating pawn evaluations 1/3");
+        (Evaluation.PawnEvaluation eval, ulong origin)[] RightPawnEvals = Batch.Select(rightPawns, p =>
+            (Evaluation.GeneratePawnEval(p, Evaluation.Section.Right), p), 8, 100);
+        foreach (var eval in RightPawnEvals)
         {
-            switch (e)
-            {
-                case 0:
-                    foreach (ulong combination in rightPawns)
-                        MagicLookupArrays.RightPawnEvalLookup[(combination * MagicLookupArrays.RightPawnEvalNumber.magicNumber) >> MagicLookupArrays.RightPawnEvalNumber.push] = 
-                            Evaluation.GeneratePawnEval(combination, Evaluation.Section.Right);
-                    break;
-                case 1:
-                    foreach (ulong combination in leftPawns)
-                        MagicLookupArrays.LeftPawnEvalLookup[(combination * MagicLookupArrays.LeftPawnEvalNumber.magicNumber) >> MagicLookupArrays.LeftPawnEvalNumber.push] = 
-                            Evaluation.GeneratePawnEval(combination, Evaluation.Section.Left);
-                    break;
-                case 2:
-                    foreach (ulong combination in centerPawns)
-                        MagicLookupArrays.CenterPawnEvalLookup[(combination * MagicLookupArrays.CenterPawnEvalNumber.magicNumber) >> MagicLookupArrays.CenterPawnEvalNumber.push] = 
-                            Evaluation.GeneratePawnEval(combination, Evaluation.Section.Center);
-                    break;
-            }
-        });
-
-        progress = new(70, "Generating piece evaluations...");
+            MagicLookupArrays.RightPawnEvalLookup[(eval.origin * MagicLookupArrays.RightPawnEvalNumber.magicNumber) >> MagicLookupArrays.RightPawnEvalNumber.push] = eval.eval;
+        }
+        
+        progress = new(35, "Generating pawn evaluations 2/3");
+        (Evaluation.PawnEvaluation eval, ulong origin)[] LeftPawnEvals = Batch.Select(leftPawns, p =>
+            (Evaluation.GeneratePawnEval(p, Evaluation.Section.Left), p), 8, 100);
+        foreach (var eval in LeftPawnEvals)
+        {
+            MagicLookupArrays.LeftPawnEvalLookup[(eval.origin * MagicLookupArrays.LeftPawnEvalNumber.magicNumber) >> MagicLookupArrays.LeftPawnEvalNumber.push] = eval.eval;
+        }
+        
+        progress = new(55, "Generating pawn evaluations 3/3");
+        (Evaluation.PawnEvaluation eval, ulong origin)[] CenterPawnEvals = Batch.Select(centerPawns, p =>
+            (Evaluation.GeneratePawnEval(p, Evaluation.Section.Center), p), 8, 100);
+        foreach (var eval in CenterPawnEvals)
+        {
+            MagicLookupArrays.CenterPawnEvalLookup[(eval.origin * MagicLookupArrays.CenterPawnEvalNumber.magicNumber) >> MagicLookupArrays.CenterPawnEvalNumber.push] = eval.eval;
+        }
+        
+        progress = new(75, "Generating piece evaluations...");
         
         List<ulong> firstSlice = BitboardUtils.Combinations(FirstSlice, 9);
         List<ulong> secondSlice = BitboardUtils.Combinations(SecondSlice, 9);
@@ -494,7 +495,7 @@ public static class Bitboards
             }
         });
 
-        progress = new(80, "Initializing magic lookup...");
+        progress = new(85, "Initializing magic lookup...");
         
         // attack line lookup
         ulong[] attackLines = BitboardUtils.GetValidCombinations(64, 2).ToArray();
