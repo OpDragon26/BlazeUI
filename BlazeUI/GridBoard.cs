@@ -22,6 +22,8 @@ public class GridBoard(Grid grid, Grid highlightGrid)
         if (_match == null)
             return;
         
+        LockAll(true);
+        
         _timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16) };
         _match.WaitStartSearch();
         _timer.Tick += Poll;
@@ -34,6 +36,8 @@ public class GridBoard(Grid grid, Grid highlightGrid)
         {
             _timer!.Stop();
             LoadBoard(node.board, _side);
+            LockAll(false);
+            LockPieces((Side)(1 - (int)_side), true);
         }
     }
     
@@ -83,13 +87,15 @@ public class GridBoard(Grid grid, Grid highlightGrid)
         {
             for (int rank = 0; rank < 8; rank++)
             {
-                if (board.GetPiece(file, rank) == Pieces.Empty)
-                    continue;
+                uint piece = board.GetPiece(file, rank);
                 
+                if (piece == Pieces.Empty)
+                    continue;
                 (int x, int y) objectivePos = PerspectiveConverter.Objective((file, rank), perspective);
-
-                MoveablePiece piece = new MoveablePiece { PieceGrid = this , Source = GetPieceBitmap(board.GetPiece(file, rank))};
-                AddPiece(piece, objectivePos);
+                Side side = (piece & Pieces.ColorMask) == 0 ? Side.White : Side.Black;
+                
+                MoveablePiece pieceObject = new MoveablePiece { PieceGrid = this , Source = GetPieceBitmap(board.GetPiece(file, rank)) , Side = side };
+                AddPiece(pieceObject, objectivePos);
             }
         }
     }
@@ -155,6 +161,27 @@ public class GridBoard(Grid grid, Grid highlightGrid)
                     HighlightSingle(subjective);
                 }
             }
+        }
+    }
+
+    private void LockPieces(Side side, bool locked)
+    {
+        foreach (PieceItem piece in _pieces)
+        {
+            if (piece.piece.Side == side)
+            {
+                if (locked) piece.piece.Lock();
+                else piece.piece.Unlock();
+            }
+        }
+    }
+
+    private void LockAll(bool locked)
+    {
+        foreach (PieceItem piece in _pieces)
+        {
+            if (locked) piece.piece.Lock();
+            else piece.piece.Unlock();
         }
     }
 

@@ -14,9 +14,14 @@ public class MoveablePiece : Image
     private Point _position;
     private TranslateTransform? _translate;
     private (int X, int Y) _start;
+    private bool _locked;
+    public Blaze.Side Side;
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
+        if (_locked || !e.Properties.IsLeftButtonPressed)
+            return;
+        
         _pressed = true;
         _position = e.GetPosition(this.GetVisualParent());
         Point _relPosition = e.GetPosition(this);
@@ -53,6 +58,16 @@ public class MoveablePiece : Image
         }
 
         base.OnPointerMoved(e);
+    }
+
+    public void Lock()
+    {
+        _locked = true;
+    }
+
+    public void Unlock()
+    {
+        _locked = false;
     }
 
     private (int X, int Y) GetPositionOnGrid(Point position)
