@@ -62,7 +62,7 @@ public class GridBoard(Grid grid, Grid highlightGrid, MainWindow mainWindow)
         if (_match.board.side != (int)_side)
             return;
 
-        Move move = new Move(Move.GetSquare(PerspectiveConverter.Objective(from, _side)) + Move.GetSquare(PerspectiveConverter.Objective(to, _side)), _match.board);
+        Move move = new Move(Move.GetSquare(PerspectiveConverter.Invert(from, _side)) + Move.GetSquare(PerspectiveConverter.Invert(to, _side)), _match.board);
         //Console.WriteLine(move.GetUCI());
         if (!_match.TryMake(move))
             return;
@@ -91,7 +91,7 @@ public class GridBoard(Grid grid, Grid highlightGrid, MainWindow mainWindow)
                 
                 if (piece == Pieces.Empty)
                     continue;
-                (int x, int y) objectivePos = PerspectiveConverter.Objective((file, rank), perspective);
+                (int x, int y) objectivePos = PerspectiveConverter.Invert((file, rank), perspective);
                 Side side = (piece & Pieces.ColorMask) == 0 ? Side.White : Side.Black;
                 
                 MoveablePiece pieceObject = new MoveablePiece { PieceGrid = this , Source = GetPieceBitmap(board.GetPiece(file, rank)) , Side = side };
@@ -156,7 +156,7 @@ public class GridBoard(Grid grid, Grid highlightGrid, MainWindow mainWindow)
             {
                 // objective coordinates on the bitboard
                 (int x, int y) pos = (x, y);
-                (int file, int rank) subjective = PerspectiveConverter.Objective(pos, perspective);
+                (int file, int rank) subjective = PerspectiveConverter.Invert(pos, perspective);
 
                 if ((bitboard & BitboardUtils.GetSquare(pos)) != 0)
                 {
@@ -232,7 +232,7 @@ public class GridBoard(Grid grid, Grid highlightGrid, MainWindow mainWindow)
 
 static class PerspectiveConverter
 {
-    public static (int x, int y) Objective((int x, int y) objective, Side side)
+    public static (int x, int y) Invert((int x, int y) objective, Side side)
     {
         return side != Side.White ? (7 - objective.x, objective.y) : (objective.x, 7 - objective.y);
     }

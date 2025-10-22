@@ -79,7 +79,12 @@
                                                         <TextBlock Classes="PopupCardTitle">Initializing Engine</TextBlock>
                                                 </Border>
                                                 <Border Grid.Row="1" Classes="PopupCardBody">
-                                                        
+                                                        <StackPanel Classes="InitializeProgressBarContainer">
+                                                                <TextBlock Classes="InitializeProgressBarStatus" x:Name="InitStatus">Status</TextBlock>
+                                                                <local:ProgressBar x:Name="InitProgress" Classes="InitializeProgressBar" Width="500" Height="10">
+                                                                        <Border x:Name="InitProgressBar" Classes="InitializeProgressBarFilled"></Border>
+                                                                </local:ProgressBar>
+                                                        </StackPanel>
                                                 </Border>
                                         </Grid>
                                 </Border>

@@ -23,6 +23,9 @@ public partial class MainWindow : Window
         _overlay = new OverlayHandler(OverlayGrid);
         InitOverlays();
         
+        InitProgress.Init(InitProgressBar);
+        InitProgress.SetCompletion(0);
+        
         // init board
         var BoardBackground = this.FindControl<UniformGrid>("board");
         for (int file = 0; file < 8; file++)
@@ -66,6 +69,9 @@ public partial class MainWindow : Window
 
     private void Poll(object? sender, EventArgs e)
     {
+        InitProgress.SetCompletion(Bitboards.progress.percentage);
+        InitStatus.Text = Bitboards.progress.message;
+        
         if (Bitboards.Poll())
         {
             _timer!.Stop();

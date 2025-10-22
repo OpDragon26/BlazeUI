@@ -29,5 +29,8 @@
                         <SolidColorBrush x:Key="PrimaryCardBackground">#1e1f21</SolidColorBrush>
                         <SolidColorBrush x:Key="SecondaryCardBackground">#292b2e</SolidColorBrush>
                         <SolidColorBrush x:Key="OverlayCover">#C0000000</SolidColorBrush>
+                        
+                        <SolidColorBrush x:Key="PrimaryProgressBarBackground">#121314</SolidColorBrush>
+                        <SolidColorBrush x:Key="PrimaryProgressBarColor">#29689E</SolidColorBrush>
                 </Application.Resources>
 </Application>

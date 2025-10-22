@@ -190,6 +190,7 @@ public static class Bitboards
     public static bool begunInit;
     public static bool init;
     private static bool inProgress;
+    public static CompletionPoint progress;
 
     public static void Init()
     {
@@ -203,6 +204,7 @@ public static class Bitboards
         Console.WriteLine("Initializing magic bitboards. This should take approximately 20 seconds");
         
         // Create the masks for every square on the board
+        progress = new(0, "Generating masks...");
         for (int rank = 0; rank < 8; rank++)
         {
             for (int file = 7; file >= 0; file--)
@@ -373,6 +375,7 @@ public static class Bitboards
             }
         }
 
+        progress = new(10, "Generating block moves");
         BlockMoves = blockMoveList.Distinct().ToArray();
         MagicLookupArrays.BlockMoveNumber = (4154364917966041783, 46, 262133); //MagicNumbers.GenerateRepeat(BlockMoves, 1, 46);
         EnPassantMasks = enPassantBitboards.ToArray();
@@ -382,7 +385,8 @@ public static class Bitboards
         {
             MagicLookupArrays.EnPassantLookupArray[(mask * MagicLookupArrays.EnPassantNumbers.magicNumber) >> MagicLookupArrays.EnPassantNumbers.push] = BitboardUtils.GetEnPassantMoves(mask);
         }
-        
+
+        progress = new(15, "Generating pawn evaluations...");
         // pawn eval combinations
         List<ulong> rightPawns = BitboardUtils.Combinations(RightPawns, 8);
         List<ulong> leftPawns = BitboardUtils.Combinations(LeftPawns, 8);
@@ -417,6 +421,8 @@ public static class Bitboards
                     break;
             }
         });
+
+        progress = new(70, "Generating piece evaluations...");
         
         List<ulong> firstSlice = BitboardUtils.Combinations(FirstSlice, 9);
         List<ulong> secondSlice = BitboardUtils.Combinations(SecondSlice, 9);
@@ -487,6 +493,8 @@ public static class Bitboards
                     break;
             }
         });
+
+        progress = new(80, "Initializing magic lookup...");
         
         // attack line lookup
         ulong[] attackLines = BitboardUtils.GetValidCombinations(64, 2).ToArray();
@@ -699,6 +707,8 @@ public static class Bitboards
                 }
             }
         }
+
+        progress = new(95, "Generating paths...");
         
         // init pathfinder
         for (int startRank = 0; startRank < 8; startRank++)
@@ -769,7 +779,9 @@ public static class Bitboards
             PathLookup[startFile, startRank, endFile, endRank] = path;
         }
 
+        progress = new(100, "Finished");
         Console.WriteLine($"Bitboards initialized in {t.Stop()}ms");
+        Thread.Sleep(20);
         init = true;
     }
 
@@ -786,16 +798,14 @@ public static class Bitboards
         t.Start();
     }
 
-    private static void WaitForFinish()
-    {
-        while (inProgress)
-        {
-            Thread.Sleep(10);
-        }
-    }
-
     public static bool Poll()
     {
         return init;
+    }
+    
+    public readonly struct CompletionPoint(int percentage, string message)
+    {
+        public readonly int percentage = percentage;
+        public readonly string message = message;
     }
 }
