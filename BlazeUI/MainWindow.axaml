@@ -11,62 +11,68 @@
                 <local:MinSizeConverter x:Key="MinSizeConverter"/>
         </Window.Resources>
         
-        <Grid RowDefinitions="50,*" Background="{DynamicResource PrimaryBackgroundGradient}"><!-- Top row -->
-                <Border Grid.Row="0" BorderBrush="{DynamicResource SecondaryBorder}" BorderThickness="0,0,0,2">
-                        <StackPanel Orientation="Horizontal" Margin="75,0,0,0">
-                                <Button Content="PLAY" Click="StartNewGame" Classes="HeaderButton"></Button>
-                                <Button Content="SETTINGS" Classes="HeaderButton"></Button>
-                                <Button Content="ANALYSIS" Classes="HeaderButton"></Button>
-                                <Button Content="DEBUG TERMINAL" Classes="HeaderButton"></Button>
-                        </StackPanel>
-                </Border>
-        
-                <!-- Main body -->
-                <Grid Grid.Row="1" ColumnDefinitions="*,2*,*">
-                        <Grid Grid.Column="1" RowDefinitions="*,Auto,*">
-                                <!-- Board -->
-                                <Border Grid.Row="1" CornerRadius="10" Background="Beige" ClipToBounds="True">
-                                        <Border.Width>
-                                                <MultiBinding Converter="{StaticResource MinSizeConverter}">
-                                                        <Binding Path="Bounds.Width" RelativeSource="{RelativeSource AncestorType=Grid}" />
-                                                        <Binding Path="Bounds.Height" RelativeSource="{RelativeSource AncestorType=Grid}" />
-                                                </MultiBinding>
-                                        </Border.Width>
-                                        <Border.Height>
-                                                <Binding Path="Width" RelativeSource="{RelativeSource Self}" />
-                                        </Border.Height>
-                                        
-                                        <Grid>
-                                                <Canvas Background="Transparent">
-                                        
-                                                </Canvas>
-                                                
-                                                <UniformGrid Rows="8" Columns="8" x:Name="board"></UniformGrid>
-                                                
-                                                <Grid RowDefinitions="*,*,*,*,*,*,*,*" ColumnDefinitions="*,*,*,*,*,*,*,*" x:Name="highlight"></Grid>
-                                                <Grid RowDefinitions="*,*,*,*,*,*,*,*" ColumnDefinitions="*,*,*,*,*,*,*,*" x:Name="pieces"></Grid>
-                                        </Grid>
-                                        
-                                </Border>
-                                
-                                
-                                <!-- Top row: enemy name, depth, material --> 
-                                <StackPanel Grid.Row="0">
-                                        
-                                </StackPanel>
-                                
-                                <!-- Top row: friendly depth, material --> 
-                                <StackPanel Grid.Row="2">
-                                        
-                                </StackPanel>
-                        </Grid>
-                        
-                        <!-- Right sidebar: PGN -->
-                        <Border Grid.Column="2" Padding="20">
-                                <Border Background="{DynamicResource SecondaryBackground}" BorderBrush="{DynamicResource SecondaryBorder}" CornerRadius="20" BorderThickness="2">
-                            
-                                </Border> 
+        <Grid>
+                <Grid RowDefinitions="50,*" Background="{DynamicResource PrimaryBackgroundGradient}">
+                        <Border Grid.Row="0" BorderBrush="{DynamicResource SecondaryBorder}" BorderThickness="0,0,0,2">
+                                <!-- Top row -->
+                                <Grid ColumnDefinitions="*,Auto" x:Name="TopRow">
+                                        <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="75,0,0,0">
+                                                <Button Content="PLAY" Click="StartNewGame" Classes="HeaderButton"></Button>
+                                                <Button Content="SETTINGS" Classes="HeaderButton"></Button>
+                                                <Button Content="ANALYSIS" Classes="HeaderButton"></Button>
+                                                <Button Content="DEBUG TERMINAL" Classes="HeaderButton"></Button>
+                                        </StackPanel>
+                                        <TextBlock Grid.Column="1" Classes="UninitializedWarning" x:Name="UninitializedWarning" Text="WARNING! Engine is uninitialized"></TextBlock>
+                                </Grid>
                         </Border>
+                
+                        <!-- Main body -->
+                        <Grid Grid.Row="1" ColumnDefinitions="*,2*,*">
+                                <Grid Grid.Column="1" RowDefinitions="*,Auto,*">
+                                        <!-- Board -->
+                                        <Border Grid.Row="1" CornerRadius="10" Background="Beige" ClipToBounds="True">
+                                                <Border.Width>
+                                                        <MultiBinding Converter="{StaticResource MinSizeConverter}">
+                                                                <Binding Path="Bounds.Width" RelativeSource="{RelativeSource AncestorType=Grid}" />
+                                                                <Binding Path="Bounds.Height" RelativeSource="{RelativeSource AncestorType=Grid}" />
+                                                        </MultiBinding>
+                                                </Border.Width>
+                                                <Border.Height>
+                                                        <Binding Path="Width" RelativeSource="{RelativeSource Self}" />
+                                                </Border.Height>
+                                                
+                                                <Grid>
+                                                        <Canvas Background="Transparent">
+                                                
+                                                        </Canvas>
+                                                        
+                                                        <UniformGrid Rows="8" Columns="8" x:Name="board"></UniformGrid>
+                                                        
+                                                        <Grid RowDefinitions="*,*,*,*,*,*,*,*" ColumnDefinitions="*,*,*,*,*,*,*,*" x:Name="highlight"></Grid>
+                                                        <Grid RowDefinitions="*,*,*,*,*,*,*,*" ColumnDefinitions="*,*,*,*,*,*,*,*" x:Name="pieces"></Grid>
+                                                </Grid>
+                                                
+                                        </Border>
+                                        
+                                        
+                                        <!-- Top row: enemy name, depth, material --> 
+                                        <StackPanel Grid.Row="0">
+                                                
+                                        </StackPanel>
+                                        
+                                        <!-- Top row: friendly depth, material --> 
+                                        <StackPanel Grid.Row="2">
+                                                
+                                        </StackPanel>
+                                </Grid>
+                                
+                                <!-- Right sidebar: PGN -->
+                                <Border Grid.Column="2" Padding="20">
+                                        <Border Background="{DynamicResource SecondaryBackground}" BorderBrush="{DynamicResource SecondaryBorder}" CornerRadius="20" BorderThickness="2">
+                                    
+                                        </Border> 
+                                </Border>
+                        </Grid>
                 </Grid>
         </Grid>
 </Window>

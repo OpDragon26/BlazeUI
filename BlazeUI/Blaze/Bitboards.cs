@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BlazeUI.Blaze;
@@ -187,11 +188,11 @@ public static class Bitboards
     public const ulong KingSafetyAppliesBlack = 0xC7C7;
 
     private static bool init;
+    private static bool inProgress;
 
     public static void Init()
     {
         if (init) return;
-        init = true;
         List<ulong> enPassantBitboards = new List<ulong>();
         List<ulong> blockMoveList = new();
         Timer t = new Timer();
@@ -767,5 +768,32 @@ public static class Bitboards
         }
 
         Console.WriteLine($"Bitboards initialized in {t.Stop()}ms");
+        init = true;
+    }
+
+    public static void StartInit()
+    {
+        if (inProgress)
+            return;
+        Thread t = new Thread(() =>
+        {
+            inProgress = true;
+            Init();
+            inProgress = false;
+        });
+        t.Start();
+    }
+
+    private static void WaitForFinish()
+    {
+        while (inProgress)
+        {
+            Thread.Sleep(10);
+        }
+    }
+
+    public static bool Poll()
+    {
+        return init;
     }
 }
