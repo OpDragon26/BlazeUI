@@ -17,6 +17,51 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
     
     private DispatcherTimer? _timer;
 
+    private ((int file, int rank) from, (int file, int rank) to) _promotionSquare;
+    private uint _promotedPiece;
+    
+    public void MovePiece((int x, int y) from, (int x, int y) to)
+    {
+        int index = FindIndexOfPiece(from);
+        if (index == -1)
+            return;
+
+        if (_match == null)
+        {
+            PieceItem piece = _pieces[index];
+        
+            RemovePiece(to, other => other.pos != from);
+        
+            Grid.SetColumn(piece.piece, to.x);
+            Grid.SetRow(piece.piece, to.y);
+            piece.pos = to;
+            return;
+        }
+        
+        if (_match.board.side != (int)_side)
+            return;
+
+        (int x, int y) invertedFrom = PerspectiveConverter.Invert(from, _side);
+        (int x, int y) invertedTo = PerspectiveConverter.Invert(to, _side);
+        
+        // white attempted promotion
+        if ((_match.board.GetPiece(invertedFrom) == Pieces.WhitePawn && invertedTo.y == 7) ||
+            (_match.board.GetPiece(invertedFrom) == Pieces.BlackPawn && invertedTo.y == 0))
+        {
+            _promotionSquare = (invertedFrom, invertedTo);
+            RequestPromotion();
+            return;
+        }
+        
+        Move move = new Move(Move.GetSquare(invertedFrom) + Move.GetSquare(invertedTo), _match.board);
+        //Console.WriteLine(move.GetUCI());
+        if (_match.TryMake(move))
+        {
+            LoadBoard(_match.board, _side);
+            StartPolling();
+        }
+    }
+    
     private void StartPolling()
     {
         if (_match == null)
@@ -40,35 +85,30 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
             LockPieces((Side)(1 - (int)_side), true);
         }
     }
-    
-    public void MovePiece((int x, int y) from, (int x, int y) to)
+
+    private void RequestPromotion()
     {
-        int index = FindIndexOfPiece(from);
-        if (index == -1)
-            return;
+        promotionHandler.RequestPromotion(_promotionSquare.to.file);
+        
+        _timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16) };
+        _timer.Tick += PollPromotion;
+        _timer.Start();
+    }
 
-        if (_match == null)
+    private void PollPromotion(object? sender, EventArgs e)
+    {
+        if (promotionHandler._selected != 0b111)
         {
-            PieceItem piece = _pieces[index];
-        
-            RemovePiece(to, other => other.pos != from);
-        
-            Grid.SetColumn(piece.piece, to.x);
-            Grid.SetRow(piece.piece, to.y);
-            piece.pos = to;
-            return;
+            _timer!.Stop();
+            _promotedPiece = promotionHandler._selected;
+            promotionHandler.SendBack();
+            Move move = new Move(Move.GetSquare(_promotionSquare.from) + Move.GetSquare(_promotionSquare.to) + Move.PromotionStr[_promotedPiece], _match!.board);
+            if (_match.TryMake(move))
+            {
+                LoadBoard(_match.board, _side);
+                StartPolling();
+            }
         }
-        
-        if (_match.board.side != (int)_side)
-            return;
-
-        Move move = new Move(Move.GetSquare(PerspectiveConverter.Invert(from, _side)) + Move.GetSquare(PerspectiveConverter.Invert(to, _side)), _match.board);
-        //Console.WriteLine(move.GetUCI());
-        if (!_match.TryMake(move))
-            return;
-        LoadBoard(_match.board, _side);
-        StartPolling();
-
     }
 
     private void AddPiece(MoveablePiece piece, (int x, int y) at)

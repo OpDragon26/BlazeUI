@@ -6,11 +6,12 @@ namespace BlazeUI;
 public class PromotionHandler(Grid displayGrid)
 {
     private readonly Border _border = (displayGrid.Children[0] as Border)!;
-    private readonly StackPanel _panel = GetPanel(displayGrid);
     private readonly Image _queenPromotion = GetPanel(displayGrid).FindControl<Image>("QueenPromotion")!;
     private readonly Image _rookPromotion = GetPanel(displayGrid).FindControl<Image>("RookPromotion")!;
     private readonly Image _knightPromotion = GetPanel(displayGrid).FindControl<Image>("KnightPromotion")!;
     private readonly Image _bishopPromotion = GetPanel(displayGrid).FindControl<Image>("BishopPromotion")!;
+
+    public uint _selected = 0b111;
     
     public void RequestPromotion(int file)
     {
@@ -18,10 +19,10 @@ public class PromotionHandler(Grid displayGrid)
         displayGrid.ZIndex = 5;
     }
 
-    public uint GetSelectedPiece()
+    public void SendBack()
     {
         displayGrid.ZIndex = -5;
-        return 0b000;
+        _selected = 0b111;
     }
 
     public void InitImages(Blaze.Side side)

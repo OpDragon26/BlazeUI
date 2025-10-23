@@ -145,7 +145,7 @@ public class Move
     }
 
     private static readonly char[] Files = ['a','b','c','d','e','f','g','h'];
-    private static readonly string[] PromotionStr = ["?", "r", "n", "b", "q","?","?",String.Empty];
+    public static readonly string[] PromotionStr = ["?", "r", "n", "b", "q","?","?",String.Empty];
     private static readonly char[] AlgPieces = ['?','R','N','B','Q','K'];
     
     public string GetUCI()

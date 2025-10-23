@@ -41,10 +41,11 @@ public partial class MainWindow : Window
         // load match
         _promotionHandler = new PromotionHandler(PromotionGrid);
         _promotionHandler.InitImages(Side.White);
-        _promotionHandler.RequestPromotion(3);
+        //_promotionHandler.RequestPromotion(3);
         _pieceBoard = new GridBoard(this.FindControl<Grid>("pieces")!, this.FindControl<Grid>("highlight")!, _promotionHandler);
         _pieceBoard.SetMatch(null, Side.White);
-        //StartNewGame();
+        StartNewGame();
+        
     }
 
     private void InitOverlays()
@@ -80,8 +81,21 @@ public partial class MainWindow : Window
         {
             _timer!.Stop();
             _overlay!.RemoveActive();
-            _pieceBoard!.SetMatch(new(new(Presets.StartingBoard), 6), Side.White);
+            _pieceBoard!.SetMatch(new(new(Presets.StartingBoard), 3, dynamicDepth: false), Side.White);
         }
+    }
+
+    private void PromotionSelected(object? sender, RoutedEventArgs e)
+    {
+        string name = (sender as Button)!.Name!;
+        _promotionHandler._selected = name switch
+        {
+            "QueenPromotionButton" => 0b100,
+            "RookPromotionButton" => 0b001,
+            "KnightPromotionButton" => 0b010,
+            "BishopPromotionButton" => 0b011,
+            _ => throw new ArgumentOutOfRangeException()
+        };
     }
 }
 

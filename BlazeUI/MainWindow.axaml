@@ -43,19 +43,19 @@
                                                         
                                                         <Grid RowDefinitions="*,*,*,*,*,*,*,*" ColumnDefinitions="*,*,*,*,*,*,*,*" x:Name="highlight"></Grid>
                                                         <Grid RowDefinitions="*,*,*,*,*,*,*,*" ColumnDefinitions="*,*,*,*,*,*,*,*" x:Name="pieces"></Grid>
-                                                        <Grid ColumnDefinitions="*,*,*,*,*,*,*,*" x:Name="PromotionGrid" RowDefinitions="Auto">
+                                                        <Grid ColumnDefinitions="*,*,*,*,*,*,*,*" x:Name="PromotionGrid" RowDefinitions="Auto" ZIndex="-5">
                                                                 <Border Classes="PromotionSelector">
                                                                         <StackPanel Classes="PromotionSelectorPanel">
-                                                                                <Button Classes="PromotionSelectorButton"><Image x:Name="QueenPromotion">
+                                                                                <Button Click="PromotionSelected" x:Name="QueenPromotionButton" Classes="PromotionSelectorButton"><Image x:Name="QueenPromotion">
                                                                                         <Image.RenderTransform><ScaleTransform ScaleX="1.2" ScaleY="1.2"></ScaleTransform></Image.RenderTransform>
                                                                                 </Image></Button>
-                                                                                <Button Classes="PromotionSelectorButton"><Image x:Name="RookPromotion">
+                                                                                <Button Click="PromotionSelected" x:Name="RookPromotionButton" Classes="PromotionSelectorButton"><Image x:Name="RookPromotion">
                                                                                         <Image.RenderTransform><ScaleTransform ScaleX="1.2" ScaleY="1.2"></ScaleTransform></Image.RenderTransform>
                                                                                 </Image></Button>
-                                                                                <Button Classes="PromotionSelectorButton"><Image x:Name="KnightPromotion">
+                                                                                <Button Click="PromotionSelected" x:Name="KnightPromotionButton" Classes="PromotionSelectorButton"><Image x:Name="KnightPromotion">
                                                                                         <Image.RenderTransform><ScaleTransform ScaleX="1.2" ScaleY="1.2"></ScaleTransform></Image.RenderTransform>
                                                                                 </Image></Button>
-                                                                                <Button Classes="PromotionSelectorButton"><Image x:Name="BishopPromotion">
+                                                                                <Button Click="PromotionSelected" x:Name="BishopPromotionButton" Classes="PromotionSelectorButton"><Image x:Name="BishopPromotion">
                                                                                         <Image.RenderTransform><ScaleTransform ScaleX="1.2" ScaleY="1.2"></ScaleTransform></Image.RenderTransform>
                                                                                 </Image></Button>
                                                                                 <TextBlock Classes="PromotionSelector">ESC</TextBlock>
@@ -63,7 +63,6 @@
                                                                 </Border>
                                                         </Grid>
                                                 </Grid>
-                                                
                                         </Border>
                                         
                                         
