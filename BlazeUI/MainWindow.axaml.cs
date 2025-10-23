@@ -17,6 +17,7 @@ public partial class MainWindow : Window
     private readonly OverlayHandler _overlay;
     private DispatcherTimer? _timer;
     private Side _lastPlayed = Side.White;
+    private readonly int _depth = 7;
     
     public MainWindow()
     {
@@ -73,7 +74,7 @@ public partial class MainWindow : Window
     private void StartNewGame()
     {
         if (Bitboards.init)
-            _pieceBoard!.SetMatch(new(new(Presets.StartingBoard), 6), _lastPlayed);
+            _pieceBoard!.SetMatch(new(new(Presets.StartingBoard), _depth), _lastPlayed);
         if (Bitboards.begunInit)
             return;
         _overlay.SetActive("init");
@@ -92,7 +93,7 @@ public partial class MainWindow : Window
         {
             _timer!.Stop();
             _overlay.RemoveActive();
-            _pieceBoard!.SetMatch(new(new(Presets.StartingBoard), 6), Side.White);
+            _pieceBoard!.SetMatch(new(new(Presets.StartingBoard), _depth), Side.White);
             //_pieceBoard!.SetMatch(new(new("8/7P/8/5K1k/8/8/8/8 w - - 0 1"), 6), Side.White);
         }
     }
