@@ -154,5 +154,5 @@ public static class Colors
 {
     public static readonly SolidColorBrush LightSquare = new(new Color(255, 238, 238, 210));
     public static readonly SolidColorBrush DarkSquare = new(new Color(255, 118, 150, 86));
-    public static readonly SolidColorBrush HighLight =  new(new Color(128, 199, 24, 24));
+    public static readonly SolidColorBrush HighLight =  new(new Color(192, 199, 24, 24));
 }

@@ -28,7 +28,8 @@ public class MoveablePiece : Image
 
         _position = new(_position.X - _relPosition.X + Bounds.Width / 2, _position.Y - _relPosition.Y + Bounds.Height / 2);
         _start = GetPositionOnGrid(_position);
-
+        PieceGrid.PieceRaised(_start);
+        
         ZIndex = 10;
         
         base.OnPointerPressed(e);

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Media.Imaging;
@@ -23,6 +24,8 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
     
     public void MovePiece((int x, int y) from, (int x, int y) to)
     {
+        HighLight(0, _side);
+        
         int index = FindIndexOfPiece(from);
         if (index == -1)
             return;
@@ -56,6 +59,11 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
         }
         
         TryMakeMove(Move.GetSquare(invertedFrom) + Move.GetSquare(invertedTo));
+    }
+
+    public void PieceRaised((int x, int y) pos)
+    {
+        HighLight(BitboardUtils.GetMoveBitboard(Search.SearchBoard(_match!.board, false).ToArray().Where(move => move.Source == PerspectiveConverter.Invert(pos, _side)).ToArray()), _side);
     }
 
     private void TryMakeMove(string moveString)
@@ -225,7 +233,7 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
         highlightGrid.Children.Clear();
     }
 
-    public void HighLight(ulong bitboard, Side perspective)
+    private void HighLight(ulong bitboard, Side perspective)
     {
         ClearHighlight();
         
