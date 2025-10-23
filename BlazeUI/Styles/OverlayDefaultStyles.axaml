@@ -35,6 +35,11 @@
         <Setter Property="FontWeight" Value="ExtraLight"></Setter>
     </Style>
     
+    <Style Selector="TextBlock.GameOverTitle">
+        <Setter Property="FontSize" Value="40"></Setter>
+        <Setter Property="FontWeight" Value="Light"></Setter>
+    </Style>
+    
     <Style Selector="local|ProgressBar.InitializeProgressBar">
         <Setter Property="Background" Value="{DynamicResource PrimaryProgressBarBackground}"></Setter>
     </Style>
@@ -44,9 +49,9 @@
         <Setter Property="Background" Value="{DynamicResource PrimaryProgressBarColor}"></Setter>
     </Style>
     
-    <Style Selector="TextBlock.InitializeProgressBarStatus">
+    <Style Selector="TextBlock.PopupSecondary">
         <Setter Property="HorizontalAlignment" Value="Center"></Setter>
-        <Setter Property="Margin" Value="0,0,0,15"></Setter>
+        <Setter Property="Margin" Value="0,15,0,15"></Setter>
         
         <Setter Property="FontSize" Value="17"></Setter>
         <Setter Property="FontWeight" Value="ExtraLight"></Setter>
@@ -54,5 +59,25 @@
     
     <Style Selector="StackPanel.InitializeProgressBarContainer">
         <Setter Property="VerticalAlignment" Value="Center"></Setter>
+    </Style>
+    
+    <Style Selector="Button.GameOverPopupButton">
+        <Setter Property="Margin" Value="0,10,0,0"></Setter>
+        <Setter Property="Width" Value="250"></Setter>
+        <Setter Property="Height" Value="50"></Setter>
+        <Setter Property="HorizontalAlignment" Value="Center"></Setter>
+        <Setter Property="HorizontalContentAlignment" Value="Center"></Setter>
+        <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
+        
+        <Setter Property="Background" Value="{DynamicResource SecondaryCardBackground}"></Setter>
+        <Setter Property="Foreground" Value="White"></Setter>
+        <Setter Property="FontWeight" Value="ExtraLight"></Setter>
+        <Setter Property="FontSize" Value="20"></Setter>
+        <Style Selector="^:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource SecondaryBorder}"></Setter>
+        </Style>
+        <Style Selector="^:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource SecondaryBorder}"></Setter>
+        </Style>
     </Style>
 </Styles>

@@ -45,21 +45,22 @@ public partial class MainWindow : Window
         InputElement.KeyDownEvent.AddClassHandler<TopLevel>(OnKeyDown, handledEventsToo: true);
         
         //_promotionHandler.RequestPromotion(3);
-        _pieceBoard = new GridBoard(this.FindControl<Grid>("pieces")!, this.FindControl<Grid>("highlight")!, _promotionHandler);
+        _pieceBoard = new GridBoard(this.FindControl<Grid>("pieces")!, this.FindControl<Grid>("highlight")!, _promotionHandler, this);
         _pieceBoard.SetMatch(null, Side.White);
         StartNewGame();
-        
     }
 
     private void InitOverlays()
     {
         _overlay!.AddOverlay(InitOverlay, "init");
+        _overlay!.AddOverlay(GameOverOverlay, "game-over");
         _overlay!.Init();
     }
 
     private void PlayButtonClick(object sender, RoutedEventArgs e)
     {
         StartNewGame();
+        _overlay!.RemoveActive();
     }
     
     private void StartNewGame()
@@ -84,9 +85,8 @@ public partial class MainWindow : Window
         {
             _timer!.Stop();
             _overlay!.RemoveActive();
-            //_pieceBoard!.SetMatch(new(new(Presets.StartingBoard), 3, dynamicDepth: false), Side.White);
-            _pieceBoard!.SetMatch(new(new("8/5P2/8/8/8/8/K1k5/8 w - - 0 1"), 6), Side.White);
-
+            _pieceBoard!.SetMatch(new(new(Presets.StartingBoard), 6), Side.White);
+            //_pieceBoard!.SetMatch(new(new("8/7P/8/5K1k/8/8/8/8 w - - 0 1"), 6), Side.White);
         }
     }
 
@@ -106,9 +106,27 @@ public partial class MainWindow : Window
     private void OnKeyDown(TopLevel t, KeyEventArgs e)
     {
         if (e.Key == Key.Escape)
-            _pieceBoard!.CancelPromotion(this, EventArgs.Empty);
+            _pieceBoard!.CancelPromotion();
         
         base.OnKeyDown(e);
+    }
+
+    public void GameOverSplash(Outcome outcome, int moves)
+    {
+        _overlay!.SetActive("game-over");
+        GameOverTitle.Text = outcome switch
+        {
+            Outcome.Draw => "Game is a draw.",
+            Outcome.WhiteWin => "White won!",
+            Outcome.BlackWin => "Black won!",
+            _ => throw new ArgumentOutOfRangeException()
+        };
+        GameOverMoves.Text = $"moves: {moves}";
+    }
+
+    private void ClosePopup(object? sender, RoutedEventArgs e)
+    {
+        _overlay!.RemoveActive();
     }
 }
 

@@ -94,10 +94,28 @@
                                                 </Border>
                                                 <Border Grid.Row="1" Classes="PopupCardBody">
                                                         <StackPanel Classes="InitializeProgressBarContainer">
-                                                                <TextBlock Classes="InitializeProgressBarStatus" x:Name="InitStatus">Status</TextBlock>
+                                                                <TextBlock Classes="PopupSecondary" x:Name="InitStatus">Status</TextBlock>
                                                                 <local:ProgressBar x:Name="InitProgress" Classes="InitializeProgressBar" Width="500" Height="10">
                                                                         <Border x:Name="InitProgressBar" Classes="InitializeProgressBarFilled"></Border>
                                                                 </local:ProgressBar>
+                                                        </StackPanel>
+                                                </Border>
+                                        </Grid>
+                                </Border>
+                        </Grid>
+                        <Grid Grid.Row="1" Grid.Column="1" x:Name="GameOverOverlay">
+                                <Border Classes="OverlayPopup" x:Name="GameOverPopup">
+                                        <Grid RowDefinitions="80,*">
+                                                <Border Grid.Row="0" Classes="PopupCardTop">
+                                                        <TextBlock Classes="PopupCardTitle GameOverTitle" x:Name="GameOverTitle">Game Over</TextBlock>
+                                                </Border>
+                                                <Border Grid.Row="1" Classes="PopupCardBody">
+                                                        <StackPanel>
+                                                                <TextBlock Classes="PopupSecondary" x:Name="GameOverMoves">moves</TextBlock>
+                                                                <Grid ColumnDefinitions="*,*">
+                                                                        <Button Grid.Column="0" Classes="GameOverPopupButton" Click="PlayButtonClick">New Game</Button>
+                                                                        <Button Grid.Column="1" Classes="GameOverPopupButton" Click="ClosePopup">Close</Button>
+                                                                </Grid>
                                                         </StackPanel>
                                                 </Border>
                                         </Grid>

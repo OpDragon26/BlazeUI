@@ -8,12 +8,13 @@ using BlazeUI.Blaze;
 
 namespace BlazeUI;
 
-public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotionHandler)
+public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotionHandler, MainWindow window)
 {
     public readonly Grid InnerGrid = grid;
     private readonly List<PieceItem> _pieces = new();
     private EmbeddedMatch? _match;
     private Side _side;
+    private Outcome _outcome;
     
     private DispatcherTimer? _timer;
 
@@ -54,18 +55,39 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
             return;
         }
         
-        Move move = new Move(Move.GetSquare(invertedFrom) + Move.GetSquare(invertedTo), _match.board);
-        //Console.WriteLine(move.GetUCI());
+        TryMakeMove(Move.GetSquare(invertedFrom) + Move.GetSquare(invertedTo));
+    }
+
+    private void TryMakeMove(string moveString)
+    {
+        if (IsGameOver())
+            return;
+        
+        Move move = new Move(moveString, _match!.board);
         if (_match.TryMake(move))
         {
             LoadBoard(_match.board, _side);
+            // Console.WriteLine("Made move " + moveString);
             StartPolling();
         }
+    }
+
+    private bool IsGameOver()
+    {
+        _outcome = _match!.GetOutcome();
+
+        if (_outcome != Outcome.Ongoing)
+        {
+            window.GameOverSplash(_outcome, _match.game.Count / 2);
+            LockAll(true);
+            return true;
+        }
+        return false;
     }
     
     private void StartPolling()
     {
-        if (_match == null)
+        if (_match == null || IsGameOver())
             return;
         
         LockAll(true);
@@ -82,8 +104,9 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
         {
             _timer!.Stop();
             LoadBoard(node.board, _side);
-            LockAll(false);
-            LockPieces((Side)(1 - (int)_side), true);
+            LockAll(true);
+            LockPieces(_side, false);
+            IsGameOver();
         }
     }
 
@@ -105,16 +128,11 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
             _timer!.Stop();
             uint piece = promotionHandler._selected;
             promotionHandler.SendBack();
-            Move move = new Move(Move.GetSquare(_promotionSquare.from) + Move.GetSquare(_promotionSquare.to) + Move.PromotionStr[piece], _match!.board);
-            if (_match.TryMake(move))
-            {
-                LoadBoard(_match.board, _side);
-                StartPolling();
-            }
+            TryMakeMove(Move.GetSquare(_promotionSquare.from) + Move.GetSquare(_promotionSquare.to) + Move.PromotionStr[piece]);
         }
     }
 
-    public void CancelPromotion(object? sender, EventArgs e)
+    public void CancelPromotion()
     {
         _expectPromotion = false;
     }
@@ -155,8 +173,14 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
         
         LockAll(true);
         LockPieces(_side, false);
-        
-        LoadBoard(match == null ? new(Presets.StartingBoard) : match.board, perspective);
+
+        if (match != null)
+        {
+            LoadBoard(match.board, perspective);
+            IsGameOver();
+        }
+        else
+            LoadBoard(new(Presets.StartingBoard), perspective);
     }
 
     private void RemovePiece((int x, int y) at)
