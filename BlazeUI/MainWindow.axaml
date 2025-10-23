@@ -16,7 +16,7 @@
                         <Border Grid.Row="0" BorderBrush="{DynamicResource SecondaryBorder}" BorderThickness="0,0,0,2">
                                 <!-- Top row -->
                                 <StackPanel Orientation="Horizontal" Margin="75,0,0,0">
-                                        <Button Content="PLAY" Click="PlayButtonClick" Classes="HeaderButton"></Button>
+                                        <Button Content="PLAY" Click="NewGameOpenDropdown" Classes="HeaderButton"></Button>
                                         <Button Content="SETTINGS" Classes="HeaderButton"></Button>
                                         <Button Content="ANALYSIS" Classes="HeaderButton"></Button>
                                         <Button Content="DEBUG TERMINAL" Classes="HeaderButton"></Button>
@@ -87,41 +87,55 @@
                                 </Border>
                         </Grid>
                 </Grid>
-                <Grid ColumnDefinitions="*,600,*" RowDefinitions="*,250,*" Classes="OverlayBackground" ZIndex="-5" x:Name="OverlayGrid">
-                        <Grid Grid.Row="1" Grid.Column="1" x:Name="InitOverlay">
-                                <Border Classes="OverlayPopup" x:Name="InitializingPopup">
-                                        <Grid RowDefinitions="50,*">
-                                                <Border Grid.Row="0" Classes="PopupCardTop">
-                                                        <TextBlock Classes="PopupCardTitle">Initializing Engine</TextBlock>
-                                                </Border>
-                                                <Border Grid.Row="1" Classes="PopupCardBody">
-                                                        <StackPanel Classes="InitializeProgressBarContainer">
-                                                                <TextBlock Classes="PopupSecondary" x:Name="InitStatus">Status</TextBlock>
-                                                                <local:ProgressBar x:Name="InitProgress" Classes="InitializeProgressBar" Width="500" Height="10">
-                                                                        <Border x:Name="InitProgressBar" Classes="InitializeProgressBarFilled"></Border>
-                                                                </local:ProgressBar>
-                                                        </StackPanel>
-                                                </Border>
-                                        </Grid>
-                                </Border>
+                <Grid x:Name="OverlayGrid" ZIndex="-5">
+                        <Grid ColumnDefinitions="*,600,*" RowDefinitions="*,250,*" Classes="OverlayBackground" x:Name="InitOverlay">
+                                <Grid Grid.Row="1" Grid.Column="1">
+                                        <Border Classes="OverlayPopup" x:Name="InitializingPopup">
+                                                <Grid RowDefinitions="50,*">
+                                                        <Border Grid.Row="0" Classes="PopupCardTop">
+                                                                <TextBlock Classes="PopupCardTitle">Initializing Engine</TextBlock>
+                                                        </Border>
+                                                        <Border Grid.Row="1" Classes="PopupCardBody">
+                                                                <StackPanel Classes="InitializeProgressBarContainer">
+                                                                        <TextBlock Classes="PopupSecondary" x:Name="InitStatus">Status</TextBlock>
+                                                                        <local:ProgressBar x:Name="InitProgress" Classes="InitializeProgressBar" Width="500" Height="10">
+                                                                                <Border x:Name="InitProgressBar" Classes="InitializeProgressBarFilled"></Border>
+                                                                        </local:ProgressBar>
+                                                                </StackPanel>
+                                                        </Border>
+                                                </Grid>
+                                        </Border>
+                                </Grid>
                         </Grid>
-                        <Grid Grid.Row="1" Grid.Column="1" x:Name="GameOverOverlay">
-                                <Border Classes="OverlayPopup" x:Name="GameOverPopup">
-                                        <Grid RowDefinitions="80,*">
-                                                <Border Grid.Row="0" Classes="PopupCardTop">
-                                                        <TextBlock Classes="PopupCardTitle GameOverTitle" x:Name="GameOverTitle">Game Over</TextBlock>
-                                                </Border>
-                                                <Border Grid.Row="1" Classes="PopupCardBody">
-                                                        <StackPanel>
-                                                                <TextBlock Classes="PopupSecondary" x:Name="GameOverMoves">moves</TextBlock>
-                                                                <Grid ColumnDefinitions="*,*">
-                                                                        <Button Grid.Column="0" Classes="GameOverPopupButton" Click="PlayButtonClick">PLAY AGAIN</Button>
-                                                                        <Button Grid.Column="1" Classes="GameOverPopupButton" Click="ClosePopup">CLOSE</Button>
-                                                                </Grid>
-                                                        </StackPanel>
-                                                </Border>
-                                        </Grid>
-                                </Border>
+                        <Grid ColumnDefinitions="*,600,*" RowDefinitions="*,250,*" Classes="OverlayBackground" x:Name="GameOverOverlay">
+                                <Grid Grid.Row="1" Grid.Column="1">
+                                        <Border Classes="OverlayPopup" x:Name="GameOverPopup">
+                                                <Grid RowDefinitions="80,*">
+                                                        <Border Grid.Row="0" Classes="PopupCardTop">
+                                                                <TextBlock Classes="PopupCardTitle GameOverTitle" x:Name="GameOverTitle">Game Over</TextBlock>
+                                                        </Border>
+                                                        <Border Grid.Row="1" Classes="PopupCardBody">
+                                                                <StackPanel>
+                                                                        <TextBlock Classes="PopupSecondary" x:Name="GameOverMoves">moves</TextBlock>
+                                                                        <Grid ColumnDefinitions="*,*">
+                                                                                <Button Grid.Column="0" Classes="GameOverPopupButton" Click="PlayButtonClick">PLAY AGAIN</Button>
+                                                                                <Button Grid.Column="1" Classes="GameOverPopupButton" Click="ClosePopup">CLOSE</Button>
+                                                                        </Grid>
+                                                                </StackPanel>
+                                                        </Border>
+                                                </Grid>
+                                        </Border>
+                                </Grid> 
+                        </Grid>
+                        <Grid x:Name="NewGameDropdownOverlay">
+                                <StackPanel Orientation="Horizontal" Margin="75,0,0,0">
+                                        <Border Classes="DropDownMenu">
+                                                <StackPanel Orientation="Vertical" Classes="DropDownPanel">
+                                                        <Button Classes="DropDownButton" Click="StartNewAsWhite">White</Button>
+                                                        <Button Classes="DropDownButton" Click="StartAsNewBlack">Black</Button>
+                                                </StackPanel>
+                                        </Border>
+                                </StackPanel>
                         </Grid>
                 </Grid>
         </Grid>

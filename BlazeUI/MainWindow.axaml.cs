@@ -14,9 +14,9 @@ public partial class MainWindow : Window
 {
     private readonly PromotionHandler _promotionHandler;
     private readonly GridBoard? _pieceBoard;
-    private readonly OverlayHandler? _overlay;
+    private readonly OverlayHandler _overlay;
     private DispatcherTimer? _timer;
-    private PGNDisplay _pgnDisplay;
+    private Side _lastPlayed = Side.White;
     
     public MainWindow()
     {
@@ -40,40 +40,43 @@ public partial class MainWindow : Window
             }
         }
         
-        // set up pgn display
-        _pgnDisplay = new PGNDisplay(PGNPanel);
-        
         // set up promotion handler
         _promotionHandler = new PromotionHandler(PromotionGrid);
         _promotionHandler.InitImages(Side.White);
         KeyDownEvent.AddClassHandler<TopLevel>(OnKeyDown, handledEventsToo: true);
         
         // load a new game from starting position
-        _pieceBoard = new GridBoard(this.FindControl<Grid>("pieces")!, this.FindControl<Grid>("highlight")!, _promotionHandler, _pgnDisplay, this);
+        _pieceBoard = new GridBoard(this.FindControl<Grid>("pieces")!, this.FindControl<Grid>("highlight")!, _promotionHandler, new PGNDisplay(PGNPanel), this);
         _pieceBoard.SetMatch(null, Side.White);
         StartNewGame();
     }
 
     private void InitOverlays()
     {
-        _overlay!.AddOverlay(InitOverlay, "init");
-        _overlay!.AddOverlay(GameOverOverlay, "game-over");
-        _overlay!.Init();
+        _overlay.AddOverlay(InitOverlay, "init");
+        _overlay.AddOverlay(GameOverOverlay, "game-over");
+        _overlay.AddOverlay(NewGameDropdownOverlay, "new-game");
+        _overlay.Init();
     }
-
+    
+    private void NewGameOpenDropdown(object sender, RoutedEventArgs e)
+    {
+        _overlay.Toggle("new-game");
+    }
+    
     private void PlayButtonClick(object sender, RoutedEventArgs e)
     {
         StartNewGame();
-        _overlay!.RemoveActive();
+        _overlay.RemoveActive();
     }
     
     private void StartNewGame()
     {
         if (Bitboards.init)
-            _pieceBoard!.SetMatch(new(new(Presets.StartingBoard), 6), Side.White);
+            _pieceBoard!.SetMatch(new(new(Presets.StartingBoard), 6), _lastPlayed);
         if (Bitboards.begunInit)
             return;
-        _overlay!.SetActive("init");
+        _overlay.SetActive("init");
         _timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16) };
         Bitboards.StartInit();
         _timer.Tick += Poll;
@@ -88,10 +91,23 @@ public partial class MainWindow : Window
         if (Bitboards.Poll())
         {
             _timer!.Stop();
-            _overlay!.RemoveActive();
+            _overlay.RemoveActive();
             _pieceBoard!.SetMatch(new(new(Presets.StartingBoard), 6), Side.White);
             //_pieceBoard!.SetMatch(new(new("8/7P/8/5K1k/8/8/8/8 w - - 0 1"), 6), Side.White);
         }
+    }
+    
+    private void StartNewAsWhite(object sender, RoutedEventArgs e)
+    {
+        _overlay.RemoveActive();
+        _lastPlayed = Side.White;
+        StartNewGame();
+    }
+    private void StartAsNewBlack(object sender, RoutedEventArgs e)
+    {
+        _overlay.RemoveActive();
+        _lastPlayed = Side.Black;
+        StartNewGame();
     }
 
     private void PromotionSelected(object? sender, RoutedEventArgs e)
@@ -117,7 +133,7 @@ public partial class MainWindow : Window
 
     public void GameOverSplash(Outcome outcome, int moves)
     {
-        _overlay!.SetActive("game-over");
+        _overlay.SetActive("game-over");
         GameOverTitle.Text = outcome switch
         {
             Outcome.Draw => "Game is a draw.",
@@ -130,7 +146,7 @@ public partial class MainWindow : Window
 
     private void ClosePopup(object? sender, RoutedEventArgs e)
     {
-        _overlay!.RemoveActive();
+        _overlay.RemoveActive();
     }
 }
 

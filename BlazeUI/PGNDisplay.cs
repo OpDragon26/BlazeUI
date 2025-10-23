@@ -17,7 +17,7 @@ public class PGNDisplay(StackPanel panel)
             // new row added
             _last = new Grid {ColumnDefinitions = new ColumnDefinitions("25,*,*") , Classes = { "GameEntry" }};
             _last.Children.Add(new TextBlock() { Text = Convert.ToString(_game.Count / 2 + 1) + '.' , Classes = { "Indexer" }});
-            Button moveText = new Button { Content = move , Classes = { "GameEntryRow" } };
+            Button moveText = new Button { Content = move , Classes = { "GameEntryRow" }};
             _last.Children.Add(moveText);
             Grid.SetColumn(moveText, 1);
             panel.Children.Add(_last);

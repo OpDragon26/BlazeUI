@@ -46,7 +46,7 @@
     
     <Style Selector="Border.InitializeProgressBarFilled">
         <Setter Property="HorizontalAlignment" Value="Left"></Setter>
-        <Setter Property="Background" Value="{DynamicResource PrimaryProgressBarColor}"></Setter>
+        <Setter Property="Background" Value="{DynamicResource PrimaryHighlightColor}"></Setter>
     </Style>
     
     <Style Selector="TextBlock.PopupSecondary">
@@ -79,5 +79,31 @@
         <Style Selector="^:pressed /template/ ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource SecondaryBorder}"></Setter>
         </Style>
+    </Style>
+    
+    <Style Selector="Border.DropDownMenu">
+        <Setter Property="Width" Value="150"></Setter>
+        <Setter Property="Margin" Value="0,50,0,0"></Setter>
+    </Style>
+    
+    <Style Selector="Button.DropDownButton">
+        <Setter Property="Background" Value="{DynamicResource SecondaryCardBackground}"></Setter>
+        <Setter Property="CornerRadius" Value="0"></Setter>
+        <Setter Property="HorizontalAlignment" Value="Stretch"></Setter>
+        <Setter Property="Height" Value="50"></Setter>
+        <Setter Property="HorizontalContentAlignment" Value="Center"></Setter>
+        <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
+        <Setter Property="FontWeight" Value="Light"></Setter>
+        <Setter Property="FontSize" Value="17"></Setter>
+        <Style Selector="^:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource SecondaryBorder}"></Setter>
+        </Style>
+        <Style Selector="^:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource SecondaryBorder}"></Setter>
+        </Style>
+    </Style>
+    
+    <Style Selector="StackPanel.DropDownPanel">
+        <Setter Property="Spacing" Value="-1"></Setter>
     </Style>
 </Styles>

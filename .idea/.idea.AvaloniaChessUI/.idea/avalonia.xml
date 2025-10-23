@@ -9,6 +9,7 @@
         <entry key="BlazeUI/App.axaml" value="BlazeUI/BlazeUI.csproj" />
         <entry key="BlazeUI/MainWindow.axaml" value="BlazeUI/BlazeUI.csproj" />
         <entry key="BlazeUI/Styles/AppDefaultStyles.axaml" value="BlazeUI/BlazeUI.csproj" />
+        <entry key="BlazeUI/Styles/GameDisplayDefaultStyles.axaml" value="BlazeUI/BlazeUI.csproj" />
         <entry key="BlazeUI/Styles/OverlayDefaultStyles.axaml" value="BlazeUI/BlazeUI.csproj" />
         <entry key="BlazeUI/Styles/PGNDisplayDefaultStyles.axaml" value="BlazeUI/BlazeUI.csproj" />
         <entry key="BlazeUI/Styles/PopupStyles.axaml" value="BlazeUI/BlazeUI.csproj" />

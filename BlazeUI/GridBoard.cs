@@ -179,6 +179,10 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
         if (match != null)
         {
             pgnDisplay.Clear();
+            if (match.board.side == 1)
+                pgnDisplay.Add("...");
+            if (perspective == Side.Black)
+                StartPolling();
             LoadBoard(match.board, perspective);
             IsGameOver();
         }

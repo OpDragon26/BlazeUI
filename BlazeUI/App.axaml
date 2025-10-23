@@ -32,6 +32,6 @@
                         <SolidColorBrush x:Key="OverlayCover">#C0000000</SolidColorBrush>
                         
                         <SolidColorBrush x:Key="PrimaryProgressBarBackground">#121314</SolidColorBrush>
-                        <SolidColorBrush x:Key="PrimaryProgressBarColor">#29689E</SolidColorBrush>
+                        <SolidColorBrush x:Key="PrimaryHighlightColor">#29689E</SolidColorBrush>
                 </Application.Resources>
 </Application>
