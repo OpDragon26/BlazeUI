@@ -28,5 +28,8 @@ build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 [/home/opdragon25/Documents/CSharp/AvaloniaChessUI/BlazeUI/Styles/AppDefaultStyles.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
+[/home/opdragon25/Documents/CSharp/AvaloniaChessUI/BlazeUI/Styles/GameDisplayDefaultStyles.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
 [/home/opdragon25/Documents/CSharp/AvaloniaChessUI/BlazeUI/Styles/OverlayDefaultStyles.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml

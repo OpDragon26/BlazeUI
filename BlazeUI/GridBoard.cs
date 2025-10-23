@@ -8,7 +8,7 @@ using BlazeUI.Blaze;
 
 namespace BlazeUI;
 
-public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotionHandler, MainWindow window)
+public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotionHandler, PGNDisplay pgnDisplay, MainWindow window)
 {
     public readonly Grid InnerGrid = grid;
     private readonly List<PieceItem> _pieces = new();
@@ -66,6 +66,7 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
         Move move = new Move(moveString, _match!.board);
         if (_match.TryMake(move))
         {
+            pgnDisplay.Add(_match.NotateLastMove());
             LoadBoard(_match.board, _side);
             // Console.WriteLine("Made move " + moveString);
             StartPolling();
@@ -102,6 +103,7 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
     {
         if (_match!.Poll(out var node))
         {
+            pgnDisplay.Add(_match.NotateLastMove());
             _timer!.Stop();
             LoadBoard(node.board, _side);
             LockAll(true);
@@ -123,7 +125,7 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
     {
         if (promotionHandler._selected != 0b111 || !_expectPromotion)
         {
-            Console.WriteLine(promotionHandler._selected);
+            //Console.WriteLine(promotionHandler._selected);
             _expectPromotion = false;
             _timer!.Stop();
             uint piece = promotionHandler._selected;
@@ -176,6 +178,7 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
 
         if (match != null)
         {
+            pgnDisplay.Clear();
             LoadBoard(match.board, perspective);
             IsGameOver();
         }

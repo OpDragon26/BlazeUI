@@ -16,6 +16,7 @@ public partial class MainWindow : Window
     private readonly GridBoard? _pieceBoard;
     private readonly OverlayHandler? _overlay;
     private DispatcherTimer? _timer;
+    private PGNDisplay _pgnDisplay;
     
     public MainWindow()
     {
@@ -39,13 +40,16 @@ public partial class MainWindow : Window
             }
         }
         
-        // load match
+        // set up pgn display
+        _pgnDisplay = new PGNDisplay(PGNPanel);
+        
+        // set up promotion handler
         _promotionHandler = new PromotionHandler(PromotionGrid);
         _promotionHandler.InitImages(Side.White);
-        InputElement.KeyDownEvent.AddClassHandler<TopLevel>(OnKeyDown, handledEventsToo: true);
+        KeyDownEvent.AddClassHandler<TopLevel>(OnKeyDown, handledEventsToo: true);
         
-        //_promotionHandler.RequestPromotion(3);
-        _pieceBoard = new GridBoard(this.FindControl<Grid>("pieces")!, this.FindControl<Grid>("highlight")!, _promotionHandler, this);
+        // load a new game from starting position
+        _pieceBoard = new GridBoard(this.FindControl<Grid>("pieces")!, this.FindControl<Grid>("highlight")!, _promotionHandler, _pgnDisplay, this);
         _pieceBoard.SetMatch(null, Side.White);
         StartNewGame();
     }

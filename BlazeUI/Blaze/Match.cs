@@ -96,6 +96,15 @@ public class Match
         depth = Math.Clamp(depth, depthFloor, depthCeiling);
     }
 
+    public string NotateLastMove()
+    {
+        if (game.Count == 0)
+            return string.Empty;
+        if (game.Count == 1)
+            return game[0].move.Notate(new Board(Presets.StartingBoard));
+        return game[^1].move.Notate(game[^2].board);
+    }
+
     public static List<PGNNode> RandomGame(int depth)
     {
         Match match = new(new Board(Presets.StartingBoard), depth, false);
