@@ -2,6 +2,7 @@ using System;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Shapes;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Threading;
@@ -41,6 +42,8 @@ public partial class MainWindow : Window
         // load match
         _promotionHandler = new PromotionHandler(PromotionGrid);
         _promotionHandler.InitImages(Side.White);
+        InputElement.KeyDownEvent.AddClassHandler<TopLevel>(OnKeyDown, handledEventsToo: true);
+        
         //_promotionHandler.RequestPromotion(3);
         _pieceBoard = new GridBoard(this.FindControl<Grid>("pieces")!, this.FindControl<Grid>("highlight")!, _promotionHandler);
         _pieceBoard.SetMatch(null, Side.White);
@@ -81,7 +84,9 @@ public partial class MainWindow : Window
         {
             _timer!.Stop();
             _overlay!.RemoveActive();
-            _pieceBoard!.SetMatch(new(new(Presets.StartingBoard), 3, dynamicDepth: false), Side.White);
+            //_pieceBoard!.SetMatch(new(new(Presets.StartingBoard), 3, dynamicDepth: false), Side.White);
+            _pieceBoard!.SetMatch(new(new("8/5P2/8/8/8/8/K1k5/8 w - - 0 1"), 6), Side.White);
+
         }
     }
 
@@ -96,6 +101,14 @@ public partial class MainWindow : Window
             "BishopPromotionButton" => 0b011,
             _ => throw new ArgumentOutOfRangeException()
         };
+    }
+    
+    private void OnKeyDown(TopLevel t, KeyEventArgs e)
+    {
+        if (e.Key == Key.Escape)
+            _pieceBoard!.CancelPromotion(this, EventArgs.Empty);
+        
+        base.OnKeyDown(e);
     }
 }
 

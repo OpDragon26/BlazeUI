@@ -18,7 +18,7 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
     private DispatcherTimer? _timer;
 
     private ((int file, int rank) from, (int file, int rank) to) _promotionSquare;
-    private uint _promotedPiece;
+    private bool _expectPromotion;
     
     public void MovePiece((int x, int y) from, (int x, int y) to)
     {
@@ -50,6 +50,7 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
         {
             _promotionSquare = (invertedFrom, invertedTo);
             RequestPromotion();
+            _expectPromotion = true;
             return;
         }
         
@@ -97,18 +98,25 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
 
     private void PollPromotion(object? sender, EventArgs e)
     {
-        if (promotionHandler._selected != 0b111)
+        if (promotionHandler._selected != 0b111 || !_expectPromotion)
         {
+            Console.WriteLine(promotionHandler._selected);
+            _expectPromotion = false;
             _timer!.Stop();
-            _promotedPiece = promotionHandler._selected;
+            uint piece = promotionHandler._selected;
             promotionHandler.SendBack();
-            Move move = new Move(Move.GetSquare(_promotionSquare.from) + Move.GetSquare(_promotionSquare.to) + Move.PromotionStr[_promotedPiece], _match!.board);
+            Move move = new Move(Move.GetSquare(_promotionSquare.from) + Move.GetSquare(_promotionSquare.to) + Move.PromotionStr[piece], _match!.board);
             if (_match.TryMake(move))
             {
                 LoadBoard(_match.board, _side);
                 StartPolling();
             }
         }
+    }
+
+    public void CancelPromotion(object? sender, EventArgs e)
+    {
+        _expectPromotion = false;
     }
 
     private void AddPiece(MoveablePiece piece, (int x, int y) at)
