@@ -11,6 +11,7 @@ public class PGNDisplay(StackPanel panel)
     private Grid? _last;
     private GridBoard? _board;
     private int _lastViewed;
+    private readonly List<Button> _buttons = new();
     
     public void Add(string move, Board board)
     {
@@ -34,20 +35,36 @@ public class PGNDisplay(StackPanel panel)
             Classes = { "GameEntryRow" }, 
             Name = Convert.ToString(_game.Count)
         };
+        _buttons.Add(moveText);
         
         moveText.Click += (sender, _) =>
         {
             _board!.LoadBoard(board, _board.side);
-            string buttonName = (sender as Button)!.Name!;
-            if (!buttonName.Equals(Convert.ToString(_game.Count - 1)))
+            Button button = (sender as Button)!;
+            if (!button.Name!.Equals(Convert.ToString(_game.Count - 1)))
                 _board!.LockAll(true);
+            
+            _lastViewed = Convert.ToInt32(button.Name);
+            ClearSelected();
+            button.Classes.Add("SelectedEntry");
         };
         
         _last!.Children.Add(moveText);
         Grid.SetColumn(moveText, _game.Count % 2 + 1);
         
         _lastViewed = _game.Count;
+        ClearSelected();
+        moveText.Classes.Add("SelectedEntry");
         _game.Add((move, board));
+    }
+
+    private void ClearSelected()
+    {
+        foreach (Button button in _buttons)
+        {
+            if (button.Classes.Contains("SelectedEntry"))
+                button.Classes.Remove("SelectedEntry");
+        }
     }
 
     public void GoBackOne()
@@ -55,6 +72,9 @@ public class PGNDisplay(StackPanel panel)
         _lastViewed = Math.Max(_lastViewed - 1, 0);
         _board!.LoadBoard(_game[_lastViewed].board, _board.side);
         _board!.LockAll(true);
+        
+        ClearSelected();
+        _buttons[_lastViewed].Classes.Add("SelectedEntry");
     }
 
     public void GoForwardOne()
@@ -63,12 +83,17 @@ public class PGNDisplay(StackPanel panel)
         _board!.LoadBoard(_game[_lastViewed].board, _board.side);
         if (_lastViewed != _game.Count - 1)
             _board!.LockAll(true);
+        
+        ClearSelected();
+        _buttons[_lastViewed].Classes.Add("SelectedEntry");
     }
 
     public void Clear()
     {
         _game.Clear();
         panel.Children.Clear();
+        _buttons.Clear();
+        _last = null;
     }
 
     public void Init(GridBoard grid)

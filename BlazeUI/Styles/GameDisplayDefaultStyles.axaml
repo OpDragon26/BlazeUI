@@ -44,4 +44,15 @@
             <Setter Property="Background" Value="{DynamicResource SecondaryCardBackground}"></Setter>
         </Style>
     </Style>
+    
+    <Style Selector="Button.SelectedEntry">
+        <Setter Property="CornerRadius" Value="5"></Setter>
+        <Setter Property="Background" Value="{DynamicResource SecondaryCardBackground}"></Setter>
+        <Style Selector="^:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource SecondaryBorder}"></Setter>
+        </Style>
+        <Style Selector="^:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource SecondaryBorder}"></Setter>
+        </Style>
+    </Style>
 </Styles>
