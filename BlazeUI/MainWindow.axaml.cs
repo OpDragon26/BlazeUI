@@ -15,6 +15,7 @@ public partial class MainWindow : Window
     private readonly PromotionHandler _promotionHandler;
     private readonly GridBoard? _pieceBoard;
     private readonly OverlayHandler _overlay;
+    private readonly PGNDisplay _pgnDisplay;
     private DispatcherTimer? _timer;
     private Side _lastPlayed = Side.White;
     private readonly int _depth = 7;
@@ -47,7 +48,8 @@ public partial class MainWindow : Window
         KeyDownEvent.AddClassHandler<TopLevel>(OnKeyDown, handledEventsToo: true);
         
         // load a new game from starting position
-        _pieceBoard = new GridBoard(this.FindControl<Grid>("pieces")!, this.FindControl<Grid>("highlight")!, _promotionHandler, new PGNDisplay(PGNPanel), this);
+        _pgnDisplay = new PGNDisplay(PGNPanel);
+        _pieceBoard = new GridBoard(this.FindControl<Grid>("pieces")!, this.FindControl<Grid>("highlight")!, _promotionHandler, _pgnDisplay, this);
         _pieceBoard.SetMatch(null, Side.White);
         StartNewGame();
     }
@@ -126,10 +128,18 @@ public partial class MainWindow : Window
     
     private void OnKeyDown(TopLevel t, KeyEventArgs e)
     {
-        if (e.Key == Key.Escape)
+        switch (e.Key)
         {
-            _pieceBoard!.CancelPromotion();
-            _pieceBoard!.LoadLatest();
+            case Key.Escape:
+                _pieceBoard!.CancelPromotion();
+                _pieceBoard!.LoadLatest();
+                break;
+            case Key.Right:
+                _pgnDisplay.GoForwardOne();
+                break;
+            case Key.Left:
+                _pgnDisplay.GoBackOne();
+                break;
         }
         
         base.OnKeyDown(e);

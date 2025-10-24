@@ -10,6 +10,7 @@ public class PGNDisplay(StackPanel panel)
     private readonly List<(string move, Board board)> _game = new();
     private Grid? _last;
     private GridBoard? _board;
+    private int _lastViewed;
     
     public void Add(string move, Board board)
     {
@@ -45,7 +46,23 @@ public class PGNDisplay(StackPanel panel)
         _last!.Children.Add(moveText);
         Grid.SetColumn(moveText, _game.Count % 2 + 1);
         
-        _game.Add((move,  board));
+        _lastViewed = _game.Count;
+        _game.Add((move, board));
+    }
+
+    public void GoBackOne()
+    {
+        _lastViewed = Math.Max(_lastViewed - 1, 0);
+        _board!.LoadBoard(_game[_lastViewed].board, _board.side);
+        _board!.LockAll(true);
+    }
+
+    public void GoForwardOne()
+    {
+        _lastViewed = Math.Min(_lastViewed + 1, _game.Count - 1);
+        _board!.LoadBoard(_game[_lastViewed].board, _board.side);
+        if (_lastViewed != _game.Count - 1)
+            _board!.LockAll(true);
     }
 
     public void Clear()
