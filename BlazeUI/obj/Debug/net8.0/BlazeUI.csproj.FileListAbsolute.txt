@@ -73,3 +73,15 @@
 /home/opdragon25/Documents/CSharp/AvaloniaChessUI/BlazeUI/obj/Debug/net8.0/BlazeUI.pdb
 /home/opdragon25/Documents/CSharp/AvaloniaChessUI/BlazeUI/obj/Debug/net8.0/BlazeUI.genruntimeconfig.cache
 /home/opdragon25/Documents/CSharp/AvaloniaChessUI/BlazeUI/obj/Debug/net8.0/ref/BlazeUI.dll
+/home/opdragon25/Documents/CSharp/AvaloniaChessUI/BlazeUI/bin/Debug/net8.0/assets/pieces/black_bishop.png
+/home/opdragon25/Documents/CSharp/AvaloniaChessUI/BlazeUI/bin/Debug/net8.0/assets/pieces/black_king.png
+/home/opdragon25/Documents/CSharp/AvaloniaChessUI/BlazeUI/bin/Debug/net8.0/assets/pieces/black_knight.png
+/home/opdragon25/Documents/CSharp/AvaloniaChessUI/BlazeUI/bin/Debug/net8.0/assets/pieces/black_pawn.png
+/home/opdragon25/Documents/CSharp/AvaloniaChessUI/BlazeUI/bin/Debug/net8.0/assets/pieces/black_queen.png
+/home/opdragon25/Documents/CSharp/AvaloniaChessUI/BlazeUI/bin/Debug/net8.0/assets/pieces/black_rook.png
+/home/opdragon25/Documents/CSharp/AvaloniaChessUI/BlazeUI/bin/Debug/net8.0/assets/pieces/white_bishop.png
+/home/opdragon25/Documents/CSharp/AvaloniaChessUI/BlazeUI/bin/Debug/net8.0/assets/pieces/white_king.png
+/home/opdragon25/Documents/CSharp/AvaloniaChessUI/BlazeUI/bin/Debug/net8.0/assets/pieces/white_knight.png
+/home/opdragon25/Documents/CSharp/AvaloniaChessUI/BlazeUI/bin/Debug/net8.0/assets/pieces/white_pawn.png
+/home/opdragon25/Documents/CSharp/AvaloniaChessUI/BlazeUI/bin/Debug/net8.0/assets/pieces/white_queen.png
+/home/opdragon25/Documents/CSharp/AvaloniaChessUI/BlazeUI/bin/Debug/net8.0/assets/pieces/white_rook.png

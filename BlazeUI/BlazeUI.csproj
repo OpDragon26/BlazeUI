@@ -43,10 +43,9 @@
         <AvaloniaResource Include="assets\pieces\white_queen.png" />
         <None Remove="assets\pieces\white_rook.png" />
         <AvaloniaResource Include="assets\pieces\white_rook.png" />
+        <Content Include="assets/**">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <Folder Include="assets\pieces\" />
     </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="assets\pieces\" />
-    </ItemGroup>
-
 </Project>

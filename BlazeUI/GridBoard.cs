@@ -6,6 +6,7 @@ using Avalonia.Controls.Shapes;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using BlazeUI.Blaze;
+using Path = System.IO.Path;
 
 namespace BlazeUI;
 
@@ -310,10 +311,9 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
     {
         string pieceFile = $"{((piece & Pieces.ColorMask) == 0 ? "white" : "black")}_{PieceName[piece & Pieces.TypeMask]}.png";
         //Console.WriteLine($"{Convert.ToString(piece, toBase:2).PadLeft(4, '0')} -> {pieceFile}");
-        return new Bitmap(AbsolutePath + pieceFile);
+        return new Bitmap(Path.Combine("assets", "pieces", pieceFile));
     }
     
-    private static readonly string AbsolutePath = "/home/opdragon25/Documents/CSharp/AvaloniaChessUI/BlazeUI/assets/pieces/";
     private static readonly Dictionary<uint, string> PieceName = new()
     {
         { 0b000 , "pawn" },

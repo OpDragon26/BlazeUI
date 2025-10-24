@@ -780,7 +780,7 @@ public static class Bitboards
             PathLookup[startFile, startRank, endFile, endRank] = path;
         }
 
-        progress = new(100, "Finished");
+        progress = new(100, "Finished!");
         Console.WriteLine($"Bitboards initialized in {t.Stop()}ms");
         Thread.Sleep(20);
         init = true;
