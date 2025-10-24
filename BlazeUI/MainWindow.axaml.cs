@@ -140,6 +140,14 @@ public partial class MainWindow : Window
             case Key.Left:
                 _pgnDisplay.GoBackOne();
                 break;
+            case Key.Down:
+                _pgnDisplay.GoForwardOne();
+                _pgnDisplay.GoForwardOne();
+                break;
+            case Key.Up:
+                _pgnDisplay.GoBackOne();
+                _pgnDisplay.GoBackOne();
+                break;
         }
         
         base.OnKeyDown(e);
