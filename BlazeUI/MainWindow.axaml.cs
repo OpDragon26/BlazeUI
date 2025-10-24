@@ -127,7 +127,10 @@ public partial class MainWindow : Window
     private void OnKeyDown(TopLevel t, KeyEventArgs e)
     {
         if (e.Key == Key.Escape)
+        {
             _pieceBoard!.CancelPromotion();
+            _pieceBoard!.LoadLatest();
+        }
         
         base.OnKeyDown(e);
     }

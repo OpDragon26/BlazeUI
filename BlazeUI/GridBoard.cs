@@ -14,7 +14,7 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
     public readonly Grid InnerGrid = grid;
     private readonly List<PieceItem> _pieces = new();
     private EmbeddedMatch? _match;
-    private Side _side;
+    public Side side;
     private Outcome _outcome;
     
     private DispatcherTimer? _timer;
@@ -24,7 +24,7 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
     
     public void MovePiece((int x, int y) from, (int x, int y) to)
     {
-        HighLight(0, _side);
+        HighLight(0, side);
         
         int index = FindIndexOfPiece(from);
         if (index == -1)
@@ -42,11 +42,11 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
             return;
         }
         
-        if (_match.board.side != (int)_side)
+        if (_match.board.side != (int)side)
             return;
 
-        (int x, int y) invertedFrom = PerspectiveConverter.Invert(from, _side);
-        (int x, int y) invertedTo = PerspectiveConverter.Invert(to, _side);
+        (int x, int y) invertedFrom = PerspectiveConverter.Invert(from, side);
+        (int x, int y) invertedTo = PerspectiveConverter.Invert(to, side);
         
         // white attempted promotion
         if ((_match.board.GetPiece(invertedFrom) == Pieces.WhitePawn && invertedTo.y == 7) ||
@@ -63,7 +63,7 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
 
     public void PieceRaised((int x, int y) pos)
     {
-        HighLight(BitboardUtils.GetMoveBitboard(Search.SearchBoard(_match!.board, false).ToArray().Where(move => move.Source == PerspectiveConverter.Invert(pos, _side)).ToArray()), _side);
+        HighLight(BitboardUtils.GetMoveBitboard(Search.SearchBoard(_match!.board, false).ToArray().Where(move => move.Source == PerspectiveConverter.Invert(pos, side)).ToArray()), side);
     }
 
     private void TryMakeMove(string moveString)
@@ -74,8 +74,8 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
         Move move = new Move(moveString, _match!.board);
         if (_match.TryMake(move))
         {
-            pgnDisplay.Add(_match.NotateLastMove());
-            LoadBoard(_match.board, _side);
+            pgnDisplay.Add(_match.NotateLastMove(), new Board(_match!.board));
+            LoadBoard(_match.board, side);
             // Console.WriteLine("Made move " + moveString);
             StartPolling();
         }
@@ -111,11 +111,11 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
     {
         if (_match!.Poll(out var node))
         {
-            pgnDisplay.Add(_match.NotateLastMove());
+            pgnDisplay.Add(_match.NotateLastMove(), new Board(_match!.board));
             _timer!.Stop();
-            LoadBoard(node.board, _side);
+            LoadBoard(node.board, side);
             LockAll(true);
-            LockPieces(_side, false);
+            LockPieces(side, false);
             IsGameOver();
         }
     }
@@ -155,7 +155,7 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
         _pieces.Add(new PieceItem(piece, at));
     }
 
-    private void LoadBoard(Board board, Side perspective)
+    public void LoadBoard(Board board, Side perspective)
     {
         Clear();
 
@@ -176,19 +176,26 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
         }
     }
 
+    public void LoadLatest()
+    {
+        LoadBoard(_match!.board, side);
+    }
+
     public void SetMatch(EmbeddedMatch? match, Side perspective)
     {
-        _side = perspective;
+        pgnDisplay.Init(this);
+        
+        side = perspective;
         _match = match;
         
         LockAll(true);
-        LockPieces(_side, false);
+        LockPieces(side, false);
 
         if (match != null)
         {
             pgnDisplay.Clear();
             if (match.board.side == 1)
-                pgnDisplay.Add("...");
+                pgnDisplay.Add("...", new Board(_match!.board));
             if (perspective == Side.Black)
                 StartPolling();
             LoadBoard(match.board, perspective);
@@ -266,7 +273,7 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
         }
     }
 
-    private void LockAll(bool locked)
+    public void LockAll(bool locked)
     {
         foreach (PieceItem piece in _pieces)
         {

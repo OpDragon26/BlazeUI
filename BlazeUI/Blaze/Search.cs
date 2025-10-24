@@ -23,12 +23,31 @@ public static class Search
         int[] evals = new int[moves.Length];
         if (moves.Length == 0) throw new Exception("No move found");
 
+        int alpha = int.MinValue;
+        int beta = int.MaxValue;
+        int eval = board.side == 0 ? int.MinValue : int.MaxValue;
+
+        for (int i = 0; i < moves.Length; i++)
+        {
+            
+        }
         
         Parallel.For(0, moves.Length, i =>
         {
             Board moveBoard = new(board);
             moveBoard.MakeMove(moves[i]);
-            evals[i] = Minimax(moveBoard, depth - 1, int.MinValue, int.MaxValue, moves[i]);
+            evals[i] = Minimax(moveBoard, depth - 1, alpha, beta, moves[i]);
+
+            if (board.side == 0)
+            {
+                eval = Math.Max(eval, evals[i]);
+                alpha = Math.Max(alpha, eval);
+            }
+            else
+            {
+                eval = Math.Min(eval, evals[i]);
+                beta = Math.Min(beta, eval);
+            }
         });
         
 
