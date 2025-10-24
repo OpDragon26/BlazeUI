@@ -100,7 +100,7 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
             return;
         
         LockAll(true);
-        
+
         _timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16) };
         _match.WaitStartSearch();
         _timer.Tick += Poll;
@@ -183,6 +183,7 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
 
     public void SetMatch(EmbeddedMatch? match, Side perspective)
     {
+        _timer?.Stop();
         pgnDisplay.Init(this);
         
         side = perspective;
