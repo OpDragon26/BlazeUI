@@ -75,7 +75,8 @@ public class PGNDisplay(StackPanel panel)
             _board!.LockAll(true);
         
         _board!.ClearHighlight("last-move");
-        _board!.HighlightMove(_game[_lastViewed].move, Colors.HighLightMove);
+        if (_game[_lastViewed].move.Source.file != 8)
+            _board!.HighlightMove(_game[_lastViewed].move, Colors.HighLightMove);
         
         ClearSelected();
         _buttons[_lastViewed].Classes.Add("SelectedEntry");

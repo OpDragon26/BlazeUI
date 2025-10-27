@@ -7,10 +7,6 @@
         x:Class="BlazeUI.MainWindow"
         Title="BlazeUI">
         
-        <Window.Resources>
-                <local:MinSizeConverter x:Key="MinSizeConverter"/>
-        </Window.Resources>
-        
         <Grid>
                 <Grid RowDefinitions="50,*" Background="{DynamicResource PrimaryBackgroundGradient}">
                         <Border Grid.Row="0" BorderBrush="{DynamicResource SecondaryBorder}" BorderThickness="0,0,0,2">
@@ -25,57 +21,53 @@
                 
                         <!-- Main body -->
                         <Grid Grid.Row="1" ColumnDefinitions="*,2*,*">
-                                <Grid Grid.Column="1" RowDefinitions="*,Auto,*">
-                                        <!-- Board -->
-                                        <Border Grid.Row="1" CornerRadius="10" Background="Beige" ClipToBounds="True">
-                                                <Border.Width>
-                                                        <MultiBinding Converter="{StaticResource MinSizeConverter}">
-                                                                <Binding Path="Bounds.Width" RelativeSource="{RelativeSource AncestorType=Grid}" />
-                                                                <Binding Path="Bounds.Height" RelativeSource="{RelativeSource AncestorType=Grid}" />
-                                                        </MultiBinding>
-                                                </Border.Width>
-                                                <Border.Height>
-                                                        <Binding Path="Width" RelativeSource="{RelativeSource Self}" />
-                                                </Border.Height>
-                                                
-                                                <Grid>
-                                                        <UniformGrid Rows="8" Columns="8" x:Name="board"></UniformGrid>
-                                                        
-                                                        <Grid RowDefinitions="*,*,*,*,*,*,*,*" ColumnDefinitions="*,*,*,*,*,*,*,*" x:Name="highlight"></Grid>
-                                                        <Grid RowDefinitions="*,*,*,*,*,*,*,*" ColumnDefinitions="*,*,*,*,*,*,*,*" x:Name="pieces"></Grid>
-                                                        <Grid ColumnDefinitions="*,*,*,*,*,*,*,*" x:Name="PromotionGrid" RowDefinitions="Auto" ZIndex="-5">
-                                                                <Border Classes="PromotionSelector">
-                                                                        <StackPanel Classes="PromotionSelectorPanel">
-                                                                                <Button Click="PromotionSelected" x:Name="QueenPromotionButton" Classes="PromotionSelectorButton"><Image x:Name="QueenPromotion">
-                                                                                        <Image.RenderTransform><ScaleTransform ScaleX="1.2" ScaleY="1.2"></ScaleTransform></Image.RenderTransform>
-                                                                                </Image></Button>
-                                                                                <Button Click="PromotionSelected" x:Name="RookPromotionButton" Classes="PromotionSelectorButton"><Image x:Name="RookPromotion">
-                                                                                        <Image.RenderTransform><ScaleTransform ScaleX="1.2" ScaleY="1.2"></ScaleTransform></Image.RenderTransform>
-                                                                                </Image></Button>
-                                                                                <Button Click="PromotionSelected" x:Name="KnightPromotionButton" Classes="PromotionSelectorButton"><Image x:Name="KnightPromotion">
-                                                                                        <Image.RenderTransform><ScaleTransform ScaleX="1.2" ScaleY="1.2"></ScaleTransform></Image.RenderTransform>
-                                                                                </Image></Button>
-                                                                                <Button Click="PromotionSelected" x:Name="BishopPromotionButton" Classes="PromotionSelectorButton"><Image x:Name="BishopPromotion">
-                                                                                        <Image.RenderTransform><ScaleTransform ScaleX="1.2" ScaleY="1.2"></ScaleTransform></Image.RenderTransform>
-                                                                                </Image></Button>
-                                                                                <TextBlock Classes="PromotionSelector">ESC</TextBlock>
-                                                                        </StackPanel>
-                                                                </Border>
+                                <Viewbox Grid.Column="1" Stretch="Uniform">
+                                        <Grid RowDefinitions="100,*,100" Width="800" Height="950">
+                                                <!-- Board -->
+                                                <Border Grid.Row="1" CornerRadius="10" Background="Beige" ClipToBounds="True">
+                                                        <Grid>
+                                                                <Grid RowDefinitions="*,*,*,*,*,*,*,*" ColumnDefinitions="*,*,*,*,*,*,*,*" x:Name="board"></Grid>
+                                                                <Grid RowDefinitions="*,*,*,*,*,*,*,*" ColumnDefinitions="*,*,*,*,*,*,*,*" x:Name="highlight"></Grid>
+                                                                <Grid RowDefinitions="*,*,*,*,*,*,*,*" ColumnDefinitions="*,*,*,*,*,*,*,*" x:Name="pieces"></Grid>
+                                                                <Grid ColumnDefinitions="*,*,*,*,*,*,*,*" x:Name="PromotionGrid" RowDefinitions="Auto" ZIndex="-5">
+                                                                        <Border Classes="PromotionSelector">
+                                                                                <StackPanel Classes="PromotionSelectorPanel">
+                                                                                        <Button Click="PromotionSelected" x:Name="QueenPromotionButton" Classes="PromotionSelectorButton"><Image x:Name="QueenPromotion">
+                                                                                                <Image.RenderTransform><ScaleTransform ScaleX="1.2" ScaleY="1.2"></ScaleTransform></Image.RenderTransform>
+                                                                                        </Image></Button>
+                                                                                        <Button Click="PromotionSelected" x:Name="RookPromotionButton" Classes="PromotionSelectorButton"><Image x:Name="RookPromotion">
+                                                                                                <Image.RenderTransform><ScaleTransform ScaleX="1.2" ScaleY="1.2"></ScaleTransform></Image.RenderTransform>
+                                                                                        </Image></Button>
+                                                                                        <Button Click="PromotionSelected" x:Name="KnightPromotionButton" Classes="PromotionSelectorButton"><Image x:Name="KnightPromotion">
+                                                                                                <Image.RenderTransform><ScaleTransform ScaleX="1.2" ScaleY="1.2"></ScaleTransform></Image.RenderTransform>
+                                                                                        </Image></Button>
+                                                                                        <Button Click="PromotionSelected" x:Name="BishopPromotionButton" Classes="PromotionSelectorButton"><Image x:Name="BishopPromotion">
+                                                                                                <Image.RenderTransform><ScaleTransform ScaleX="1.2" ScaleY="1.2"></ScaleTransform></Image.RenderTransform>
+                                                                                        </Image></Button>
+                                                                                        <TextBlock Classes="PromotionSelector">ESC</TextBlock>
+                                                                                </StackPanel>
+                                                                        </Border>
+                                                                </Grid>
                                                         </Grid>
-                                                </Grid>
-                                        </Border>
-                                        
-                                        
-                                        <!-- Top row: enemy name, depth, material --> 
-                                        <StackPanel Grid.Row="0">
+                                                </Border>
                                                 
-                                        </StackPanel>
+                                                <!-- Top row: enemy name, depth, material --> 
+                                                <Border Grid.Row="0">
+                                                        <Grid ColumnDefinitions="*,Auto" Classes="InfoBarTopGrid">
+                                                                <StackPanel Grid.Column="0" Classes="InfoBarTop">
+                                                                        <TextBlock Classes="InfoBarName">BLAZE</TextBlock>
+                                                                        <TextBlock Classes="InfoBarDepth" Name="DepthDisplay">depth</TextBlock>
+                                                                </StackPanel>
+                                                                <TextBlock Classes="InfoBarMaterialTop InfoBarMaterial" Grid.Column="1">material</TextBlock>
+                                                        </Grid>
+                                                </Border>
                                         
-                                        <!-- Bottom row: friendly depth, material --> 
-                                        <StackPanel Grid.Row="2">
-                                                
-                                        </StackPanel>
-                                </Grid>
+                                                <!-- Bottom row: friendly material --> 
+                                                <Border Grid.Row="2">
+                                                        <TextBlock Classes="InfoBarMaterialBottom InfoBarMaterial">material</TextBlock>
+                                                </Border>
+                                        </Grid>
+                                </Viewbox>
                                 
                                 <!-- Right sidebar: PGN -->
                                 <Border Grid.Column="2" Padding="20">

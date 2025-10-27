@@ -54,4 +54,36 @@
         <Setter Property="FontSize" Value="12"></Setter>
         <Setter Property="FontWeight" Value="ExtraLight"></Setter>
     </Style>
+    
+    <Style Selector="StackPanel.InfoBarTop">
+        <Setter Property="VerticalAlignment" Value="Bottom"></Setter>
+    </Style>
+    
+    <Style Selector="Grid.InfoBarTopGrid">
+        <Setter Property="Margin" Value="0,0,0,20"></Setter>
+    </Style>
+    
+    <Style Selector="TextBlock.InfoBarName">
+        <Setter Property="FontSize" Value="30"></Setter>
+        <Setter Property="FontWeight" Value="Light"></Setter>
+    </Style>
+    
+    <Style Selector="TextBlock.InfoBarDepth">
+        <Setter Property="FontSize" Value="20"></Setter>
+        <Setter Property="FontWeight" Value="ExtraLight"></Setter>
+    </Style>
+    
+    <Style Selector="TextBlock.InfoBarMaterial">
+        <Setter Property="FontSize" Value="20"></Setter>
+        <Setter Property="HorizontalAlignment" Value="Right"></Setter>
+        <Setter Property="FontWeight" Value="ExtraLight"></Setter>
+    </Style>
+    
+    <Style Selector="TextBlock.InfoBarMaterialTop">
+        <Setter Property="VerticalAlignment" Value="Bottom"></Setter>
+    </Style>
+    <Style Selector="TextBlock.InfoBarMaterialBottom">
+        <Setter Property="VerticalAlignment" Value="Top"></Setter>
+        <Setter Property="Margin" Value="0,20,0,0"></Setter>
+    </Style>
 </Styles>

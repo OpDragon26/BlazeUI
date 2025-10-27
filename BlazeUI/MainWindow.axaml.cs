@@ -32,13 +32,15 @@ public partial class MainWindow : Window
         InitProgress.SetCompletion(0);
         
         // init board
-        var BoardBackground = this.FindControl<UniformGrid>("board");
+        var BoardBackground = this.FindControl<Grid>("board");
         for (int file = 0; file < 8; file++)
         {
             for (int rank = 0; rank < 8; rank++)
             {
-                BoardBackground!.Children.Add(new Rectangle
-                    { [Shape.FillProperty] = (file + rank) % 2 == 0 ? Colors.LightSquare : Colors.DarkSquare });
+                Rectangle rect = new Rectangle { [Shape.FillProperty] = (file + rank) % 2 == 0 ? Colors.LightSquare : Colors.DarkSquare };
+                Grid.SetRow(rect, file);
+                Grid.SetColumn(rect, rank);
+                BoardBackground!.Children.Add(rect);
             }
         }
         
@@ -49,7 +51,7 @@ public partial class MainWindow : Window
         
         // load a new game from starting position
         _pgnDisplay = new PGNDisplay(PGNPanel);
-        _pieceBoard = new GridBoard(this.FindControl<Grid>("pieces")!, this.FindControl<Grid>("highlight")!, _promotionHandler, _pgnDisplay, this);
+        _pieceBoard = new GridBoard(this.FindControl<Grid>("pieces")!, this.FindControl<Grid>("highlight")!, _promotionHandler, _pgnDisplay, DepthDisplay, this);
         _pieceBoard.SetMatch(null, Side.White);
         StartNewGame();
     }

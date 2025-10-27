@@ -12,7 +12,7 @@ using Rectangle = Avalonia.Controls.Shapes.Rectangle;
 
 namespace BlazeUI;
 
-public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotionHandler, PGNDisplay pgnDisplay, MainWindow window)
+public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotionHandler, PGNDisplay pgnDisplay, TextBlock depthDisplay, MainWindow window)
 {
     public readonly Grid InnerGrid = grid;
     private readonly List<PieceItem> _pieces = new();
@@ -125,6 +125,7 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
 
     private void HandleBotMove(PGNNode node)
     {
+        depthDisplay.Text = $"depth {_match!.depth}";
         ClearHighlight("last-move");
         HighlightMove(node.move, Colors.HighLightMove);
         pgnDisplay.Add(_match!.NotateLastMove(), _match.game[^1].move, new Board(_match!.board));
@@ -198,6 +199,7 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
 
     public void SetMatch(EmbeddedMatch? match, Side perspective)
     {
+        ClearHighlight();
         _timer?.Stop();
         pgnDisplay.Init(this);
         
@@ -209,9 +211,10 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
 
         if (match != null)
         {
+            depthDisplay.Text = $"depth {_match!.depth}";
             pgnDisplay.Clear();
             if (match.board.side == 1)
-                pgnDisplay.Add("...", new Move("a1a1", new Board(_match!.board)), new Board(_match!.board));
+                pgnDisplay.Add("...", new Move((8,8),(8,8)), new Board("8/8/8/8/8/8/8/8 w - - 0 1"));
             if (perspective == Side.Black)
                 StartPolling();
             LoadBoard(match.board, perspective);
