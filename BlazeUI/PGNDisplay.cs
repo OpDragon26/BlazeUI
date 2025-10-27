@@ -7,13 +7,13 @@ namespace BlazeUI;
 
 public class PGNDisplay(StackPanel panel)
 {
-    private readonly List<(string move, Board board)> _game = new();
+    private readonly List<(string moveString, Move move, Board board)> _game = new();
     private Grid? _last;
     private GridBoard? _board;
     private int _lastViewed;
     private readonly List<Button> _buttons = new();
     
-    public void Add(string move, Board board)
+    public void Add(string moveString, Move move, Board board)
     {
         if (_game.Count % 2 == 0)
         {
@@ -31,7 +31,7 @@ public class PGNDisplay(StackPanel panel)
         }
         
         Button moveText = new Button {
-            Content = move, 
+            Content = moveString, 
             Classes = { "GameEntryRow" }, 
             Name = Convert.ToString(_game.Count)
         };
@@ -44,6 +44,9 @@ public class PGNDisplay(StackPanel panel)
             if (!button.Name!.Equals(Convert.ToString(_game.Count - 1)))
                 _board!.LockAll(true);
             
+            _board!.ClearHighlight("last-move");
+            _board!.HighlightMove(move, Colors.HighLightMove);
+            
             _lastViewed = Convert.ToInt32(button.Name);
             ClearSelected();
             button.Classes.Add("SelectedEntry");
@@ -55,7 +58,7 @@ public class PGNDisplay(StackPanel panel)
         _lastViewed = _game.Count;
         ClearSelected();
         moveText.Classes.Add("SelectedEntry");
-        _game.Add((move, board));
+        _game.Add((moveString, move, board));
     }
 
     private void ClearSelected()
@@ -73,6 +76,9 @@ public class PGNDisplay(StackPanel panel)
         _board!.LoadBoard(_game[_lastViewed].board, _board.side);
         _board!.LockAll(true);
         
+        _board!.ClearHighlight("last-move");
+        _board!.HighlightMove(_game[_lastViewed].move, Colors.HighLightMove);
+        
         ClearSelected();
         _buttons[_lastViewed].Classes.Add("SelectedEntry");
     }
@@ -83,6 +89,9 @@ public class PGNDisplay(StackPanel panel)
         _board!.LoadBoard(_game[_lastViewed].board, _board.side);
         if (_lastViewed != _game.Count - 1)
             _board!.LockAll(true);
+        
+        _board!.ClearHighlight("last-move");
+        _board!.HighlightMove(_game[_lastViewed].move, Colors.HighLightMove);
         
         ClearSelected();
         _buttons[_lastViewed].Classes.Add("SelectedEntry");

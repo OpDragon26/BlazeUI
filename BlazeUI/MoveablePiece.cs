@@ -1,4 +1,3 @@
-using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -41,7 +40,8 @@ public class MoveablePiece : Image
         
         _pressed = false;
         SnapToGrid(e.GetPosition(this.GetVisualParent()));
-
+        PieceGrid.PieceReleased();
+        
         base.OnPointerReleased(e);
     }
 
