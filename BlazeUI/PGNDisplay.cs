@@ -39,17 +39,8 @@ public class PGNDisplay(StackPanel panel)
         
         moveText.Click += (sender, _) =>
         {
-            _board!.LoadBoard(board, _board.side);
             Button button = (sender as Button)!;
-            if (!button.Name!.Equals(Convert.ToString(_game.Count - 1)))
-                _board!.LockAll(true);
-            
-            _board!.ClearHighlight("last-move");
-            _board!.HighlightMove(move, Colors.HighLightMove);
-            
-            _lastViewed = Convert.ToInt32(button.Name);
-            ClearSelected();
-            button.Classes.Add("SelectedEntry");
+            JumpTo(int.Parse(button.Name!));
         };
         
         _last!.Children.Add(moveText);
@@ -69,23 +60,16 @@ public class PGNDisplay(StackPanel panel)
                 button.Classes.Remove("SelectedEntry");
         }
     }
-
-    public void GoBackOne()
+    
+    public void Slide(int by)
     {
-        _lastViewed = Math.Max(_lastViewed - 1, 0);
-        _board!.LoadBoard(_game[_lastViewed].board, _board.side);
-        _board!.LockAll(true);
-        
-        _board!.ClearHighlight("last-move");
-        _board!.HighlightMove(_game[_lastViewed].move, Colors.HighLightMove);
-        
-        ClearSelected();
-        _buttons[_lastViewed].Classes.Add("SelectedEntry");
+        JumpTo(_lastViewed + by);
     }
 
-    public void GoForwardOne()
+    private void JumpTo(int to)
     {
-        _lastViewed = Math.Min(_lastViewed + 1, _game.Count - 1);
+        to = Math.Clamp(to, 0, _game.Count - 1);
+        _lastViewed = to;
         _board!.LoadBoard(_game[_lastViewed].board, _board.side);
         if (_lastViewed != _game.Count - 1)
             _board!.LockAll(true);

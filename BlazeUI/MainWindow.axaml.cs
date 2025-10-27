@@ -135,18 +135,16 @@ public partial class MainWindow : Window
                 _pieceBoard!.LoadLatest();
                 break;
             case Key.Right:
-                _pgnDisplay.GoForwardOne();
+                _pgnDisplay.Slide(1);
                 break;
             case Key.Left:
-                _pgnDisplay.GoBackOne();
+                _pgnDisplay.Slide(-1);
                 break;
             case Key.Down:
-                _pgnDisplay.GoForwardOne();
-                _pgnDisplay.GoForwardOne();
+                _pgnDisplay.Slide(2);
                 break;
             case Key.Up:
-                _pgnDisplay.GoBackOne();
-                _pgnDisplay.GoBackOne();
+                _pgnDisplay.Slide(-2);
                 break;
         }
         
