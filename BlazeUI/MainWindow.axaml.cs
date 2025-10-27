@@ -51,7 +51,7 @@ public partial class MainWindow : Window
         
         // load a new game from starting position
         _pgnDisplay = new PGNDisplay(PGNPanel);
-        _pieceBoard = new GridBoard(this.FindControl<Grid>("pieces")!, this.FindControl<Grid>("highlight")!, _promotionHandler, _pgnDisplay, DepthDisplay, this);
+        _pieceBoard = new GridBoard(this.FindControl<Grid>("pieces")!, this.FindControl<Grid>("highlight")!, _promotionHandler, _pgnDisplay, DepthDisplay, BotMaterial, PlayerMaterial,  this);
         _pieceBoard.SetMatch(null, Side.White);
         StartNewGame();
     }

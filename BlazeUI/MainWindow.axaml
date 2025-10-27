@@ -58,13 +58,13 @@
                                                                         <TextBlock Classes="InfoBarName">BLAZE</TextBlock>
                                                                         <TextBlock Classes="InfoBarDepth" Name="DepthDisplay">depth</TextBlock>
                                                                 </StackPanel>
-                                                                <TextBlock Classes="InfoBarMaterialTop InfoBarMaterial" Grid.Column="1">material</TextBlock>
+                                                                <TextBlock Name="BotMaterial" Classes="InfoBarMaterialTop InfoBarMaterial" Grid.Column="1">material</TextBlock>
                                                         </Grid>
                                                 </Border>
                                         
                                                 <!-- Bottom row: friendly material --> 
                                                 <Border Grid.Row="2">
-                                                        <TextBlock Classes="InfoBarMaterialBottom InfoBarMaterial">material</TextBlock>
+                                                        <TextBlock Name="PlayerMaterial" Classes="InfoBarMaterialBottom InfoBarMaterial">material</TextBlock>
                                                 </Border>
                                         </Grid>
                                 </Viewbox>

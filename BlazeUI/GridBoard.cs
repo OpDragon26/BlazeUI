@@ -12,7 +12,7 @@ using Rectangle = Avalonia.Controls.Shapes.Rectangle;
 
 namespace BlazeUI;
 
-public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotionHandler, PGNDisplay pgnDisplay, TextBlock depthDisplay, MainWindow window)
+public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotionHandler, PGNDisplay pgnDisplay, TextBlock depthDisplay, TextBlock botMaterial, TextBlock? playerMaterial, MainWindow window)
 {
     public readonly Grid InnerGrid = grid;
     private readonly List<PieceItem> _pieces = new();
@@ -174,7 +174,8 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
     public void LoadBoard(Board board, Side perspective)
     {
         Clear();
-
+        UpdateMaterial(board, perspective);
+        
         for (int file = 0; file < 8; file++)
         {
             for (int rank = 0; rank < 8; rank++)
@@ -189,6 +190,22 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
                 MoveablePiece pieceObject = new MoveablePiece { PieceGrid = this , Source = GetPieceBitmap(board.GetPiece(file, rank)) , Side = pieceSide };
                 AddPiece(pieceObject, objectivePos);
             }
+        }
+    }
+
+    private void UpdateMaterial(Board board, Side perspective)
+    {
+        Utils.MaterialComparison comparison = Utils.CompareMaterial(board);
+
+        if (perspective == Side.White)
+        {
+            playerMaterial!.Text = comparison.GetWhiteString();
+            botMaterial!.Text = comparison.GetBlackString();
+        }
+        else
+        {
+            playerMaterial!.Text = comparison.GetBlackString();
+            botMaterial!.Text = comparison.GetWhiteString();
         }
     }
 

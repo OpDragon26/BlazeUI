@@ -144,7 +144,7 @@ public class Board
         this.considerRepetition = considerRepetition;
     }
 
-    public bool CompareTo(Board other)
+    public bool CompareTo(Board other, bool log)
     {
         bool match = true;
         
@@ -155,44 +155,54 @@ public class Board
 
         if (!match)
         {
-            Console.WriteLine("Piecewise boards don't match");
-            Console.WriteLine("this");
-            CLIMatch.PrintBoard(this);
-            Console.WriteLine("other");
-            CLIMatch.PrintBoard(other);
+            if (log)
+            {
+                Console.WriteLine("Piecewise boards don't match");
+                Console.WriteLine("this");
+                CLIMatch.PrintBoard(this);
+                Console.WriteLine("other");
+                CLIMatch.PrintBoard(other);
+            }
             return false;
         }
         
         // side
         if (side != other.side)
         {
-            Console.WriteLine("Side is opposite");
+            if (log) Console.WriteLine("Side is opposite");
             return false;
         }
         
         // en passant
         if (enPassant != other.enPassant)
         {
-            Console.WriteLine((enPassant.file == 8, other.enPassant.file == 8) switch
+            if (log)
             {
-                (true, true) => "Erm what?",
-                (true, false) => $"En passant present only on other: {Move.GetSquare(other.enPassant)}",
-                (false, true) => $"En passant present only on this: {Move.GetSquare(enPassant)}",
-                (false, false) => $"En passant doesn't match - this: {Move.GetSquare(enPassant)} other: {Move.GetSquare(other.enPassant)}"
-            });
+                Console.WriteLine((enPassant.file == 8, other.enPassant.file == 8) switch
+                {
+                    (true, true) => "Erm what?",
+                    (true, false) => $"En passant present only on other: {Move.GetSquare(other.enPassant)}",
+                    (false, true) => $"En passant present only on this: {Move.GetSquare(enPassant)}",
+                    (false, false) => $"En passant doesn't match - this: {Move.GetSquare(enPassant)} other: {Move.GetSquare(other.enPassant)}"
+                });
+            }
+            
             return false;
         }
         
         // bitboards
         if (AllPieces() != other.AllPieces())
         {
-            Console.WriteLine("Piece bitboards don't match");
-            Console.WriteLine("this");
-            CLIMatch.PrintBitboard(AllPieces(), 0);
-            Console.WriteLine("other");
-            CLIMatch.PrintBitboard(other.AllPieces(), 0);
-            Console.WriteLine("difference");
-            CLIMatch.PrintBitboard(AllPieces() ^ other.AllPieces(), 1);
+            if (log)
+            {
+                Console.WriteLine("Piece bitboards don't match");
+                Console.WriteLine("this");
+                CLIMatch.PrintBitboard(AllPieces(), 0);
+                Console.WriteLine("other");
+                CLIMatch.PrintBitboard(other.AllPieces(), 0);
+                Console.WriteLine("difference");
+                CLIMatch.PrintBitboard(AllPieces() ^ other.AllPieces(), 1);
+            }
             
             return false;
         }
@@ -200,9 +210,12 @@ public class Board
         // castling rights
         if (castling != other.castling)
         {
-            Console.WriteLine("Castling rights don't match");
-            Console.WriteLine($"this: {Convert.ToString(castling, 2).PadLeft(4, '0')}");
-            Console.WriteLine($"other: {Convert.ToString(other.castling, 2).PadLeft(4, '0')}");
+            if (log)
+            {
+                Console.WriteLine("Castling rights don't match");
+                Console.WriteLine($"this: {Convert.ToString(castling, 2).PadLeft(4, '0')}");
+                Console.WriteLine($"other: {Convert.ToString(other.castling, 2).PadLeft(4, '0')}");
+            }
             
             return false;
         }
@@ -210,9 +223,12 @@ public class Board
         // king positions
         if (!KingPositions.Equals(other.KingPositions))
         {
-            Console.WriteLine("King positions don't match");
-            Console.WriteLine($"this: {KingPositions}");
-            Console.WriteLine($"other: {other.KingPositions}");
+            if (log)
+            {
+                Console.WriteLine("King positions don't match");
+                Console.WriteLine($"this: {KingPositions}");
+                Console.WriteLine($"other: {other.KingPositions}");
+            }
             
             return false;
         }
@@ -220,9 +236,14 @@ public class Board
         // castled
         if (castled != other.castled)
         {
-            Console.WriteLine("Castled is inconsistent");
-            Console.WriteLine($"this: {Convert.ToString(castled, 2).PadLeft(2, '0')}");
-            Console.WriteLine($"other: {Convert.ToString(other.castled, 2).PadLeft(2, '0')}");
+            if (log)
+            {
+                Console.WriteLine("Castled is inconsistent");
+                Console.WriteLine($"this: {Convert.ToString(castled, 2).PadLeft(2, '0')}");
+                Console.WriteLine($"other: {Convert.ToString(other.castled, 2).PadLeft(2, '0')}");
+            }
+            
+            return false;
         }
         
         return true;
