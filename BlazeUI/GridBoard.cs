@@ -174,8 +174,19 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
 
     public void LoadBoard(Board board, Side perspective, bool playSound)
     {
+        LoadBoard(board, perspective, playSound, _ => 0UL);
+    }
+
+    private void LoadBoard(Board board, Side perspective, bool playSound, Func<Board, ulong> highlighter)
+    {
         Clear();
         UpdateMaterial(board, perspective);
+        ClearHighlight("check");
+        if (_match != null && Search.Attacked(board.KingPositions[board.side], board, 1 - board.side))
+            HighLight(BitboardUtils.GetSquare(board.KingPositions[board.side]), perspective, "check", Colors.HighLightCheck);
+        
+        ClearHighlight("specified");
+        HighLight(highlighter(board), perspective, "specified", Colors.HighLight);
         
         if (playSound)
             Sound.PlaySound("move");
