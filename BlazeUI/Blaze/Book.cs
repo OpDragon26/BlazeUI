@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 
 namespace BlazeUI.Blaze;
@@ -55,30 +54,18 @@ public static class Book
 
         public void AddEntry(Board board, Move move)
         {
-            foreach (Entry entry in entries)
-            {
-                if (entry.board.Equals(board))
-                {
-                    entry.moves.Add(move);
-                    return;
-                }
-            }
-            entries.Add(new Entry(board, move));
+            Entry? entry = entries.Find(e => e.board.Equals(board));
+            if (entry == null)
+                entries.Add(new Entry(board, move));
+            else
+                entry.moves.Add(move);
         }
 
         public bool TryRetrieve(Board board, out Move? move)
         {
-            move = null;
-            
-            foreach (Entry entry in entries)
-            {
-                if (entry.board.Equals(board))
-                {
-                    move = entry.moves[random.Next(entry.moves.Count)];
-                    return true;
-                }
-            }
-            return false;
+            Entry? entry = entries.Find(e => e.board.Equals(board));
+            move = entry?.moves[random.Next(entry.moves.Count)];
+            return entry == null;
         }
     }
     

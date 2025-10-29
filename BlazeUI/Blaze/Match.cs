@@ -91,6 +91,8 @@ public class Match
     private void UpdateDepth(Search.SearchResult last)
     {
         if (last.bookMove) return;
+        if (last.move.Promotion != Pieces.Empty)
+            depth--;
 
         int increase = Thresholds[depthFloor, 0];
         int decrease = board.IsEndgame() ? Thresholds[depthFloor, 2] : Thresholds[depthFloor, 1];
