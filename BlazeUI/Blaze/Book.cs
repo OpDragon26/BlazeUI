@@ -1,25 +1,20 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 
 namespace BlazeUI.Blaze;
 
 public static class Book
 {
-    static readonly List<Entry>[] book = new List<Entry>[15];
+    private static readonly List<Layer> book = new();
     private static bool init;
     private static readonly Random random = new();
 
     public static void Init(string[] origin)
     {
-        // ensures that the code only runs once
         if (init) return;
         init = true;
-        
-        // set the first board to the staring board
-        book[0] = [new Entry { board = new Board(Presets.StartingBoard), moves = new List<BookMove>() }];
-        for (int i = 1; i < 15; i++)
-            book[i] = new List<Entry>();
         
         foreach (string line in origin)
         {
@@ -28,129 +23,70 @@ public static class Book
         }
     }
     
-    // tries to find the given board at the given depth, and if it found it, return a random stored move for that board
-    public static Output Retrieve(Board board, int depth)
+    public static bool TryRetrieve(Board board, int depth, out Move? move)
     {
-        if (depth > 17)
-            return new Output { move = new Move((8,8),(8,8)), result = Result.NotFound };
-        
-        foreach (Entry entry in book[depth])
-        {
-            // if the board that belongs to the entry is the given board
-            if (entry.board.Equals(board))
-            {
-                return Pick(entry.moves);
-            }
-        }
-        
-        return new Output { move = new Move((8,8), (8,8)), result = Result.NotFound };
-    }
+        move = null;
+        if (depth >= book.Count)
+            return false;
 
-    private static Output Pick(List<BookMove> moves)
-    {
-        if (moves.Count == 0)
-            return new Output { move = new Move((8,8),(8,8)), result = Result.NotFound };
-        if (moves.Count == 1)
-            return new Output { move = moves[0].move, result = Result.Found };
-        
-        List<int> indices = new List<int>();
-        for (int move = 0; move < moves.Count; move++)
-        {
-            for (int i = 0; i < moves[move].weight; i++)
-            {
-                indices.Add(move);
-            }
-        }
-        
-        Move picked = moves[indices[random.Next(indices.Count)]].move;
-        return new Output { move = picked, result = Result.Found };
+        return book[depth].TryRetrieve(board, out move);
     }
-
+    
     private static void AddLine(PGNNode[] line)
     {
-        // for the first node
-        // if the board has the move, increase its weight
-        // for each move of the board
-        bool found = false;
-        foreach (BookMove move in book[0][0].moves)
+        for (int depth = 0; depth < line.Length; depth++)
         {
-            // if the board contains the move, increase its weight
-            if (move.move.Equals(line[0].move))
-            {
-                found = true;
-                move.weight += 1;
-                break;
-            }
-        }
-        // if the board does not contain the move, add it
-        if (!found)
-        {
-            book[0][0].moves.Add(new BookMove { move = line[0].move, weight = 1 });
-            // add the resulting board to the next list
-            book[1].Add(new Entry { board = line[0].board, moves = new List<BookMove>() });
-        }
-        
-        // for each node
-        for (int i = 1; i < 14; i++)
-        {
-            // for each board at the given depth
-            for (int board = 0; board < book[i].Count; board++)
-            {
-                // if the board belongs to the previous node
-                if (line[i-1].board.Equals(book[i][board].board))
-                {
-                    // board is book[i][board]
-                    
-                    // if the board has the move, increase its weight
-                    // for each move of the board
-                    found = false;
-                    foreach (BookMove move in book[i][board].moves)
-                    {
-                        // if the board contains the move, increase its weight
-                        if (move.move.Equals(line[i].move))
-                        {
-                            found = true;
-                            move.weight += 1;
-                            break;
-                        }
-                    }
-                    // if the board does not contain the move, add it
-                    if (!found)
-                    {
-                        book[i][board].moves.Add(new BookMove { move = line[i].move, weight = 1 });
-                        // add the resulting board to the next list
-                        if (i != 13)
-                            book[i+1].Add(new Entry { board = line[i].board, moves = new List<BookMove>() });
-                    }
-                    
-                    break;
-                }
-            }
+            Board board = depth == 0 ? new Board(Presets.StartingBoard) : line[depth - 1].board;
+            Move move = line[depth].move;
+            AddToLayer(board, move, depth);
         }
     }
-}
 
-public struct Entry
-{
-    public Board board;
-    public List<BookMove> moves;
-}
+    private static void AddToLayer(Board board, Move move, int depth)
+    {
+        if (depth == book.Count)
+            book.Add(new());
+        book[depth].AddEntry(board, move);
+    }
 
-public class BookMove
-{
-    public required Move move;
-    public int weight;
-}
+    private class Layer
+    {
+        readonly List<Entry> entries = new();
 
-public enum Result
-{
-    Found,
-    NotFound,
-}
-public struct Output
-{
-    public Result result;
-    public Move move;
+        public void AddEntry(Board board, Move move)
+        {
+            foreach (Entry entry in entries)
+            {
+                if (entry.board.Equals(board))
+                {
+                    entry.moves.Add(move);
+                    return;
+                }
+            }
+            entries.Add(new Entry(board, move));
+        }
+
+        public bool TryRetrieve(Board board, out Move? move)
+        {
+            move = null;
+            
+            foreach (Entry entry in entries)
+            {
+                if (entry.board.Equals(board))
+                {
+                    move = entry.moves[random.Next(entry.moves.Count)];
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+    
+    private class Entry(Board board, Move move)
+    {
+        public readonly Board board = board;
+        public readonly List<Move> moves = [move];
+    }
 }
 
 public static class Parser

@@ -10,11 +10,8 @@ public static class Search
     public static SearchResult BestMove(Board board, int depth, bool useBook, int bookDepth)
     {
         if (useBook)
-        {
-            Output output = Book.Retrieve(board, bookDepth);
-            if (output.result == Result.Found)
-                return new SearchResult(output.move, 1, true, 0);
-        }
+            if (Book.TryRetrieve(board, bookDepth, out Move? move))
+                return new SearchResult(move!, 1, true, 0);
         
         Timer timer = new Timer();
         timer.Start();
