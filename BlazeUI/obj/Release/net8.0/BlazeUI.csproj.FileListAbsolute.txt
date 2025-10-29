@@ -82,3 +82,9 @@
 /home/opdragon25/Documents/CSharp/AvaloniaChessUI/BlazeUI/obj/Release/net8.0/BlazeUI.pdb
 /home/opdragon25/Documents/CSharp/AvaloniaChessUI/BlazeUI/obj/Release/net8.0/BlazeUI.genruntimeconfig.cache
 /home/opdragon25/Documents/CSharp/AvaloniaChessUI/BlazeUI/obj/Release/net8.0/ref/BlazeUI.dll
+/home/opdragon25/Documents/CSharp/AvaloniaChessUI/BlazeUI/bin/Release/net8.0/assets/sounds/game_lost.wav
+/home/opdragon25/Documents/CSharp/AvaloniaChessUI/BlazeUI/bin/Release/net8.0/assets/sounds/game_won.wav
+/home/opdragon25/Documents/CSharp/AvaloniaChessUI/BlazeUI/bin/Release/net8.0/assets/sounds/move_1.wav
+/home/opdragon25/Documents/CSharp/AvaloniaChessUI/BlazeUI/bin/Release/net8.0/assets/sounds/move_2.wav
+/home/opdragon25/Documents/CSharp/AvaloniaChessUI/BlazeUI/bin/Release/net8.0/assets/sounds/move_3.wav
+/home/opdragon25/Documents/CSharp/AvaloniaChessUI/BlazeUI/bin/Release/net8.0/LibVLCSharp.dll

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace BlazeUI.Blaze;
 
@@ -11,18 +12,20 @@ public class Match
     private readonly int depthFloor;
     private const int depthCeiling = 8;
     private readonly bool dynamicDepth;
+    private readonly bool delayBook;
     
     private bool inBook;
     internal int ply;
     public List<PGNNode> game = new();
     
-    internal Match(Board board, int depth, bool dynamicDepth = true, bool useBook = true)
+    internal Match(Board board, int depth, bool dynamicDepth = true, bool useBook = true, bool delayBook = false)
     {
         this.board = board;
         this.depth = depth;
         depthFloor = depth;
         inBook = useBook;
         this.dynamicDepth = dynamicDepth;
+        this.delayBook = delayBook;
         
         RefutationTable.Init((int)Math.Pow(2, 20) + 7);
         Bitboards.Init();
@@ -69,6 +72,9 @@ public class Match
     {
         Search.SearchResult bestMove = Search.BestMove(board, depth, inBook, ply);
         
+        if (bestMove.bookMove && delayBook)
+            Thread.Sleep(500);
+        
         board.MakeMove(bestMove.move);
 
         PGNNode node = new PGNNode(new(board), bestMove.move, bestMove.time);
@@ -94,15 +100,6 @@ public class Match
         else if (last.time > decrease) // the move took a long time, decrease depth
             depth--;
         depth = Math.Clamp(depth, depthFloor, depthCeiling);
-    }
-
-    public string NotateLastMove()
-    {
-        if (game.Count == 0)
-            return string.Empty;
-        if (game.Count == 1)
-            return game[0].move.Notate(new Board(Presets.StartingBoard));
-        return game[^1].move.Notate(game[^2].board);
     }
 
     public static List<PGNNode> RandomGame(int depth)
@@ -132,7 +129,7 @@ public class Match
         {50, 1000, 1000}, // 4
         {100, 5000, 2000}, // 5
         {300, 9000, 6000}, // 6
-        {1500, 30000, 20000}, // 7
+        {750, 15000, 10000}, // 7
         {20000, 300000, 150000}, // 8
     };
 }

@@ -3,7 +3,7 @@ using System.Threading;
 
 namespace BlazeUI.Blaze;
 
-public class EmbeddedMatch(Board board, int depth, bool dynamicDepth = true, bool useBook = true) : Match(board, depth, dynamicDepth, useBook)
+public class EmbeddedMatch(Board board, int depth, bool dynamicDepth = true, bool useBook = true, bool delayBook = false) : Match(board, depth, dynamicDepth, useBook, delayBook)
 {
     private bool complete = true;
     PGNNode last = new PGNNode {board = board};

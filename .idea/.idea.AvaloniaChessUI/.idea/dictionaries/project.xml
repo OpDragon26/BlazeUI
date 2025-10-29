@@ -2,6 +2,7 @@
   <dictionary name="project">
     <words>
       <w>evals</w>
+      <w>libvlc</w>
       <w>nfxe</w>
       <w>perft</w>
       <w>zobrist</w>

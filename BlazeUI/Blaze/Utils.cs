@@ -6,6 +6,20 @@ namespace BlazeUI.Blaze;
 
 public static class Utils
 {
+    public static bool SideWon(Side side, Outcome outcome)
+    {
+        return (side == Side.White && outcome == Outcome.WhiteWin) || (side == Side.Black && outcome == Outcome.BlackWin);
+    }
+
+    public static string NotateLastMove(Match match)
+    {
+        if (match.game.Count == 0)
+            return string.Empty;
+        if (match.game.Count == 1)
+            return match.game[0].move.Notate(new Board(Presets.StartingBoard));
+        return match.game[^1].move.Notate(match.game[^2].board);
+    }
+    
     public static MaterialComparison CompareMaterial(Board board)
     {
         MaterialComparison comparison = new(board.GetImbalance() / 100);

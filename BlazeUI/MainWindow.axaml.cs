@@ -24,6 +24,8 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
+        Sound.Init();
+        
         // init overlay
         _overlay = new OverlayHandler(OverlayGrid);
         InitOverlays();
@@ -97,7 +99,7 @@ public partial class MainWindow : Window
         {
             _timer!.Stop();
             _overlay.RemoveActive();
-            _pieceBoard!.SetMatch(new(new(Presets.StartingBoard), _depth), Side.White);
+            _pieceBoard!.SetMatch(new(new(Presets.StartingBoard), _depth, delayBook: true), Side.White);
             //_pieceBoard!.SetMatch(new(new("8/7P/8/5K1k/8/8/8/8 w - - 0 1"), 6), Side.White);
         }
     }

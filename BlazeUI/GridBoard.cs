@@ -84,8 +84,8 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
         {
             ClearHighlight("last-move");
             HighlightMove(move, Colors.HighLightMove);
-            pgnDisplay.Add(_match.NotateLastMove(), _match.game[^1].move, new Board(_match!.board));
-            LoadBoard(_match.board, side);
+            pgnDisplay.Add(Utils.NotateLastMove(_match), _match.game[^1].move, new Board(_match!.board));
+            LoadBoard(_match.board, side, true);
             // Console.WriteLine("Made move " + moveString);
             StartPolling();
         }
@@ -99,6 +99,7 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
         {
             window.GameOverSplash(_outcome, _match.game.Count / 2);
             LockAll(true);
+            Sound.PlaySound(Utils.SideWon(side, _outcome) ? "game-won" : "game-lost");
             return true;
         }
         return false;
@@ -128,9 +129,9 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
         depthDisplay.Text = $"depth {_match!.depth}";
         ClearHighlight("last-move");
         HighlightMove(node.move, Colors.HighLightMove);
-        pgnDisplay.Add(_match!.NotateLastMove(), _match.game[^1].move, new Board(_match!.board));
+        pgnDisplay.Add(Utils.NotateLastMove(_match), _match.game[^1].move, new Board(_match!.board));
         _timer!.Stop();
-        LoadBoard(node.board, side);
+        LoadBoard(node.board, side, true);
         LockAll(true);
         LockPieces(side, false);
         IsGameOver();
@@ -171,10 +172,13 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
         _pieces.Add(new PieceItem(piece, at));
     }
 
-    public void LoadBoard(Board board, Side perspective)
+    public void LoadBoard(Board board, Side perspective, bool playSound)
     {
         Clear();
         UpdateMaterial(board, perspective);
+        
+        if (playSound)
+            Sound.PlaySound("move");
         
         for (int file = 0; file < 8; file++)
         {
@@ -200,18 +204,18 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
         if (perspective == Side.White)
         {
             playerMaterial!.Text = comparison.GetWhiteString();
-            botMaterial!.Text = comparison.GetBlackString();
+            botMaterial.Text = comparison.GetBlackString();
         }
         else
         {
             playerMaterial!.Text = comparison.GetBlackString();
-            botMaterial!.Text = comparison.GetWhiteString();
+            botMaterial.Text = comparison.GetWhiteString();
         }
     }
 
     public void LoadLatest()
     {
-        LoadBoard(_match!.board, side);
+        LoadBoard(_match!.board, side, false);
     }
 
     public void SetMatch(EmbeddedMatch? match, Side perspective)
@@ -234,11 +238,11 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
                 pgnDisplay.Add("...", new Move((8,8),(8,8)), new Board("8/8/8/8/8/8/8/8 w - - 0 1"));
             if (perspective == Side.Black)
                 StartPolling();
-            LoadBoard(match.board, perspective);
+            LoadBoard(match.board, perspective, true);
             IsGameOver();
         }
         else
-            LoadBoard(new(Presets.StartingBoard), perspective);
+            LoadBoard(new(Presets.StartingBoard), perspective, false);
     }
 
     private void RemovePiece((int x, int y) at)

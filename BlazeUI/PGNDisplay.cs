@@ -70,7 +70,7 @@ public class PGNDisplay(StackPanel panel)
     {
         to = Math.Clamp(to, 0, _game.Count - 1);
         _lastViewed = to;
-        _board!.LoadBoard(_game[_lastViewed].board, _board.side);
+        _board!.LoadBoard(_game[_lastViewed].board, _board.side, true);
         if (_lastViewed != _game.Count - 1)
             _board!.LockAll(true);
         
