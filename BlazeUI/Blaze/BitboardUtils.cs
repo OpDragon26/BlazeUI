@@ -459,6 +459,21 @@ public static class BitboardUtils
         
         return final;
     }
+
+    public static int EvaluateKnightMobility(int file, int rank)
+    {
+        return (int)(ulong.PopCount(Bitboards.KnightMasks[file, rank]) * Weights.MobilityMultiplier) * 3;
+    }
+
+    public static int EvaluateRookMobility(int file, int rank, int index)
+    {
+        return (int)(ulong.PopCount(Bitboards.SmallRookBitboards[file, rank][index]) * Weights.MobilityMultiplier);
+    }
+
+    public static int EvaluateBishopMobility(int file, int rank, int index)
+    {
+        return (int)(ulong.PopCount(Bitboards.SmallBishopBitboards[file, rank][index]) * Weights.MobilityMultiplier);
+    }
     
     public static ulong[] GetSingleBits(ulong mask)
     {

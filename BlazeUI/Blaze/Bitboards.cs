@@ -42,8 +42,8 @@ public static class Bitboards
     public static readonly ulong[,] SmallBishopMasks = new ulong[8,8];
     private static readonly ulong[,][] SmallRookCombinations = new ulong[8,8][];
     private static readonly ulong[,][] SmallBishopCombinations = new ulong[8,8][];
-    private static readonly ulong[,][] SmallRookBitboards = new ulong[8,8][];
-    private static readonly ulong[,][] SmallBishopBitboards = new ulong[8,8][];
+    public static readonly ulong[,][] SmallRookBitboards = new ulong[8,8][];
+    public static readonly ulong[,][] SmallBishopBitboards = new ulong[8,8][];
     
     private static readonly ulong[,][] BlockCaptures = new ulong[8,8][];
     private static ulong[]? BlockMoves;
@@ -266,7 +266,7 @@ public static class Bitboards
                 
                 // knight masks
                 KnightMasks[file, rank] = BitboardUtils.GetMask((file, rank), BitboardUtils.KnightPattern);
-                MagicLookupArrays.KnightMobilityLookup[file, rank] = (int)(ulong.PopCount(KnightMasks[file, rank]) * Weights.MobilityMultiplier) * 3;
+                MagicLookupArrays.KnightMobilityLookup[file, rank] = BitboardUtils.EvaluateKnightMobility(file, rank);
                 KnightCombinations[file, rank] = BitboardUtils.Combinations(KnightMasks[file, rank]);
                 
                 // king masks
@@ -564,7 +564,7 @@ public static class Bitboards
                 for (int i = 0; i < SmallRookCombinations[file, rank].Length; i++) // for each blocker
                 {
                     MagicLookupArrays.RookBitboardLookup[file, rank][(SmallRookCombinations[file, rank][i] * MagicLookupArrays.RookBitboardNumbers[file, rank].magicNumber) >> MagicLookupArrays.RookBitboardNumbers[file, rank].push] = SmallRookBitboards[file, rank][i];
-                    MagicLookupArrays.RookMobilityLookupArray[file, rank][(SmallRookCombinations[file, rank][i] * MagicLookupArrays.RookBitboardNumbers[file, rank].magicNumber) >> MagicLookupArrays.RookBitboardNumbers[file, rank].push] = (int)(ulong.PopCount(SmallRookBitboards[file, rank][i]) * Weights.MobilityMultiplier);
+                    MagicLookupArrays.RookMobilityLookupArray[file, rank][(SmallRookCombinations[file, rank][i] * MagicLookupArrays.RookBitboardNumbers[file, rank].magicNumber) >> MagicLookupArrays.RookBitboardNumbers[file, rank].push] = BitboardUtils.EvaluateRookMobility(file, rank, i);
                 }
                 
                 MagicLookupArrays.BishopBitboardNumbers[file, rank] = MagicNumbers.BishopBitboardNumbers[file, rank];
@@ -574,7 +574,7 @@ public static class Bitboards
                 for (int i = 0; i < SmallBishopCombinations[file, rank].Length; i++) // for each blocker
                 {
                     MagicLookupArrays.BishopBitboardLookup[file, rank][(SmallBishopCombinations[file, rank][i] * MagicLookupArrays.BishopBitboardNumbers[file, rank].magicNumber) >> MagicLookupArrays.BishopBitboardNumbers[file, rank].push] = SmallBishopBitboards[file, rank][i];
-                    MagicLookupArrays.BishopMobilityLookupArray[file, rank][(SmallBishopCombinations[file, rank][i] * MagicLookupArrays.BishopBitboardNumbers[file, rank].magicNumber) >> MagicLookupArrays.BishopBitboardNumbers[file, rank].push] = (int)(ulong.PopCount(SmallBishopBitboards[file, rank][i]) * Weights.MobilityMultiplier);
+                    MagicLookupArrays.BishopMobilityLookupArray[file, rank][(SmallBishopCombinations[file, rank][i] * MagicLookupArrays.BishopBitboardNumbers[file, rank].magicNumber) >> MagicLookupArrays.BishopBitboardNumbers[file, rank].push] = BitboardUtils.EvaluateBishopMobility(file, rank, i);
                 }
                 
                 // knight moves
