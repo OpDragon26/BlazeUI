@@ -6,7 +6,7 @@ namespace BlazeUI.Blaze;
 
 public static class Batch
 {
-    public static TResult[] Select<TSource, TResult>(TSource[] sourceArray, Func<TSource, TResult> converter, int threads = 5, int batchCount = 500)
+    public static TResult[] Select<TSource, TResult>(TSource[] sourceArray, Func<TSource, TResult> converter, int threads = 5, int batchCount = 100)
     {
         TResult[] resultArray = new TResult[sourceArray.Length];
         
@@ -34,6 +34,32 @@ public static class Batch
             Thread.Sleep(10);
         
         return resultArray;
+    }
+
+    public static void ForEach<T>(List<T> list, Action<T> action, int threads = 5, int batchCount = 100)
+    {
+        BatchList batch = Divide(list.Count, batchCount);
+        
+        Thread[] workers = new Thread[threads];
+        for (int i = 0; i < threads; i++)
+        {
+            workers[i] = new(() =>
+            {
+                while (true)
+                {
+                    if (batch.TryGetNext(out BatchItem result))
+                        for (int j = result.from; j < result.to; j++)
+                            action(list[j]);
+                    else
+                        break;
+                }
+            });
+            workers[i].Start();
+        }
+        
+        // poll whether the threads have finished
+        while (!batch.Finished())
+            Thread.Sleep(10);
     }
 
     private static BatchList Divide(int length, int batchCount)
