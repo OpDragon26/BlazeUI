@@ -1,25 +1,32 @@
 {
   "format": 1,
   "restore": {
-    "/home/opdragon25/Documents/CSharp/AvaloniaChessUI/BlazeUI/BlazeUI.csproj": {}
+    "D:\\11A_Szalai_Máté\\C#\\BlazeUI\\BlazeUI\\BlazeUI.csproj": {}
   },
   "projects": {
-    "/home/opdragon25/Documents/CSharp/AvaloniaChessUI/BlazeUI/BlazeUI.csproj": {
+    "D:\\11A_Szalai_Máté\\C#\\BlazeUI\\BlazeUI\\BlazeUI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/opdragon25/Documents/CSharp/AvaloniaChessUI/BlazeUI/BlazeUI.csproj",
+        "projectUniqueName": "D:\\11A_Szalai_Máté\\C#\\BlazeUI\\BlazeUI\\BlazeUI.csproj",
         "projectName": "BlazeUI",
-        "projectPath": "/home/opdragon25/Documents/CSharp/AvaloniaChessUI/BlazeUI/BlazeUI.csproj",
-        "packagesPath": "/home/opdragon25/.nuget/packages/",
-        "outputPath": "/home/opdragon25/Documents/CSharp/AvaloniaChessUI/BlazeUI/obj/",
+        "projectPath": "D:\\11A_Szalai_Máté\\C#\\BlazeUI\\BlazeUI\\BlazeUI.csproj",
+        "packagesPath": "C:\\Users\\szalai.mate\\.nuget\\packages\\",
+        "outputPath": "D:\\11A_Szalai_Máté\\C#\\BlazeUI\\BlazeUI\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "/home/opdragon25/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\szalai.mate\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -32,7 +39,13 @@
           "warnAsError": [
             "NU1605"
           ]
-        }
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
         "net8.0": {
@@ -47,8 +60,6 @@
               "version": "[11.3.6, )"
             },
             "Avalonia.Diagnostics": {
-              "include": "None",
-              "suppressParent": "All",
               "target": "Package",
               "version": "[11.3.6, )"
             },
@@ -63,6 +74,10 @@
             "LibVLCSharp": {
               "target": "Package",
               "version": "[3.9.4, )"
+            },
+            "VideoLAN.LibVLC.Windows": {
+              "target": "Package",
+              "version": "[3.0.21, )"
             }
           },
           "imports": [
@@ -76,18 +91,12 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[8.0.19, 8.0.19]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/8.0.119/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

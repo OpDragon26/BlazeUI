@@ -55,16 +55,16 @@
                                                 <Border Grid.Row="0">
                                                         <Grid ColumnDefinitions="*,Auto" Classes="InfoBarTopGrid">
                                                                 <StackPanel Grid.Column="0" Classes="InfoBarTop">
-                                                                        <TextBlock Classes="InfoBarName">BLAZE</TextBlock>
-                                                                        <TextBlock Classes="InfoBarDepth" Name="DepthDisplay">depth</TextBlock>
+                                                                        <TextBlock Classes="InfoBarName WhiteText">BLAZE</TextBlock>
+                                                                        <TextBlock Classes="InfoBarDepth WhiteText" Name="DepthDisplay">depth</TextBlock>
                                                                 </StackPanel>
-                                                                <TextBlock Name="BotMaterial" Classes="InfoBarMaterialTop InfoBarMaterial" Grid.Column="1">material</TextBlock>
+                                                                <TextBlock Name="BotMaterial" Classes="InfoBarMaterialTop InfoBarMaterial WhiteText" Grid.Column="1">material</TextBlock>
                                                         </Grid>
                                                 </Border>
                                         
                                                 <!-- Bottom row: friendly material --> 
                                                 <Border Grid.Row="2">
-                                                        <TextBlock Name="PlayerMaterial" Classes="InfoBarMaterialBottom InfoBarMaterial">material</TextBlock>
+                                                        <TextBlock Name="PlayerMaterial" Classes="InfoBarMaterialBottom InfoBarMaterial WhiteText">material</TextBlock>
                                                 </Border>
                                         </Grid>
                                 </Viewbox>
@@ -85,11 +85,11 @@
                                         <Border Classes="OverlayPopup" x:Name="InitializingPopup">
                                                 <Grid RowDefinitions="50,*">
                                                         <Border Grid.Row="0" Classes="PopupCardTop">
-                                                                <TextBlock Classes="PopupCardTitle">Initializing Engine</TextBlock>
+                                                                <TextBlock Classes="PopupCardTitle WhiteText">Initializing Engine</TextBlock>
                                                         </Border>
                                                         <Border Grid.Row="1" Classes="PopupCardBody">
                                                                 <StackPanel Classes="InitializeProgressBarContainer">
-                                                                        <TextBlock Classes="PopupSecondary" x:Name="InitStatus">Status</TextBlock>
+                                                                        <TextBlock Classes="PopupSecondary WhiteText" x:Name="InitStatus">Status</TextBlock>
                                                                         <local:ProgressBar x:Name="InitProgress" Classes="InitializeProgressBar" Width="500" Height="10">
                                                                                 <Border x:Name="InitProgressBar" Classes="InitializeProgressBarFilled"></Border>
                                                                         </local:ProgressBar>
