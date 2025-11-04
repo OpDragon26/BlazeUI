@@ -79,6 +79,8 @@ public static class Bitboards
     public const ulong SecondSlice = 0xffff0000;
     public const ulong ThirdSlice =  0xffff00000000;
     public const ulong FourthSlice = 0xffff000000000000;
+
+    public const ulong CenterControlMask = 0x3c3c3c3c0000;
     
     public static readonly int[,] PriorityWeights =
     {
@@ -688,49 +690,38 @@ public static class Bitboards
 
                     for (int i = 0; i < WhitePawnMoveCombinations[file, rank].Length; i++) // for each combination
                     {
-                        MagicLookupArrays.WhitePawnLookup[file, rank][(WhitePawnMoveCombinations[file, rank][i] * MagicLookupArrays.WhitePawnMove[file, rank].magicNumber) >> MagicLookupArrays.WhitePawnMove[file, rank].push] = BitboardUtils.GetPawnMoves(WhitePawnMoveCombinations[file, rank][i], (file, rank), 0);
+                        MagicLookupArrays.WhitePawnLookup[file, rank][(WhitePawnMoveCombinations[file, rank][i] * MagicLookupArrays.WhitePawnMove[file, rank].magicNumber) >> MagicLookupArrays.WhitePawnMove[file, rank].push] = 
+                            BitboardUtils.GetPawnMoves(WhitePawnMoveCombinations[file, rank][i], (file, rank), 0);
                     }
 
                     // captures
                     MagicLookupArrays.WhitePawnCapture[file, rank] = MagicNumbers.WhiteCaptureMoveNumbers[file, rank];
-                    MagicLookupArrays.WhitePawnCaptureLookup[file, rank] =
-                        new Move[MagicLookupArrays.WhitePawnCapture[file, rank].highest + 1][];
+                    MagicLookupArrays.WhitePawnCaptureLookup[file, rank] = new Move[MagicLookupArrays.WhitePawnCapture[file, rank].highest + 1][];
 
                     for (int i = 0; i < WhitePawnCaptureCombinations[file, rank].Length; i++) // for each combination
                     {
-                        MagicLookupArrays.WhitePawnCaptureLookup[file, rank][
-                                (WhitePawnCaptureCombinations[file, rank][i] *
-                                 MagicLookupArrays.WhitePawnCapture[file, rank].magicNumber) >>
-                                MagicLookupArrays.WhitePawnCapture[file, rank].push] =
+                        MagicLookupArrays.WhitePawnCaptureLookup[file, rank][(WhitePawnCaptureCombinations[file, rank][i] * MagicLookupArrays.WhitePawnCapture[file, rank].magicNumber) >> MagicLookupArrays.WhitePawnCapture[file, rank].push] =
                             BitboardUtils.GetPawnCaptures(WhitePawnCaptureCombinations[file, rank][i], (file, rank), 0);
                     }
 
                     // black pawns
                     // moves
                     MagicLookupArrays.BlackPawnMove[file, rank] = MagicNumbers.BlackPawnMoveNumbers[file, rank];
-                    MagicLookupArrays.BlackPawnLookup[file, rank] =
-                        new Move[MagicLookupArrays.BlackPawnMove[file, rank].highest + 1][];
+                    MagicLookupArrays.BlackPawnLookup[file, rank] = new Move[MagicLookupArrays.BlackPawnMove[file, rank].highest + 1][];
 
                     for (int i = 0; i < BlackPawnMoveCombinations[file, rank].Length; i++) // for each combination
                     {
-                        MagicLookupArrays.BlackPawnLookup[file, rank][
-                                (BlackPawnMoveCombinations[file, rank][i] *
-                                 MagicLookupArrays.BlackPawnMove[file, rank].magicNumber) >>
-                                MagicLookupArrays.BlackPawnMove[file, rank].push] =
+                        MagicLookupArrays.BlackPawnLookup[file, rank][(BlackPawnMoveCombinations[file, rank][i] * MagicLookupArrays.BlackPawnMove[file, rank].magicNumber) >> MagicLookupArrays.BlackPawnMove[file, rank].push] =
                             BitboardUtils.GetPawnMoves(BlackPawnMoveCombinations[file, rank][i], (file, rank), 1);
                     }
 
                     // captures
                     MagicLookupArrays.BlackPawnCapture[file, rank] = MagicNumbers.BlackCaptureMoveNumbers[file, rank];
-                    MagicLookupArrays.BlackPawnCaptureLookup[file, rank] =
-                        new Move[MagicLookupArrays.BlackPawnCapture[file, rank].highest + 1][];
+                    MagicLookupArrays.BlackPawnCaptureLookup[file, rank] = new Move[MagicLookupArrays.BlackPawnCapture[file, rank].highest + 1][];
 
                     for (int i = 0; i < BlackPawnCaptureCombinations[file, rank].Length; i++) // for each combination
                     {
-                        MagicLookupArrays.BlackPawnCaptureLookup[file, rank][
-                                (BlackPawnCaptureCombinations[file, rank][i] *
-                                 MagicLookupArrays.BlackPawnCapture[file, rank].magicNumber) >>
-                                MagicLookupArrays.BlackPawnCapture[file, rank].push] =
+                        MagicLookupArrays.BlackPawnCaptureLookup[file, rank][(BlackPawnCaptureCombinations[file, rank][i] * MagicLookupArrays.BlackPawnCapture[file, rank].magicNumber) >> MagicLookupArrays.BlackPawnCapture[file, rank].push] =
                             BitboardUtils.GetPawnCaptures(BlackPawnCaptureCombinations[file, rank][i], (file, rank), 1);
                     }
                 }

@@ -103,6 +103,8 @@ public static class Evaluation
         List<PassedBonus> bPassedBonuses = new();
         List<PassedBonus> wPassedBonusesEndgame = new();
         List<PassedBonus> bPassedBonusesEndgame = new();
+        ulong wControlled = 0;
+        ulong bControlled = 0;
 
         ulong relevantPawns = pawnCombination & boardSide switch
         {
@@ -138,15 +140,11 @@ public static class Evaluation
                     eval.wEval += (int)(Pieces.Value[Pieces.WhitePawn] * Weights.MaterialMultiplier * Weights.PiecewiseMaterialWeights[Pieces.WhitePawn] + Weights.Pieces[Pieces.WhitePawn, file, rank]);
                     eval.bEval += (int)(Pieces.Value[Pieces.BlackPawn] * Weights.MaterialMultiplier * Weights.PiecewiseMaterialWeights[Pieces.WhitePawn] - Weights.Pieces[Pieces.WhitePawn, file, 7-rank]);
                     
-                    eval.wEval += (int)(Pieces.Value[Pieces.WhitePawn] * Weights.MaterialMultiplier * Weights.PiecewiseMaterialWeights[Pieces.WhitePawn] + Weights.EndgamePieces[Pieces.WhitePawn, file, rank]);
-                    eval.bEval += (int)(Pieces.Value[Pieces.BlackPawn] * Weights.MaterialMultiplier * Weights.PiecewiseMaterialWeights[Pieces.WhitePawn] - Weights.EndgamePieces[Pieces.WhitePawn, file, 7-rank]);
+                    eval.wEvalEndgame += (int)(Pieces.Value[Pieces.WhitePawn] * Weights.MaterialMultiplier * Weights.PiecewiseMaterialWeights[Pieces.WhitePawn] + Weights.EndgamePieces[Pieces.WhitePawn, file, rank]);
+                    eval.bEvalEndgame += (int)(Pieces.Value[Pieces.BlackPawn] * Weights.MaterialMultiplier * Weights.PiecewiseMaterialWeights[Pieces.WhitePawn] - Weights.EndgamePieces[Pieces.WhitePawn, file, 7-rank]);
                     
-                    // protected
-                    eval.wEval += Weights.ProtectedPawnBonus * (int)ulong.PopCount(pawnCombination & Bitboards.WhitePawnCaptureMasks[file, rank]);
-                    eval.bEval -= Weights.ProtectedPawnBonus * (int)ulong.PopCount(pawnCombination & Bitboards.BlackPawnCaptureMasks[file, rank]);
-                    
-                    eval.wEvalEndgame += Weights.ProtectedPawnBonus * (int)ulong.PopCount(pawnCombination & Bitboards.WhitePawnCaptureMasks[file, rank]);
-                    eval.bEvalEndgame -= Weights.ProtectedPawnBonus * (int)ulong.PopCount(pawnCombination & Bitboards.BlackPawnCaptureMasks[file, rank]);
+                    wControlled |= Bitboards.WhitePawnCaptureMasks[file, rank];
+                    bControlled |= Bitboards.BlackPawnCaptureMasks[file, rank];
                     
                     // passed masks
                     wPassedBonuses.Add(new PassedBonus(BitboardUtils.GetWhitePassedPawnMask(file, rank), Weights.WhitePassedPawnBonuses[rank]));
@@ -166,6 +164,16 @@ public static class Evaluation
                 }
             }
         }
+
+        // protected 
+        eval.wEval += (int)(ulong.PopCount(wControlled & pawnCombination) * Weights.ProtectedPawnBonus);
+        eval.bEval -= (int)(ulong.PopCount(bControlled & pawnCombination) * Weights.ProtectedPawnBonus);
+        eval.wEvalEndgame += (int)(ulong.PopCount(wControlled & pawnCombination) * Weights.ProtectedPawnBonus);
+        eval.bEvalEndgame -= (int)(ulong.PopCount(bControlled & pawnCombination) * Weights.ProtectedPawnBonus);
+        
+        // center control
+        eval.wEval += (int)(ulong.PopCount(wControlled & Bitboards.CenterControlMask) * Weights.CenterControlMultiplier);
+        eval.bEval -= (int)(ulong.PopCount(bControlled & Bitboards.CenterControlMask) * Weights.CenterControlMultiplier);
         
         eval.wPassedPawnChecks = wPassedBonuses.ToArray();
         eval.bPassedPawnChecks = bPassedBonuses.ToArray();
@@ -487,16 +495,22 @@ public static class Evaluation
     
     public static int EvaluateKnightMobility(int file, int rank)
     {
-        return (int)(ulong.PopCount(Bitboards.KnightMasks[file, rank]) * Weights.MobilityMultiplier) * 3;
+        ulong controlled = Bitboards.KnightMasks[file, rank];
+        return (int)(ulong.PopCount(controlled) * Weights.MobilityMultiplier 
+                     + ulong.PopCount(controlled & Bitboards.CenterControlMask) * Weights.CenterControlMultiplier) * 3;
     }
 
     public static int EvaluateRookMobility(int file, int rank, int index)
     {
-        return (int)(ulong.PopCount(Bitboards.SmallRookBitboards[file, rank][index]) * Weights.MobilityMultiplier);
+        ulong controlled = Bitboards.SmallRookBitboards[file, rank][index];
+        return (int)(ulong.PopCount(controlled) * Weights.MobilityMultiplier
+            + ulong.PopCount(controlled & Bitboards.CenterControlMask) * Weights.CenterControlMultiplier);
     }
 
     public static int EvaluateBishopMobility(int file, int rank, int index)
     {
-        return (int)(ulong.PopCount(Bitboards.SmallBishopBitboards[file, rank][index]) * Weights.MobilityMultiplier);
+        ulong controlled = Bitboards.SmallBishopBitboards[file, rank][index];
+        return (int)(ulong.PopCount(controlled) * Weights.MobilityMultiplier
+            + ulong.PopCount(controlled & Bitboards.CenterControlMask) * Weights.CenterControlMultiplier);
     }
 }
