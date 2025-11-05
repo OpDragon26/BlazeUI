@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace BlazeUI.Blaze;
 
@@ -31,12 +30,12 @@ public class Board
     */
     
     // basic values
-    private readonly uint[] board;
+    private PiecewiseBoard board;
     public int side;
     public (int file, int rank) enPassant = (8, 8);
     
     // bitboards
-    public readonly ulong[] bitboards = new ulong[14];
+    public BitwiseBoard bitboards;
     // white pieces
     // black pieces
     // white pawns only
@@ -60,9 +59,9 @@ public class Board
 
     public bool considerRepetition;
     
-    public Board(uint[] board, bool considerRepetition = true)
+    public Board(PiecewiseBoard board, bool considerRepetition = true)
     {
-        this.board = (uint[])board.Clone();
+        this.board = board;
         
         // init bitboards
         AutoFillBitboards();
@@ -74,9 +73,9 @@ public class Board
     
     public Board(Board board, bool permChange = false) // clone board
     {
-        this.board = [board.board[0], board.board[1], board.board[2], board.board[3], board.board[4], board.board[5], board.board[6], board.board[7]];
+        this.board = board.board;
         side = board.side;
-        bitboards = (ulong[])board.bitboards.Clone();
+        bitboards = board.bitboards;
         enPassant = board.enPassant;
         castling = board.castling;
         KingPositions = board.KingPositions;
@@ -96,7 +95,6 @@ public class Board
         
         // piece placement data
         string[] ranks = fields[0].Split('/');
-        board = new uint[8];
         for (int r = 0; r < 8; r++) // for each rank
         {
             // current file
@@ -511,7 +509,7 @@ public class Board
         var item = obj as Board;
         if (item == null)
             return false;
-        return board.SequenceEqual(item.board) && enPassant == item.enPassant && side == item.side && castling == item.castling;
+        return board.Equals(item.board) && enPassant == item.enPassant && side == item.side && castling == item.castling;
     }
 
     public override int GetHashCode()
@@ -588,6 +586,38 @@ public class Board
     {
         board[rank] &= ~(PieceMask << (file * 4)); // set the given square to 0000
         board[rank] |= (piece << (file * 4)); // set the square to the given piece
+    }
+    
+    [System.Runtime.CompilerServices.InlineArray(8)]
+    public struct PiecewiseBoard : IEquatable<PiecewiseBoard>
+    {
+        private uint rank;
+
+        public PiecewiseBoard(uint[] board)
+        {
+            for(int i = 0; i < 8; i++)
+                this[i] = board[i];
+        }
+
+        public bool Equals(PiecewiseBoard other)
+        {
+            for(int i = 0; i < 8; i++)
+                if (this[i] != other[i])
+                    return false;
+            return true;
+        }
+    }
+
+    [System.Runtime.CompilerServices.InlineArray(14)]
+    public struct BitwiseBoard
+    {
+        private ulong bitboard;
+
+        public ulong this[uint i]
+        {
+            get => this[(int)i];
+            set => this[(int)i] = value;
+        }
     }
     
     public struct CoordinatePair((int file, int rank) white, (int file, int rank)  black) : IEquatable<CoordinatePair>
@@ -709,15 +739,5 @@ public static class Pieces
 
 public static class Presets
 {
-    public static readonly uint[] StartingBoard =
-    [
-        0b0001_0010_0011_0101_0100_0011_0010_0001, // white pieces
-        0b0000_0000_0000_0000_0000_0000_0000_0000,
-        uint.MaxValue, // full empty row
-        uint.MaxValue,
-        uint.MaxValue,
-        uint.MaxValue,
-        0b1000_1000_1000_1000_1000_1000_1000_1000, // black pieces
-        0b1001_1010_1011_1101_1100_1011_1010_1001
-    ];
+    public static readonly string StartingBoard = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 }
