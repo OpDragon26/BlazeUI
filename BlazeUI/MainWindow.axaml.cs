@@ -55,6 +55,7 @@ public partial class MainWindow : Window
         _pgnDisplay = new PGNDisplay(PGNPanel);
         _pieceBoard = new GridBoard(this.FindControl<Grid>("pieces")!, this.FindControl<Grid>("highlight")!, _promotionHandler, _pgnDisplay, DepthDisplay, BotMaterial, PlayerMaterial,  this);
         _pieceBoard.SetMatch(null, Side.White);
+        //Perft.TestGameSpeed(15, 6);
         StartNewGame();
     }
 
