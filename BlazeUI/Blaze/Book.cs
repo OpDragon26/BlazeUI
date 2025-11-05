@@ -65,7 +65,7 @@ public static class Book
         {
             Entry? entry = entries.Find(e => e.board.Equals(board));
             move = entry?.moves[random.Next(entry.moves.Count)];
-            return entry == null;
+            return entry != null;
         }
     }
     
