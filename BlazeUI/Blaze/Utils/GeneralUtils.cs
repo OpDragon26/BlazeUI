@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using BlazeUI.Blaze.Board_Representation;
 
 namespace BlazeUI.Blaze;
 
-public static class Utils
+public static class GeneralUtils
 {
     public static bool SideWon(Side side, Outcome outcome)
     {

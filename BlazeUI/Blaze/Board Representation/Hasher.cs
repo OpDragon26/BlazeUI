@@ -1,6 +1,6 @@
 using System;
 
-namespace BlazeUI.Blaze;
+namespace BlazeUI.Blaze.Board_Representation;
 
 public static class Hasher
 {

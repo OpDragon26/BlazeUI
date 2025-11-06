@@ -9,6 +9,7 @@ using Avalonia.Threading;
 using BlazeUI.Blaze;
 using Path = System.IO.Path;
 using Rectangle = Avalonia.Controls.Shapes.Rectangle;
+using BlazeUI.Blaze.Board_Representation;
 
 namespace BlazeUI;
 
@@ -84,7 +85,7 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
         {
             ClearHighlight("last-move");
             HighlightMove(move, Colors.HighLightMove);
-            pgnDisplay.Add(Utils.NotateLastMove(_match), _match.game[^1].move, new Board(_match!.board));
+            pgnDisplay.Add(GeneralUtils.NotateLastMove(_match), _match.game[^1].move, new Board(_match!.board));
             LoadBoard(_match.board, side, true);
             // Console.WriteLine("Made move " + moveString);
             StartPolling();
@@ -99,7 +100,7 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
         {
             window.GameOverSplash(_outcome, _match.game.Count / 2);
             LockAll(true);
-            Sound.PlaySound(Utils.SideWon(side, _outcome) ? "game-won" : "game-lost");
+            Sound.PlaySound(GeneralUtils.SideWon(side, _outcome) ? "game-won" : "game-lost");
             return true;
         }
         return false;
@@ -129,7 +130,7 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
         depthDisplay.Text = $"depth {_match!.depth}";
         ClearHighlight("last-move");
         HighlightMove(node.move, Colors.HighLightMove);
-        pgnDisplay.Add(Utils.NotateLastMove(_match), _match.game[^1].move, new Board(_match!.board));
+        pgnDisplay.Add(GeneralUtils.NotateLastMove(_match), _match.game[^1].move, new Board(_match!.board));
         _timer!.Stop();
         LoadBoard(node.board, side, true);
         LockAll(true);
@@ -210,7 +211,7 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
 
     private void UpdateMaterial(Board board, Side perspective)
     {
-        Utils.MaterialComparison comparison = Utils.CompareMaterial(board);
+        GeneralUtils.MaterialComparison comparison = GeneralUtils.CompareMaterial(board);
 
         if (perspective == Side.White)
         {

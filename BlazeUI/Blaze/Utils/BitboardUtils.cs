@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using BlazeUI.Blaze.Board_Representation;
 
 namespace BlazeUI.Blaze;
 

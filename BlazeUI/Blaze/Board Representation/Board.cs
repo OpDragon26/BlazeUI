@@ -1,15 +1,9 @@
 using System;
 using System.Collections.Generic;
+using static BlazeUI.Blaze.Utils.BoardUtils;
+using static BlazeUI.Blaze.Utils.BoardUtils.General;
 
-namespace BlazeUI.Blaze;
-
-public enum Outcome
-{
-    Ongoing,
-    WhiteWin,
-    BlackWin,
-    Draw
-}
+namespace BlazeUI.Blaze.Board_Representation;
 
 public class Board
 {
@@ -47,7 +41,7 @@ public class Board
     public CoordinatePair KingPositions;
 
     private int halfMoveClock;
-    private int pawns = 16;
+    private int pawns;
     private ValuePair values;
     private readonly Dictionary<int, int> repeat = new();
     public int hashKey;
@@ -63,9 +57,7 @@ public class Board
     {
         this.board = board;
         
-        // init bitboards
-        AutoFillBitboards();
-        CountPawns();
+        InitBoard();
 
         hashKey = Hasher.ZobristHash(this);
         this.considerRepetition = considerRepetition;
@@ -117,8 +109,7 @@ public class Board
             }
         }
         
-        AutoFillBitboards();
-        CountPawns();
+        InitBoard();
 
         // active side
         if (fields[1] == "w")
@@ -140,145 +131,6 @@ public class Board
         hashKey = Hasher.ZobristHash(this);
         
         this.considerRepetition = considerRepetition;
-    }
-
-    public bool CompareTo(Board other, bool log)
-    {
-        bool match = true;
-        
-        // piecewise board
-        for (int rank = 0; rank < 8; rank++)
-            match &= board[rank] == other.board[rank];
-        
-
-        if (!match)
-        {
-            if (log)
-            {
-                Console.WriteLine("Piecewise boards don't match");
-                Console.WriteLine("this");
-                CLIMatch.PrintBoard(this);
-                Console.WriteLine("other");
-                CLIMatch.PrintBoard(other);
-            }
-            return false;
-        }
-        
-        // side
-        if (side != other.side)
-        {
-            if (log) Console.WriteLine("Side is opposite");
-            return false;
-        }
-        
-        // en passant
-        if (enPassant != other.enPassant)
-        {
-            if (log)
-            {
-                Console.WriteLine((enPassant.file == 8, other.enPassant.file == 8) switch
-                {
-                    (true, true) => "Erm what?",
-                    (true, false) => $"En passant present only on other: {Move.GetSquare(other.enPassant)}",
-                    (false, true) => $"En passant present only on this: {Move.GetSquare(enPassant)}",
-                    (false, false) => $"En passant doesn't match - this: {Move.GetSquare(enPassant)} other: {Move.GetSquare(other.enPassant)}"
-                });
-            }
-            
-            return false;
-        }
-        
-        // bitboards
-        if (AllPieces() != other.AllPieces())
-        {
-            if (log)
-            {
-                Console.WriteLine("Piece bitboards don't match");
-                Console.WriteLine("this");
-                CLIMatch.PrintBitboard(AllPieces(), 0);
-                Console.WriteLine("other");
-                CLIMatch.PrintBitboard(other.AllPieces(), 0);
-                Console.WriteLine("difference");
-                CLIMatch.PrintBitboard(AllPieces() ^ other.AllPieces(), 1);
-            }
-            
-            return false;
-        }
-        
-        // castling rights
-        if (castling != other.castling)
-        {
-            if (log)
-            {
-                Console.WriteLine("Castling rights don't match");
-                Console.WriteLine($"this: {Convert.ToString(castling, 2).PadLeft(4, '0')}");
-                Console.WriteLine($"other: {Convert.ToString(other.castling, 2).PadLeft(4, '0')}");
-            }
-            
-            return false;
-        }
-        
-        // king positions
-        if (!KingPositions.Equals(other.KingPositions))
-        {
-            if (log)
-            {
-                Console.WriteLine("King positions don't match");
-                Console.WriteLine($"this: {KingPositions}");
-                Console.WriteLine($"other: {other.KingPositions}");
-            }
-            
-            return false;
-        }
-        
-        // castled
-        if (castled != other.castled)
-        {
-            if (log)
-            {
-                Console.WriteLine("Castled is inconsistent");
-                Console.WriteLine($"this: {Convert.ToString(castled, 2).PadLeft(2, '0')}");
-                Console.WriteLine($"other: {Convert.ToString(other.castled, 2).PadLeft(2, '0')}");
-            }
-            
-            return false;
-        }
-        
-        return true;
-    }
-
-    private void AutoFillBitboards()
-    {
-        for (int rank = 0; rank < 8; rank++)
-        {
-            for (int file = 7; file >= 0; file--)
-            {
-                if (GetPiece(file, rank) != Pieces.Empty)
-                {
-                    bitboards[GetPiece(file, rank)] |= BitboardUtils.GetSquare(file, rank);
-                    values[GetPiece(file, rank) >> 3] += Pieces.Value[GetPiece(file, rank)];
-                    
-                    if (GetPiece(file, rank) == Pieces.WhiteKing)
-                        KingPositions[0] = (file, rank);
-                    else if (GetPiece(file, rank) == Pieces.BlackKing)
-                        KingPositions[1] = (file, rank);
-                }
-            }
-        }
-    }
-
-    private void CountPawns()
-    {
-        pawns = 0;
-        
-        for (int rank = 0; rank < 8; rank++)
-        {
-            for (int file = 7; file >= 0; file--)
-            {
-                if (GetPiece(file, rank) is Pieces.WhitePawn or Pieces.BlackPawn)
-                    pawns++;
-            }
-        }
     }
     
     public void MakeMove(Move move)
@@ -456,14 +308,22 @@ public class Board
         return Outcome.Ongoing;
     }
 
+    private void InitBoard()
+    {
+        bitboards = new BitwiseBoard(this);
+        pawns = BoardSetup.CountPawns(this);
+        KingPositions = BoardSetup.FindKings(this);
+        values = BoardSetup.CountMaterial(this);
+    }
+
     public int GetImbalance()
     {
         return values.Sum();
     }
-
-    public int AllMaterial()
+    
+    public bool IsEndgame()
     {
-        return values.white - values.black;
+        return values.white + int.Abs(values.black) < 5300;
     }
 
     // adds the hash of the board 
@@ -516,12 +376,7 @@ public class Board
     {
         return Hasher.ZobristHash(this);
     }
-
-    public bool IsEndgame()
-    {
-        return values.white + int.Abs(values.black) < 5300;
-    }
-
+    
     public ulong AllPieces()
     {
         return bitboards[Pieces.WhitePawn] | bitboards[Pieces.BlackPawn] | bitboards[Pieces.WhiteRook] | bitboards[Pieces.BlackRook]
@@ -587,156 +442,16 @@ public class Board
         board[rank] &= ~(PieceMask << (file * 4)); // set the given square to 0000
         board[rank] |= (piece << (file * 4)); // set the square to the given piece
     }
-    
-    [System.Runtime.CompilerServices.InlineArray(8)]
-    public struct PiecewiseBoard : IEquatable<PiecewiseBoard>
-    {
-        private uint rank;
-
-        public PiecewiseBoard(uint[] board)
-        {
-            for(int i = 0; i < 8; i++)
-                this[i] = board[i];
-        }
-
-        public bool Equals(PiecewiseBoard other)
-        {
-            for(int i = 0; i < 8; i++)
-                if (this[i] != other[i])
-                    return false;
-            return true;
-        }
-    }
-
-    [System.Runtime.CompilerServices.InlineArray(14)]
-    public struct BitwiseBoard
-    {
-        private ulong bitboard;
-
-        public ulong this[uint i]
-        {
-            get => this[(int)i];
-            set => this[(int)i] = value;
-        }
-    }
-    
-    public struct CoordinatePair((int file, int rank) white, (int file, int rank)  black) : IEquatable<CoordinatePair>
-    {
-        private (int file, int rank)  white = white;
-        private (int file, int rank)  black = black;
-        
-        public (int file, int rank)  this[int side]
-        {
-            get => side == 0 ? white : black;
-            set {
-                if (side == 0) white = value;
-                else black = value;
-            }
-        }
-
-        bool IEquatable<CoordinatePair>.Equals(CoordinatePair other)
-        {
-            return white == other.white && black == other.black;
-        }
-
-        public override string ToString()
-        {
-            return $"white: {white}, black: {black}";
-        }
-    }
-    
-    private struct ValuePair(int white, int black)
-    {
-        public int  white = white;
-        public int  black = black;
-        
-        public int this[int side]
-        {
-            get => side == 0 ? white : black;
-            set { if (side == 0) white = value;else black = value; }
-        }
-        
-        public int this[uint side]
-        {
-            get => side == 0 ? white : black;
-            set { if (side == 0) white = value;else black = value; }
-        }
-
-        public int Sum()
-        {
-            return white + black;
-        }
-    }
 }
 
-public static class Pieces
+public enum Outcome
 {
-    // 4 bits per piece
-    // white and black pieces only differ in the first bit
-    public const uint WhitePawn = 0b0000; // 0
-    public const uint WhiteRook = 0b0001; // 1
-    public const uint WhiteKnight = 0b0010; // 2
-    public const uint WhiteBishop = 0b0011; // 3
-    public const uint WhiteQueen = 0b0100; // 4
-    public const uint WhiteKing = 0b0101; // 5
-
-    public const uint BlackPawn = 0b1000; // 8
-    public const uint BlackRook = 0b1001; // 9
-    public const uint BlackKnight = 0b1010; // 10
-    public const uint BlackBishop = 0b1011; // 11
-    public const uint BlackQueen = 0b1100; // 12
-    public const uint BlackKing = 0b1101; // 13
-
-    public const uint Empty = 0b1111; // 15
-
-    public const uint TypeMask = 0b111;
-    public const uint ColorMask = 0b1000;
-
-    public static readonly int[] Value =
-    [
-        100, // 0
-        500,
-        300,
-        300,
-        900,
-        1000, // 5
-        0,
-        0,
-        -100, // 8
-        -500,
-        -300,
-        -300,
-        -900,
-        -1000, // 13
-        0,
-        0
-    ];
-
-    private static readonly Dictionary<char, uint> PieceStrings = new()
-    {
-        {'P', WhitePawn },
-        {'R', WhiteRook },
-        {'N', WhiteKnight },
-        {'B', WhiteBishop },
-        {'Q', WhiteQueen },
-        {'K', WhiteKing },
-        {'p', BlackPawn},
-        {'r', BlackRook },
-        {'n', BlackKnight },
-        {'b', BlackBishop },
-        {'q', BlackQueen },
-        {'k', BlackKing },
-    };
-
-    public static uint Parse(char s)
-    {
-        if (PieceStrings.TryGetValue(s, out uint piece))
-            return piece;
-        
-        throw new FormatException($"Unable to parse FEN: Unknown piece: '{s}'");
-    }
+    Ongoing,
+    WhiteWin,
+    BlackWin,
+    Draw
 }
-
+    
 public static class Presets
 {
     public static readonly string StartingBoard = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
