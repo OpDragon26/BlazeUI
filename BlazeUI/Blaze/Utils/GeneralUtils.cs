@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using BlazeUI.Blaze.Board_Representation;
-using BlazeUI.Blaze.Interface;
 
 namespace BlazeUI.Blaze.Utils;
+using Board_Representation;
+using Interface;
 
 public static class GeneralUtils
 {
@@ -99,4 +99,20 @@ public static class GeneralUtils
         {0b1100,'♕'},
         {0b1101,'♔'},
     };
+    
+    public class Timer
+    {
+        private DateTime StartTime = DateTime.Now;
+
+        public void Start()
+        {
+            StartTime = DateTime.Now;
+        }
+
+        public long Stop()
+        {
+            TimeSpan elapsed = StartTime - DateTime.Now;
+            return elapsed.Milliseconds;
+        }
+    }
 }

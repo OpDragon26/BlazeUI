@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace BlazeUI.Blaze;
+namespace BlazeUI.Blaze.Magic_Lookup;
 
 public static class MagicNumbers
 {

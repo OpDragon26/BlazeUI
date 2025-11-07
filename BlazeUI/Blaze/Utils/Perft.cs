@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using BlazeUI.Blaze.Board_Representation;
-using BlazeUI.Blaze.Move_Generation;
-using static BlazeUI.Blaze.Move_Generation.MoveGenerator;
 
 namespace BlazeUI.Blaze.Utils;
+using Board_Representation;
+using Move_Generation;
+using static Move_Generation.MoveGenerator;
+using Magic_Lookup;
 
 public static class Perft
 {
@@ -15,7 +16,7 @@ public static class Perft
     {
         Bitboards.Init();
         PerftResult Result = new(depth);
-        Timer timer = new();
+        GeneralUtils.Timer timer = new();
         timer.Start();
 
         board.considerRepetition = false;

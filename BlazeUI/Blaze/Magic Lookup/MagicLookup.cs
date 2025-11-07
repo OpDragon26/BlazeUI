@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using BlazeUI.Blaze.Evaluation;
-using BlazeUI.Blaze.Move_Generation;
 
-
-namespace BlazeUI.Blaze;
+namespace BlazeUI.Blaze.Magic_Lookup;
+using Evaluation;
+using Move_Generation;
+using Utils;
 
 public static class MagicLookup
 {

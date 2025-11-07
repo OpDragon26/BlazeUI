@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using BlazeUI.Blaze.Board_Representation;
-using BlazeUI.Blaze.Interface;
-using BlazeUI.Blaze.Move_Generation;
-using BlazeUI.Blaze.Search;
 
 namespace BlazeUI.Blaze.Utils;
+using Board_Representation;
+using Interface;
+using Move_Generation;
+using Search;
 
 public static class DebugUtils
 {

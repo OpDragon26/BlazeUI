@@ -1,8 +1,8 @@
 using System;
 using System.Runtime.InteropServices;
-using BlazeUI.Blaze.Board_Representation;
 
 namespace BlazeUI.Blaze.Utils;
+using Board_Representation;
 
 public static class CLIUtils
 {

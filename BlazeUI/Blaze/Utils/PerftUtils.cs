@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using BlazeUI.Blaze.Board_Representation;
-using BlazeUI.Blaze.Move_Generation;
 
 namespace BlazeUI.Blaze.Utils;
+using Board_Representation;
+using Move_Generation;
 
 public static class PerftUtils
 {

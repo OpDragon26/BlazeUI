@@ -1,11 +1,10 @@
 using System;
-using System.Runtime.InteropServices;
-using BlazeUI.Blaze.Board_Representation;
-using BlazeUI.Blaze.Move_Generation;
-using BlazeUI.Blaze.Utils;
-using static BlazeUI.Blaze.Utils.CLIUtils;
 
 namespace BlazeUI.Blaze.Interface;
+using Board_Representation;
+using Move_Generation;
+using Utils;
+using static Utils.CLIUtils;
 
 public enum Type
 {
@@ -70,7 +69,7 @@ public class CLIMatch(Board board, Type type, Side side, int depth = 2, bool deb
 
     private void PlayerTurn()
     {
-        Timer t = new();
+        GeneralUtils.Timer t = new();
         t.Start();
         while (true)
         {

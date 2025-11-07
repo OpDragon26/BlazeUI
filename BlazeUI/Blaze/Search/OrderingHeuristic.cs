@@ -1,8 +1,8 @@
 ﻿using System;
-using static BlazeUI.Blaze.Board_Representation.ZobristHash;
-using BlazeUI.Blaze.Move_Generation;
 
 namespace BlazeUI.Blaze.Search;
+using static Board_Representation.ZobristHash;
+using Move_Generation;
 
 public static class History
 {

@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using BlazeUI.Blaze.Board_Representation;
-using BlazeUI.Blaze.Evaluation;
-using BlazeUI.Blaze.Move_Generation;
 
-namespace BlazeUI.Blaze;
+namespace BlazeUI.Blaze.Magic_Lookup;
+using Board_Representation;
+using Evaluation;
+using Move_Generation;
+using Utils;
 
 public static class Bitboards
 {
@@ -203,7 +204,7 @@ public static class Bitboards
         begunInit = true;
         List<ulong> enPassantBitboards = new List<ulong>();
         List<ulong> blockMoveList = new();
-        Timer t = new Timer();
+        GeneralUtils.Timer t = new GeneralUtils.Timer();
         t.Start();
         
         Console.WriteLine("Initializing magic bitboards");

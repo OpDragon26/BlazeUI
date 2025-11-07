@@ -1,9 +1,10 @@
 using System.Linq;
-using BlazeUI.Blaze.Board_Representation;
-using BlazeUI.Blaze.Move_Generation;
-using static BlazeUI.Blaze.Utils.MoveUtils;
 
 namespace BlazeUI.Blaze.Utils;
+using Board_Representation;
+using Move_Generation;
+using static MoveUtils;
+using Magic_Lookup;
 
 public static class AlgebraicNotation
 {

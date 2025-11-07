@@ -1,8 +1,8 @@
 using System.Threading;
-using BlazeUI.Blaze.Board_Representation;
-using BlazeUI.Blaze.Move_Generation;
 
 namespace BlazeUI.Blaze.Interface;
+using Board_Representation;
+using Move_Generation;
 
 public class EmbeddedMatch(Board board, int depth, bool dynamicDepth = true, bool useBook = true, bool delayBook = false) : Match(board, depth, dynamicDepth, useBook, delayBook)
 {
@@ -35,7 +35,7 @@ public class EmbeddedMatch(Board board, int depth, bool dynamicDepth = true, boo
 
     public bool Poll(out GameNode result)
     {
-        result = game.LastMove;
+        result = game.LastMove!;
         return complete;
     }
 
@@ -43,12 +43,12 @@ public class EmbeddedMatch(Board board, int depth, bool dynamicDepth = true, boo
     {
         while (!complete)
             Thread.Sleep(10);
-        return game.LastMove;
+        return game.LastMove!;
     }
 
     public new bool TryMake(Move move, out GameNode node, long time = -1)
     {
-        node = game.LastMove;
+        node = game.LastMove!;
         if (!complete)
             return false;
         

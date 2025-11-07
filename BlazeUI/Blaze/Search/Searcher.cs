@@ -1,12 +1,13 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using BlazeUI.Blaze.Board_Representation;
-using BlazeUI.Blaze.Evaluation;
-using BlazeUI.Blaze.Move_Generation;
-using static BlazeUI.Blaze.Move_Generation.MoveGenerator;
 
 namespace BlazeUI.Blaze.Search;
+using Board_Representation;
+using Evaluation;
+using Move_Generation;
+using static Utils.GeneralUtils;
+using static Move_Generation.MoveGenerator;
 
 public static class Searcher
 {

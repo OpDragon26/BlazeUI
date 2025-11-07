@@ -1,11 +1,10 @@
 using System.Collections.Generic;
-using static BlazeUI.Blaze.Utils.BoardUtils;
-using static BlazeUI.Blaze.Utils.BoardUtils.General;
-using BlazeUI.Blaze.Move_Generation;
-using BlazeUI.Blaze.Utils;
 
 namespace BlazeUI.Blaze.Board_Representation;
-
+using static Utils.BoardUtils;
+using static Utils.BoardUtils.General;
+using Move_Generation;
+using Utils;
 public class Board
 {
 

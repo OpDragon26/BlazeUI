@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
-using BlazeUI.Blaze.Board_Representation;
-using BlazeUI.Blaze.Search;
 
 namespace BlazeUI.Blaze.Move_Generation;
+using Board_Representation;
+using Search;
+using Magic_Lookup;
+using Utils;
 
 public static class MoveGenerator
 {

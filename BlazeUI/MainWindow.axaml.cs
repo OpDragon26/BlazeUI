@@ -5,13 +5,11 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Threading;
-using BlazeUI.Blaze;
-using BlazeUI.Blaze.Board_Representation;
-using BlazeUI.Blaze.Interface;
-using Type = BlazeUI.Blaze.Interface.Type;
 
 namespace BlazeUI;
-
+using Blaze.Board_Representation;
+using Blaze.Interface;
+using Blaze.Magic_Lookup;
 public partial class MainWindow : Window
 {
     private readonly PromotionHandler _promotionHandler;

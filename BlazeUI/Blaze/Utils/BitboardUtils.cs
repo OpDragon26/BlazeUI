@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
-using BlazeUI.Blaze.Board_Representation;
-using BlazeUI.Blaze.Move_Generation;
 
-namespace BlazeUI.Blaze;
+namespace BlazeUI.Blaze.Utils;
+using Board_Representation;
+using Move_Generation;
+using Magic_Lookup;
 
 public static class BitboardUtils
 {
@@ -70,7 +71,7 @@ public static class BitboardUtils
                 if (!ValidSquare(target.file, target.rank)) // if the square is outside the bounds of the board
                     break;
                 if ((blockers & GetSquare(target)) == 0) // if the targeted square is empty
-                    moves.Add(new Move(pos, target, priority: 5 + Bitboards.PriorityWeights[target.file, target.rank] * Weights.PriorityWeightMultiplier));
+                    moves.Add(new Move(pos, target, priority: 5 + Bitboards.PriorityWeights[target.file, target.rank] * Evaluation.Weights.PriorityWeightMultiplier));
                 else
                 {
                     captures |= GetSquare(target);

@@ -1,8 +1,10 @@
 using System;
-using BlazeUI.Blaze.Board_Representation;
-using BlazeUI.Blaze.Move_Generation;
 
 namespace BlazeUI.Blaze.Search;
+using Magic_Lookup;
+using Board_Representation;
+using Move_Generation;
+using Utils;
 
 public static class MoveOrdering
 {
@@ -16,7 +18,7 @@ public static class MoveOrdering
         new Span<int>(keys).Sort(moveSpan, (x, y) => y.CompareTo(x));
     }
     
-    public static int Reevaluate(Board board, Move move, Move? previous)
+    private static int Reevaluate(Board board, Move move, Move? previous)
     {
         int priority = move.Priority;
         

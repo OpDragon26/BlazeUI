@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using BlazeUI.Blaze.Board_Representation;
-using static BlazeUI.Blaze.Move_Generation.MoveGenerator;
 
 namespace BlazeUI.Blaze.Move_Generation;
+using Board_Representation;
+using static MoveGenerator;
+using Magic_Lookup;
+using Utils;
 
 public static class PseudoLegalMoveGen
 {

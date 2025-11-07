@@ -1,10 +1,11 @@
-using BlazeUI.Blaze.Board_Representation;
-using BlazeUI.Blaze.Move_Generation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace BlazeUI.Blaze.Utils;
+using Magic_Lookup;
+using Board_Representation;
+using Move_Generation;
 
 public static class MoveUtils
 {

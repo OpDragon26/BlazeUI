@@ -1,9 +1,9 @@
 using System;
-using BlazeUI.Blaze.Board_Representation;
-using BlazeUI.Blaze.Utils;
-using static BlazeUI.Blaze.Utils.MoveUtils;
 
 namespace BlazeUI.Blaze.Move_Generation;
+using Board_Representation;
+using Utils;
+using static Utils.MoveUtils;
 
 public class Move : IComparable<Move>
 {

@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
-using BlazeUI.Blaze.Board_Representation;
-using BlazeUI.Blaze.Interface;
-using BlazeUI.Blaze.Move_Generation;
 
 namespace BlazeUI.Blaze.Book;
-
+using Board_Representation;
+using Interface;
+using Move_Generation;
 public static class Book
 {
     private static readonly List<Layer> book = new();
