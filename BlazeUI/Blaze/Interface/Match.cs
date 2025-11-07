@@ -30,7 +30,7 @@ public class Match
         
         RefutationTable.Init((int)Math.Pow(2, 20) + 7);
         Bitboards.Init();
-        Hasher.Init();
+        ZobristHash.Init();
         Book.Init(Books.Standard);
     }
 

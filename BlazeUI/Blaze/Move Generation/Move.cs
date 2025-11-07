@@ -50,6 +50,11 @@ public class Move
         if (source == (4, 7)) CastlingBan = 0b1100; // if the origin of the move is the black king's starting position, remove black's castling rights
     }
 
+    public bool IsPromotion()
+    {
+        return Promotion != 0b111;
+    }
+
     public override bool Equals(object? obj)
     {
         var item = obj as Move;
