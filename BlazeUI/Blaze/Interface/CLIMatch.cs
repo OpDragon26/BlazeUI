@@ -2,6 +2,7 @@ using System;
 using System.Runtime.InteropServices;
 using BlazeUI.Blaze.Board_Representation;
 using BlazeUI.Blaze.Move_Generation;
+using BlazeUI.Blaze.Utils;
 
 namespace BlazeUI.Blaze.Interface;
 
@@ -79,7 +80,7 @@ public class CLIMatch(Board board, Type type, Side side, int depth = 2, bool deb
 
             try
             {
-                Move move = Move.Parse(input, board);
+                Move move = AlgebraicNotation.ParseMove(input, board);
                 if (TryMake(move, t.Stop())) // successfully made move
                     break;
                 

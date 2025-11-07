@@ -65,7 +65,7 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
             return;
         }
         
-        TryMakeMove(Move.GetSquare(invertedFrom) + Move.GetSquare(invertedTo));
+        TryMakeMove(MoveUtils.GetSquare(invertedFrom) + MoveUtils.GetSquare(invertedTo));
     }
 
     public void PieceRaised((int x, int y) pos)
@@ -159,7 +159,7 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
             _timer!.Stop();
             uint piece = promotionHandler._selected;
             promotionHandler.SendBack();
-            TryMakeMove(Move.GetSquare(_promotionSquare.from) + Move.GetSquare(_promotionSquare.to) + Move.PromotionStr[piece]);
+            TryMakeMove(MoveUtils.GetSquare(_promotionSquare.from) + MoveUtils.GetSquare(_promotionSquare.to) + MoveUtils.PromotionStr[piece]);
         }
     }
 

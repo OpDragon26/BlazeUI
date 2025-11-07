@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using static BlazeUI.Blaze.Utils.BoardUtils;
 using static BlazeUI.Blaze.Utils.BoardUtils.General;
 using BlazeUI.Blaze.Move_Generation;
+using BlazeUI.Blaze.Utils;
 
 namespace BlazeUI.Blaze.Board_Representation;
 
@@ -88,7 +89,7 @@ public class Board
         board = Parsing.LoadFENPiecewise(fields[0]);
         side = Parsing.GetActiveSide(fields[1]);
         castling = Parsing.ParseCastling(fields[2]);
-        enPassant = fields[3] == "-" ? (8, 8) : Move.ParseSquare(fields[3]);
+        enPassant = fields[3] == "-" ? (8, 8) : MoveUtils.ParseSquare(fields[3]);
         halfMoveClock = int.Parse(fields[4]);
         hashKey = ZobristHash.HashBoard(this);
 
