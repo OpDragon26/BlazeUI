@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.VisualTree;
+using BlazeUI.Blaze.Interface;
 
 namespace BlazeUI;
 
@@ -14,7 +15,7 @@ public class MoveablePiece : Image
     private TranslateTransform? _translate;
     private (int X, int Y) _start;
     private bool _locked;
-    public Blaze.Side Side;
+    public Side Side;
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {

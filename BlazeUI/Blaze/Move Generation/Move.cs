@@ -5,7 +5,7 @@ using BlazeUI.Blaze.Board_Representation;
 
 namespace BlazeUI.Blaze;
 
-public class Move
+public class Move : IComparable<Move>
 {
     public readonly (int file, int rank) Source;
     public readonly (int file, int rank) Destination;
@@ -72,6 +72,23 @@ public class Move
         hash |= (int)Promotion << 17;
         hash |= Type << 13;
         return hash;
+    }
+
+    public int CompareTo(Move? other)
+    {
+        if (other == null) return 1;
+        
+        if (Source.file != other.Source.file)
+            return Source.file.CompareTo(other.Source.file);
+        if (Source.rank != other.Source.rank)
+            return Source.rank.CompareTo(other.Source.rank);
+        
+        if (Destination.file != other.Destination.file)
+            return Destination.file.CompareTo(other.Destination.file);
+        if (Destination.rank != other.Destination.rank)
+            return Destination.rank.CompareTo(other.Destination.rank);
+
+        return Promotion.CompareTo(other.Promotion);
     }
 
     private static readonly Dictionary<char, int> Indices = new()

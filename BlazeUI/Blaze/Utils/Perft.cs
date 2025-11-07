@@ -4,9 +4,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using BlazeUI.Blaze.Board_Representation;
-using BlazeUI.Blaze.Book;
+using BlazeUI.Blaze.Interface;
 
-namespace BlazeUI.Blaze;
+namespace BlazeUI.Blaze.Utils;
 
 public static class Perft
 {
@@ -187,7 +187,7 @@ public static class Perft
     public static void Breakdown(Board board, int depth)
     {
         Move[] moves = Search.SearchBoard(board, false).ToArray();
-        Array.Sort(moves, (a, b) => a.GetUCI().CompareTo(b.GetUCI()));
+        Array.Sort(moves);
         ulong total = 0;
 
         foreach (Move move in moves)
@@ -205,7 +205,7 @@ public static class Perft
     public static void BreakdownEval(Board board, int depth)
     {
         Move[] moves = Search.SearchBoard(board, false).ToArray();
-        Array.Sort(moves, (a, b) => a.GetUCI().CompareTo(b.GetUCI()));
+        Array.Sort(moves);
 
         foreach (Move move in moves)
         {
@@ -221,7 +221,7 @@ public static class Perft
         {
             depth--;
             Move[] initMoves = Search.SearchBoard(board, false).ToArray();
-            Array.Sort(initMoves, (a, b) => a.GetUCI().CompareTo(b.GetUCI()));
+            Array.Sort(initMoves);
             board.MakeMove(initMoves[examine]);
             Console.Write($"{initMoves[examine].GetUCI()}, ");
         }
@@ -232,7 +232,7 @@ public static class Perft
         if (depth == 1)
         {
             Move[] moves = Search.SearchBoard(board, false).ToArray();
-            Array.Sort(moves, (a, b) => a.GetUCI().CompareTo(b.GetUCI()));
+            Array.Sort(moves);
             
             foreach (Move move in moves)
                 Console.WriteLine($"{move.GetUCI()}");
@@ -243,7 +243,7 @@ public static class Perft
         {
             Move[] moves = Search.SearchBoard(board, false).ToArray();
             
-            Array.Sort(moves, (a, b) => a.GetUCI().CompareTo(b.GetUCI()));
+            Array.Sort(moves);
             ulong total = 0;
 
             foreach (Move move in moves)
@@ -292,16 +292,18 @@ public static class Perft
     
     public static void TestGameSpeed(int games, int depth)
     {
-        List<PGNNode> allMoves = new();
+        List<Game> gamesPlayed = new();
         for (int i = 0; i < games; i++)
         {
-            List<PGNNode> game = Match.RandomGame(depth);
-            Console.WriteLine(CLIMatch.GetPGN(game));
-            allMoves.AddRange(game);
+            Game game = Match.RandomGame(depth);
+            gamesPlayed.Add(game);
+            Console.WriteLine(game.GetPGN());
             Console.WriteLine($"Game {i + 1}/{games}");
         }
 
-        Console.WriteLine($"Average time per move: {allMoves.Where(node => node.time > 50).Average(node => node.time)}ms");
+        List<GameNode> allNodes = gamesPlayed.Aggregate(((game1, game2) => game1.Join(game2))).ToList();
+        
+        Console.WriteLine($"Average time per move: {allNodes.Where(node => node.time > 50).Average(node => node.time)}ms");
     }
     
     public static void AnalyzeBoard(Board board)

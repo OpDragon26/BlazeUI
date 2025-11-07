@@ -7,6 +7,8 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using BlazeUI.Blaze;
 using BlazeUI.Blaze.Board_Representation;
+using BlazeUI.Blaze.Interface;
+using Type = BlazeUI.Blaze.Interface.Type;
 
 namespace BlazeUI;
 
@@ -55,7 +57,10 @@ public partial class MainWindow : Window
         _pgnDisplay = new PGNDisplay(PGNPanel);
         _pieceBoard = new GridBoard(this.FindControl<Grid>("pieces")!, this.FindControl<Grid>("highlight")!, _promotionHandler, _pgnDisplay, DepthDisplay, BotMaterial, PlayerMaterial,  this);
         _pieceBoard.SetMatch(null, Side.White);
+        
         //Perft.TestGameSpeed(15, 6);
+        //Environment.Exit(0);
+        
         StartNewGame();
     }
 

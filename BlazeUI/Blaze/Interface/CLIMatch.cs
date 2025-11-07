@@ -1,10 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using BlazeUI.Blaze.Board_Representation;
-using BlazeUI.Blaze.Book;
 
-namespace BlazeUI.Blaze;
+namespace BlazeUI.Blaze.Interface;
 
 public enum Type
 {
@@ -21,26 +19,11 @@ public enum Side
     Black
 }
 
-public class CLIMatch : Match
+public class CLIMatch(Board board, Type type, Side side, int depth = 2, bool debug = false, bool clear = true, int moveLimit = -1, bool dynamicDepth = true, bool useBook = true) : Match(board, depth, dynamicDepth, useBook)
 {
     private static readonly Random random = new();
     private static readonly bool WindowsMode = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-    private readonly bool debug;
-    private readonly Type type;
-    private readonly int side;
-    private readonly int moveLimit;
-    private readonly bool clear;
-
-    public CLIMatch(Board board, Type type, Side side, int depth = 2, bool debug = false, bool clear = true, int moveLimit = -1, bool dynamicDepth = true, bool useBook = true) : base(board, depth, dynamicDepth, useBook)
-    {
-        game = new();
-    
-        this.debug = debug;
-        this.type = type;
-        this.side = (int)side;
-        this.moveLimit = moveLimit;
-        this.clear = clear;
-    }
+    private readonly int side = (int)side;
 
     public void Play()
     {
@@ -77,7 +60,7 @@ public class CLIMatch : Match
                     break;
                 case Type.Random:
                     Move[] moves = Search.SearchBoard(board, false).ToArray();
-                    TryMake(PickRandom(moves), out var node, 0);
+                    TryMake(PickRandom(moves), 0);
                     break;
             }
         }
@@ -96,7 +79,7 @@ public class CLIMatch : Match
             try
             {
                 Move move = Move.Parse(input, board);
-                if (TryMake(move, out var node, t.Stop())) // successfully made move
+                if (TryMake(move, t.Stop())) // successfully made move
                     break;
                 
                 PrintState("Illegal move");
@@ -125,7 +108,7 @@ public class CLIMatch : Match
         });
         
         Console.WriteLine("Full game:");
-        Console.WriteLine(GetPGN());
+        Console.WriteLine(game.GetPGN());
     }
 
     private void PrintState(string? insert = null)
@@ -135,67 +118,21 @@ public class CLIMatch : Match
         if (insert is not null) 
             Console.WriteLine(insert);
         Console.WriteLine($"Move {ply / 2} - {(side == 0 ? "white" : "black")} to move");
-        Console.WriteLine($"Last move: {LastMove()}");
+        Console.WriteLine($"Last move: {game.LastMove?.Notate()}");
         if (debug)
             PrintDebugInfo();
         Print(side);
     }
 
-    private string LastMove()
-    {
-        if (game.Count == 0)
-            return "";
-        if (game.Count == 1)
-            return game[0].move.Notate(new Board(Presets.StartingBoard));
-        return game[^1].move.Notate(game[^2].board);
-    }
-
     private void PrintDebugInfo()
     {
-        Console.WriteLine(game.Count > 0 ? $"Move made in {game[^1].time}ms" : "");
+        Console.WriteLine(game[^1].time >= 0 ? $"Move made in {game[^1].time}ms" : "");
         Console.WriteLine($"Depth {depth}");
     }
 
     private Move PickRandom(Move[] moves)
     {
         return moves[random.Next(moves.Length)];
-    }
-
-    public string GetUCI()
-    {
-        string[] pgn = new string[game.Count];
-
-        for (int i = 0; i < pgn.Length; i++)
-        {
-            pgn[i] = game[i].move.GetUCI();
-        }
-        
-        return string.Join(' ', pgn);
-    }
-
-    private string GetPGN()
-    {
-        return GetPGN(game);
-    }
-
-    public static string GetPGN(List<PGNNode> game)
-    {
-        string[] pgn = new string[game.Count];
-
-        pgn[0] = "1. " + game[0].move.Notate(new Board(Presets.StartingBoard));
-        for (int i = 1; i < pgn.Length; i++)
-        {
-            string num = i % 2 == 0 ? $"{i / 2 + 1}. " : "";
-            
-            pgn[i] = num + game[i].move.Notate(game[i-1].board);
-        }
-        
-        return string.Join(' ', pgn);
-    }
-
-    public PGNNode[] GetNodes()
-    {
-        return game.ToArray();
     }
 
     public static void PrintBoard(Board board, int perspective = 0, int imbalance = 0)

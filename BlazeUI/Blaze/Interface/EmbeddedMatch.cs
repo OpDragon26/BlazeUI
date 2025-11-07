@@ -1,20 +1,18 @@
-using BlazeUI.Blaze.Book;
 using System.Threading;
 using BlazeUI.Blaze.Board_Representation;
 
-namespace BlazeUI.Blaze;
+namespace BlazeUI.Blaze.Interface;
 
 public class EmbeddedMatch(Board board, int depth, bool dynamicDepth = true, bool useBook = true, bool delayBook = false) : Match(board, depth, dynamicDepth, useBook, delayBook)
 {
     private bool complete = true;
-    PGNNode last = new PGNNode {board = board};
 
     private void StartSearch()
     {
         Thread t = new Thread(() =>
         {
             complete = false;
-            last = BotMove();
+            BotMove();
             complete = true;
         });
         t.Start();
@@ -34,26 +32,26 @@ public class EmbeddedMatch(Board board, int depth, bool dynamicDepth = true, boo
         return complete;
     }
 
-    public bool Poll(out PGNNode result)
+    public bool Poll(out GameNode result)
     {
-        result = last;
+        result = game.LastMove;
         return complete;
     }
 
-    public PGNNode WaitMove()
+    private GameNode WaitMove()
     {
         while (!complete)
             Thread.Sleep(10);
-        return last;
+        return game.LastMove;
     }
 
-    public new bool TryMake(Move move, out PGNNode node, long time = -1)
+    public new bool TryMake(Move move, out GameNode node, long time = -1)
     {
-        node = new PGNNode();
+        node = game.LastMove;
         if (!complete)
             return false;
         
-        return base.TryMake(move, out node, time);
+        return base.TryMake(move, out node!, time);
     }
     
     public new bool TryMake(Move move, long time = -1)

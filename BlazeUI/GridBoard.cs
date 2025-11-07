@@ -11,6 +11,8 @@ using Path = System.IO.Path;
 using Rectangle = Avalonia.Controls.Shapes.Rectangle;
 using BlazeUI.Blaze.Board_Representation;
 using BlazeUI.Blaze.Book;
+using BlazeUI.Blaze.Interface;
+using BlazeUI.Blaze.Utils;
 
 namespace BlazeUI;
 
@@ -86,7 +88,7 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
         {
             ClearHighlight("last-move");
             HighlightMove(move, Colors.HighLightMove);
-            pgnDisplay.Add(GeneralUtils.NotateLastMove(_match), _match.game[^1].move, new Board(_match!.board));
+            pgnDisplay.Add(_match.game.LastMove.Notate(), _match.game.LastMove.move!, new Board(_match!.board));
             LoadBoard(_match.board, side, true);
             // Console.WriteLine("Made move " + moveString);
             StartPolling();
@@ -126,14 +128,14 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
             HandleBotMove(node);
     }
 
-    private void HandleBotMove(PGNNode node)
+    private void HandleBotMove(GameNode node)
     {
         depthDisplay.Text = $"depth {_match!.depth}";
         ClearHighlight("last-move");
-        HighlightMove(node.move, Colors.HighLightMove);
-        pgnDisplay.Add(GeneralUtils.NotateLastMove(_match), _match.game[^1].move, new Board(_match!.board));
+        HighlightMove(node.move!, Colors.HighLightMove);
+        pgnDisplay.Add(_match.game.LastMove!.Notate(), _match.game.LastMove.move!, new Board(_match!.board));
         _timer!.Stop();
-        LoadBoard(node.board, side, true);
+        LoadBoard(_match.board, side, true);
         LockAll(true);
         LockPieces(side, false);
         IsGameOver();

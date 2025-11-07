@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using BlazeUI.Blaze.Board_Representation;
+using BlazeUI.Blaze.Interface;
 
 namespace BlazeUI.Blaze.Book;
 
@@ -19,7 +19,7 @@ public static class Book
         foreach (string line in origin)
         {
             //Console.WriteLine(line);
-            AddLine(Parser.ParseUCI(line));
+            AddLine(ParseUCI(line));
         }
     }
     
@@ -32,21 +32,19 @@ public static class Book
         return book[depth].TryRetrieve(board, out move);
     }
     
-    private static void AddLine(PGNNode[] line)
+    private static void AddLine(Game line)
     {
-        for (int depth = 0; depth < line.Length; depth++)
+        for (int depth = 0; depth < line.Count - 1; depth++)
         {
-            Board board = depth == 0 ? new Board(Presets.StartingBoard) : line[depth - 1].board;
-            Move move = line[depth].move;
-            AddToLayer(board, move, depth);
+            AddToLayer(line[depth], depth);
         }
     }
 
-    private static void AddToLayer(Board board, Move move, int depth)
+    private static void AddToLayer(GameNode node, int depth)
     {
         if (depth == book.Count)
             book.Add(new());
-        book[depth].AddEntry(board, move);
+        book[depth].AddEntry(node.board, node.move!);
     }
 
     private class Layer
@@ -75,81 +73,16 @@ public static class Book
         public readonly Board board = board;
         public readonly List<Move> moves = [move];
     }
-}
 
-public static class Parser
-{
-    public static void PrintGame(PGNNode[] game, int perspective, int pause = 10)
+    private static Game ParseUCI(string UCI)
     {
-        foreach (PGNNode node in game)
-        {
-            Console.Clear();
-            CLIMatch.PrintBoard(node.board, perspective);
-            Thread.Sleep(pause * 100);
-        }
-    }
-
-    public static PGNNode[] ParsePGN(string pgn)
-    {
-        List<PGNNode> nodes = new List<PGNNode>();
-        string[] game = pgn.Replace("\n", " ").Split(' ');
-        Board board = new Board(Presets.StartingBoard);
-
-        foreach (string alg in game)
-        {
-            if (alg.Equals(string.Empty) || alg[^1] == '.' || alg.Equals("0-1") || alg.Equals("1-0") || alg.Equals("1/2-1/2")) // notates the index of the move, or end of game
-                continue;
-            Move move;
-            try
-            {
-                move = Move.Parse(alg, board); // converts the move from algebraic notation to Move
-            }
-            catch
-            {
-                Console.WriteLine(alg);
-                throw;
-            }
-
-            board.MakeMove(move);
-
-            nodes.Add(new PGNNode { board = new Board(board), move = move });
-        }
-
-        return nodes.ToArray();
-    }
-
-    public static string ToUCI(PGNNode[] game)
-    {
-        List<string> UCI = [];
-        foreach (PGNNode node in game)
-            UCI.Add(node.move.GetUCI());
+        Game line = new Game(new(Presets.StartingBoard));
         
-        return string.Join(' ', UCI);
+        string[] uciGame = UCI.Split(' ');
+
+        foreach (string move in uciGame)
+            line.AddNodeUCI(move);
+        
+        return line;
     }
-
-    public static PGNNode[] ParseUCI(string pgn)
-    {
-        List<PGNNode> nodes = new List<PGNNode>();
-        string[] game = pgn.Replace("\n", " ").Split(' ');
-        Board board = new Board(Presets.StartingBoard);
-
-        foreach (string uci in game)
-        {
-            if (uci.Equals(string.Empty) || uci[^1] == '.') // notates the index of the move
-                continue;
-            Move move = new Move(uci, board); // converts the move from UCI notation to Move
-            board.MakeMove(move);
-            
-            nodes.Add(new PGNNode { board = new Board(board), move = move });
-        }
-
-        return nodes.ToArray();
-    }
-}
-
-public struct PGNNode(Board board, Move move, long time = 0)
-{
-    public Board board = board;
-    public Move move = move;
-    public readonly long time = time;
 }

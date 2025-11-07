@@ -1,11 +1,10 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using BlazeUI.Blaze.Board_Representation;
 using BlazeUI.Blaze.Book;
 
-namespace BlazeUI.Blaze;
+namespace BlazeUI.Blaze.Interface;
 
 public class Match
 {
@@ -18,7 +17,7 @@ public class Match
     
     private bool inBook;
     internal int ply;
-    public List<PGNNode> game = new();
+    public Game game;
     
     internal Match(Board board, int depth, bool dynamicDepth = true, bool useBook = true, bool delayBook = false)
     {
@@ -28,6 +27,7 @@ public class Match
         inBook = useBook;
         this.dynamicDepth = dynamicDepth;
         this.delayBook = delayBook;
+        game = new(new(board));
         
         RefutationTable.Init((int)Math.Pow(2, 20) + 7);
         Bitboards.Init();
@@ -37,18 +37,18 @@ public class Match
 
     // attempts to make the given move on the board, returns true if successful 
     // time only required for game keeping purposes
-    public bool TryMake(Move move, out PGNNode node, long time = -1)
+    public bool TryMake(Move move, out GameNode? node, long time = -1)
     {
         Move[] legalMoves = Search.SearchBoard(board, false).ToArray();
-        node = new PGNNode();
+        node = null;
 
         if (!legalMoves.Contains(move))
             return false;
         
+        game.AddNode(move, time);
         board.MakeMove(move);
         
-        node = new PGNNode(new(board), move, time);
-        game.Add(node);
+        node = game.LastMove;
         
         ply++;
         return true;
@@ -61,33 +61,29 @@ public class Match
         if (!legalMoves.Contains(move))
             return false;
         
+        game.AddNode(move, time);
         board.MakeMove(move);
-        
-        PGNNode node = new PGNNode(new(board), move, time);
-        game.Add(node);
         
         ply++;
         return true;
     }
 
-    public PGNNode BotMove()
+    public GameNode BotMove()
     {
         Search.SearchResult bestMove = Search.BestMove(board, depth, inBook, ply);
         
         if (bestMove.bookMove && delayBook)
             Thread.Sleep(500);
-        
-        board.MakeMove(bestMove.move);
 
-        PGNNode node = new PGNNode(new(board), bestMove.move, bestMove.time);
-        game.Add(node);
+        game.AddNode(bestMove.move, bestMove.time);
+        board.MakeMove(bestMove.move);
         
         if (dynamicDepth)
             UpdateDepth(bestMove);
         
         inBook = bestMove.bookMove;
         ply++;
-        return node;
+        return game[^1];
     }
 
     private void UpdateDepth(Search.SearchResult last)
@@ -106,7 +102,7 @@ public class Match
         depth = Math.Clamp(depth, depthFloor, depthCeiling);
     }
 
-    public static List<PGNNode> RandomGame(int depth)
+    public static Game RandomGame(int depth)
     {
         Match match = new(new Board(Presets.StartingBoard), depth, false);
         while (!match.GameEnded())
