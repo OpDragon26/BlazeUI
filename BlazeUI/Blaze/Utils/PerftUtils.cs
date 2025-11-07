@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using BlazeUI.Blaze.Board_Representation;
-using BlazeUI.Blaze.Interface;
 using BlazeUI.Blaze.Move_Generation;
 
 namespace BlazeUI.Blaze.Utils;
@@ -26,7 +25,7 @@ public static class PerftUtils
     public static void PrintMismatch(MismatchedMove[] moves, Board board)
     {
         Console.WriteLine("Board:");
-        CLIMatch.PrintBoard(board);
+        CLIUtils.PrintBoard(board);
         Console.WriteLine();
 
         foreach (MismatchedMove move in moves)
