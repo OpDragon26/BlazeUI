@@ -4,8 +4,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using BlazeUI.Blaze.Board_Representation;
-using BlazeUI.Blaze.Interface;
-using BlazeUI.Blaze.Search;
 using BlazeUI.Blaze.Move_Generation;
 using static BlazeUI.Blaze.Move_Generation.MoveGenerator;
 
@@ -13,7 +11,7 @@ namespace BlazeUI.Blaze.Utils;
 
 public static class Perft
 {
-    private static ulong RunSingle(int depth, Board board, bool testDifference, bool multiThreaded, PerftTest? comparison, bool printResult = true)
+    public static ulong RunSingle(int depth, Board board, bool testDifference, bool multiThreaded, PerftTest? comparison, bool printResult = true)
     {
         Bitboards.Init();
         PerftResult Result = new(depth);
@@ -87,7 +85,7 @@ public static class Perft
             {
                 MismatchMutex.WaitOne();
                 Console.WriteLine($"At depth {depth}");
-                PrintMismatch(CompareResults(pseudolegal, legal.ToArray()), board);
+                PerftUtils.PrintMismatch(PerftUtils.CompareResults(pseudolegal, legal.ToArray()), board);
                 Environment.Exit(1);
             }
             
@@ -138,7 +136,7 @@ public static class Perft
         
     }
 
-    private class PerftResult(int depth)
+    public class PerftResult(int depth)
     {
         readonly List<ulong[]> Results = new();
         readonly Mutex mutex = new();
@@ -164,7 +162,7 @@ public static class Perft
         }
     }
 
-    private class PerftTest(string name, Board board, ulong[] expected, int depthOffset)
+    public class PerftTest(string name, Board board, ulong[] expected, int depthOffset)
     {
         public readonly Board board = board;
         public readonly int depthOffset = depthOffset;
@@ -185,82 +183,6 @@ public static class Perft
                 }
             }
         }
-    }
-
-    public static void Breakdown(Board board, int depth)
-    {
-        Move[] moves = SearchBoard(board, false).ToArray();
-        Array.Sort(moves);
-        ulong total = 0;
-
-        foreach (Move move in moves)
-        {
-            Board moveBoard = new Board(board);
-            moveBoard.MakeMove(move);
-            ulong perftResult = RunSingle(depth - 1, moveBoard, false, depth > 3, null, false);
-            Console.WriteLine($"{move.GetUCI()}: {perftResult}");
-            total += perftResult;
-        }
-        
-        Console.WriteLine($"Nodes Searched: {total}");
-    }
-
-    public static void BreakdownEval(Board board, int depth)
-    {
-        Move[] moves = SearchBoard(board, false).ToArray();
-        Array.Sort(moves);
-
-        foreach (Move move in moves)
-        {
-            Board moveBoard = new Board(board);
-            moveBoard.MakeMove(move);
-            Console.WriteLine($"{move.GetUCI()}: {Searcher.Minimax(moveBoard, depth - 1, int.MinValue, int.MaxValue)}");
-        }
-    }
-
-    public static void BreakdownWithExamine(Board board, int depth, int[] examination)
-    {
-        foreach (int examine in examination)
-        {
-            depth--;
-            Move[] initMoves = SearchBoard(board, false).ToArray();
-            Array.Sort(initMoves);
-            board.MakeMove(initMoves[examine]);
-            Console.Write($"{initMoves[examine].GetUCI()}, ");
-        }
-        Console.WriteLine();
-
-        if (depth < 1)
-            Console.WriteLine("Depth too low");
-        if (depth == 1)
-        {
-            Move[] moves = SearchBoard(board, false).ToArray();
-            Array.Sort(moves);
-            
-            foreach (Move move in moves)
-                Console.WriteLine($"{move.GetUCI()}");
-            
-            Console.WriteLine($"Found: {moves.Length}");
-        }
-        else
-        {
-            Move[] moves = SearchBoard(board, false).ToArray();
-            
-            Array.Sort(moves);
-            ulong total = 0;
-
-            foreach (Move move in moves)
-            {
-                Board moveBoard = new Board(board);
-                moveBoard.MakeMove(move);
-                ulong perftResult = RunSingle(depth - 1, moveBoard, false, depth > 3, null, false);
-                Console.WriteLine($"{move.GetUCI()}: {perftResult}");
-                total += perftResult;
-            }
-
-            Console.WriteLine($"Nodes Searched: {total}");
-        }
-        
     }
     
     static readonly PerftTest StartingPositionTest = new("Starting Position", new(Presets.StartingBoard), 
@@ -292,74 +214,6 @@ public static class Perft
         { "start", StartingPositionTest },
         { "kiwipete", KiwipeteTest },
     };
-    
-    public static void TestGameSpeed(int games, int depth)
-    {
-        List<Game> gamesPlayed = new();
-        for (int i = 0; i < games; i++)
-        {
-            Game game = Match.RandomGame(depth);
-            gamesPlayed.Add(game);
-            Console.WriteLine(game.GetPGN());
-            Console.WriteLine($"Game {i + 1}/{games}");
-        }
-
-        List<GameNode> allNodes = gamesPlayed.Aggregate(((game1, game2) => game1.Join(game2))).ToList();
-        
-        Console.WriteLine($"Average time per move: {allNodes.Where(node => node.time > 50).Average(node => node.time)}ms");
-    }
-    
-    public static void AnalyzeBoard(Board board)
-    {
-        Move[] pseudolegal = PseudoLegalMoveGen.FilterChecks(PseudoLegalMoveGen.SearchBoard(board), board);
-        Move[] legal = SearchBoard(board, false).ToArray();
-
-        if (pseudolegal.Length != legal.Length)
-            PrintMismatch(CompareResults(pseudolegal,  legal), board);
-        else
-        {
-            Console.WriteLine("Correct moves found:");
-            foreach (Move move in legal)
-                Console.WriteLine(move.Notate(board));
-        }
-    }
-
-    private static MismatchedMove[] CompareResults(Move[] pseudolegal, Move[] legal)
-    {
-        List<MismatchedMove> mismatchedList = new();
-
-        foreach (Move move in pseudolegal)
-            if (!legal.Contains(move)) // move present in pseudolegal but not in legal -> missing move
-                mismatchedList.Add(new MismatchedMove(move, Mismatch.Missing));
-        foreach (Move move in legal)
-            if (!pseudolegal.Contains(move)) // move present in legal but not pseudolegal -> extra move
-                mismatchedList.Add(new MismatchedMove(move, Mismatch.Extra));
-
-        return mismatchedList.ToArray();
-    }
 
     private static readonly Mutex MismatchMutex = new();
-    private static void PrintMismatch(MismatchedMove[] moves, Board board)
-    {
-        Console.WriteLine("Board:");
-        CLIMatch.PrintBoard(board);
-        Console.WriteLine();
-
-        foreach (MismatchedMove move in moves)
-            Console.WriteLine(move);
-    }
-    
-    private readonly struct MismatchedMove(Move move, Mismatch mismatch)
-    {
-        public override string ToString()
-        {
-            return $"{mismatch.ToString()} move: {move.GetUCI()}";
-        }
-    }
-
-    enum Mismatch
-    {
-        Extra,
-        Missing
-    }
 }
