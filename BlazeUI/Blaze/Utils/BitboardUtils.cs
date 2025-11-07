@@ -462,6 +462,15 @@ public static class BitboardUtils
         
         return final;
     }
+
+    public static (int file, int rank) FindSquare(ulong bitboard)
+    {
+        for (int file = 0; file < 8; file++)
+        for (int rank = 0; rank < 8; rank++)
+            if ((bitboard & GetSquare(file, rank)) != 0)
+                return (file, rank);
+        return (8, 8);
+    }
     
     public static ulong[] GetSingleBits(ulong mask)
     {

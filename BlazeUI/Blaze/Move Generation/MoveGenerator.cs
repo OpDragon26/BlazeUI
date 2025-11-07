@@ -352,7 +352,7 @@ public static class MoveGenerator
         return attacked;
     }
 
-    private static (ulong pinned, Dictionary<ulong, ulong> pinStates) GetPinStates(Board board, int side)
+    public static (ulong pinned, Dictionary<ulong, ulong> pinStates) GetPinStates(Board board, int side)
     {
         Dictionary<ulong, ulong> pinStates = new();
         ulong pinned = 0;

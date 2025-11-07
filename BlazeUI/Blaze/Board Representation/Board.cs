@@ -314,7 +314,7 @@ public class Board
         return (board[rank] >> (file * 4)) & PieceMask;
     }
 
-    private void Clear((int file, int rank) square) // overload that takes a tuple
+    public void Clear((int file, int rank) square) // overload that takes a tuple
     {
         board[square.rank] |= (PieceMask << (square.file * 4)); // set the given square to 1111
     }

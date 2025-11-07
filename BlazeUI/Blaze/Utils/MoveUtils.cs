@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using BlazeUI.Blaze.Move_Generation;
 
 namespace BlazeUI.Blaze.Utils;
 using Magic_Lookup;
 using Board_Representation;
-using Move_Generation;
 
 public static class MoveUtils
 {
@@ -61,41 +60,47 @@ public static class MoveUtils
 
     public static Disambiguation FindLowestDisambiguation(Board board, Finder finder, (int file, int rank) src, (int file, int rank) dest)
     {
-        int count = 0;
-        List<(int file, int rank)> sources = new();
-        Move[] moves = MoveGenerator.SearchBoard(board, false).ToArray();
+        ulong potentialCapturers = finder.mask & board.bitboards[finder.GetPiece(board.side)];
+        List<(int Files, int rank)> sources = new();
+        
+        (ulong pinned, Dictionary<ulong, ulong> pinStates) pinState = MoveGenerator.GetPinStates(board, board.side);
 
-        foreach (Move move in moves)
-        {
-            // if the moves is made by the given piece to the given square
-            if (move.Destination == dest && board.GetPiece(move.Source) == finder.GetPiece(board.side))
+        for (int file = 0; file < 8; file++)
+        for (int rank = 0; rank < 8; rank++)
+            if ((potentialCapturers & BitboardUtils.GetSquare(file, rank)) != 0)
             {
-                sources.Add(move.Source);
-                count++;
+                // if pinned
+                if ((pinState.pinned & BitboardUtils.GetSquare(file, rank)) != 0)
+                {
+                    ulong possibleMoves = pinState.pinStates[BitboardUtils.GetSquare(file, rank)];
+                    if ((BitboardUtils.GetSquare(dest) & possibleMoves) == 0)
+                        continue;
+                }
+                
+                sources.Add((file, rank));
             }
-        }
-
-        if (count == 0)
-            throw new NotationParsingException(
-                $"No piece found that could move to the given square: {GetSquare(dest)}");
-        if (count == 1)
+        
+        if (sources.Count == 0)
+            throw new NotationParsingException($"No moves found to square: {GetSquare(dest)}");
+        
+        if (sources.Count == 1)
             return Disambiguation.None;
-        // count > 1
-        int file = 0;
-        int rank = 0;
+        
+        int files = 0;
+        int ranks = 0;
         
         // counts how many squares have a given file or rank
         foreach ((int file, int rank) square in sources)
         {
             // if any of the found moves start from the same file as the disambiguated move
             if (square.file == src.file)
-                file++;
+                files++;
             // if any of the found moves start from the same rank as the disambiguated move
             if (square.rank == src.rank)
-                rank++;
+                ranks++;
         }
-
-        return (file > 1, rank > 1) switch
+        
+        return (files > 1, ranks > 1) switch
         {
             (false, false) => Disambiguation.File,
             (true, false) => Disambiguation.Rank,
@@ -118,31 +123,18 @@ public static class MoveUtils
     
     public static (int File, int rank) FindMovingPiece(Board board, Finder finder, Disambiguation disambiguation, (int File, int rank) dest, int d=8)
     {
-        int found = 0;
-        (int File, int rank) last = (8,8);
-        Move[] moves = MoveGenerator.SearchBoard(board, false).ToArray();
+        ulong potentialCapturers = finder.mask & board.bitboards[finder.GetPiece(board.side)];
         
-        for (int rank = 7; rank >= 0; rank--)
-        {
-            if (disambiguation == Disambiguation.Rank && rank != d - 1) continue;
-            for (int file = 0; file < 8; file++)
-            {
-                if (disambiguation == Disambiguation.File && file != d) continue;
-                if ((finder.mask & BitboardUtils.GetSquare(file, rank)) != 0 && board.GetPiece(file, rank) == finder.GetPiece(board.side)) 
-                {
-                    if (moves.Contains(new Move((file, rank), dest)))
-                    {
-                        last = (file, rank);
-                        found++;
-                    }
-                }
-            }
-        }
-        if (found == 0)
-            throw (new NotationParsingException(d != 8 ? $"Unnecessary disambiguation: None found on {d - 1}" : "No piece found that could move to the given square"));
-        if (found != 1)
-            throw new NotationParsingException($"Inadequate disambiguation: found {found}");
-        return last;
+        if (disambiguation == Disambiguation.File)
+            potentialCapturers &= BitboardUtils.GetFile(d);
+        else if (disambiguation == Disambiguation.Rank)
+            potentialCapturers &= BitboardUtils.GetRank(d);
+
+        if (ulong.PopCount(potentialCapturers) == 1)
+            return BitboardUtils.FindSquare(potentialCapturers);
+        string message = (ulong.PopCount(potentialCapturers) < 1 ? "Multiple pieces" : "No piece") +
+                         $" could move to the square {GetSquare(dest)} with disambiguation {disambiguation} {d}";
+        throw new NotationParsingException(message);
     }
     
     public static readonly string[] PromotionStr = ["?", "r", "n", "b", "q","?","?",String.Empty];

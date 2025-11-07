@@ -95,26 +95,34 @@ public static class AlgebraicNotation
             return board.side == 0 ? Bitboards.WhiteLongCastle : Bitboards.BlackLongCastle;
 
         (int file, int rank) dest;
-        (int file, int rank) src;
+        (int file, int rank) src = (8, 8);
         int flag = 0;
         
         switch (alg.Length)
         {
             case 2: // pawn move forward
+            {
                 dest = ParseSquare(alg);
                 int offset = board.side * 2 - 1;
-                if (board.GetPiece(dest.file, dest.rank + offset) == (board.side == 0 ? Pieces.WhitePawn : Pieces.BlackPawn))
-                    src = (dest.file, dest.rank + offset);
-                else if (board.GetPiece(dest.file, dest.rank + 2 * offset) == (board.side == 0 ? Pieces.WhitePawn : Pieces.BlackPawn))
-                {
-                    src = (dest.file, dest.rank + 2 * offset);
-                    flag = board.side == 0 ? 0b0001 : 0b1001;
-                }
-                else
-                    throw new NotationParsingException($"No pawn can move to the given square: {alg}");
+                
+                uint pawn = board.side == 0 ? Pieces.WhitePawn : Pieces.BlackPawn;
+                int startRank = board.side * 5 + 1;
 
+                int doubleMoveSrc = dest.rank + offset * 2;
+                int singleMoveSrc = dest.rank + offset;
+                
+                if (doubleMoveSrc == startRank) // if a pawn can double move to the starting rank
+                    if (board.GetPiece(dest.file, doubleMoveSrc) == pawn)
+                        src = (dest.file, doubleMoveSrc);
+                
+                if (board.GetPiece(dest.file, singleMoveSrc) == pawn) // pawn can single move to the square
+                    src = (dest.file, singleMoveSrc);
+
+                if (src == (8, 8))
+                    throw new NotationParsingException($"No pawn could move to the square: {alg}");
+                
                 return new Move(src, dest, type: flag, pawn: true);
-            
+            }
             case 3:
                 // regular non-disambiguated piece move: Nf3
                 dest = ParseSquare($"{alg[1]}{alg[2]}");
@@ -133,33 +141,56 @@ public static class AlgebraicNotation
                     {
                         // pawn capture
                         dest = ParseSquare($"{alg[2]}{alg[3]}");
-                        
                         if (board.GetPiece(dest) == Pieces.Empty && dest != board.enPassant)
                             throw new  NotationParsingException("The targeted square is empty and isn't an en passant target");
+                        
                         if (dest == board.enPassant)
                             flag = board.side == 0 ? 0b0100 : 0b1100;
                         
-                        if (board.side == 0 && board.GetPiece(Indices[alg[0]], dest.rank - 1) == Pieces.WhitePawn)
-                            return new Move((Indices[alg[0]], dest.rank - 1), dest, pawn: true, type: flag);
-                        if (board.GetPiece(Indices[alg[0]], dest.rank + 1) == Pieces.BlackPawn)
-                            return new Move((Indices[alg[0]], dest.rank + 1), dest, pawn: true, type: flag);
+                        int srcFile = Indices[alg[0]];
+                        int destRank;
+                        
+                        if (board.side == 0)
+                        {
+                            destRank = dest.rank - 1;
+                            if (board.GetPiece(srcFile, destRank) == Pieces.WhitePawn)
+                                return new Move((srcFile, destRank), dest, pawn: true, type: flag);
+
+                            throw new NotationParsingException($"No pawn could capture on the square {GetSquare(dest)}");
+                        }
+                        
+                        destRank = dest.rank + 1;
+                        if (board.GetPiece(srcFile, destRank) == Pieces.BlackPawn)
+                            return new Move((srcFile, destRank), dest, pawn: true, type: flag);
+                        
+                        throw new NotationParsingException($"No pawn could capture on the square {GetSquare(dest)}");
                     }
-                    else if (ValidPieces.Contains(alg[0]))
+                    if (ValidPieces.Contains(alg[0]))
                         // piece capture: Nxe4
                         // treated as it wasn't a capture
                         return ParseMove($"{alg[0]}{alg[2]}{alg[3]}", board);
-                    else
-                        throw new  NotationParsingException($"Invalid file or piece: {alg[0]}");
+                    throw new  NotationParsingException($"Invalid file or piece: {alg[0]}");
                 }
-                else if (alg[2] == '=')
+                if (alg[2] == '=')
                 {
                     // promotion: e8=Q
                     if (validPromotions.Contains(alg[3]))
                     {
                         dest = ParseSquare($"{alg[0]}{alg[1]}");
-                        src = board.GetPiece(dest.file, dest.rank + (board.side * 2 - 1)) == (board.side == 0 ? Pieces.WhitePawn : Pieces.BlackPawn) 
-                            ? (dest.file, dest.rank - (board.side * 2 - 1)) : throw new NotationParsingException("No pawn can move to the given square");
-                        return new Move(src, dest, pawn: true, promotion: Promotions[char.ToLower(alg[3])]);
+                        int offset = board.side * 2 - 1;
+                        uint pawn = board.side == 0 ? Pieces.WhitePawn : Pieces.BlackPawn;
+                        int possibleSrc = dest.rank + offset;
+                        
+                        if (board.GetPiece(dest.file, possibleSrc) == pawn)
+                        {
+                            src = (dest.file, possibleSrc);
+                            uint promotion = Promotions[char.ToLower(alg[3])];
+                            
+                            return new Move(src, dest, pawn: true, promotion: promotion);
+                        }
+                        
+                        throw new NotationParsingException("No pawn can move to the given square");
+                        
                     }
                     throw new NotationParsingException($"Unknown or incorrect promotion: {alg[3]}");
                 }
@@ -188,35 +219,41 @@ public static class AlgebraicNotation
                         return new Move(FindMovingPiece(board, GetFinderMask(alg[0], dest.file, dest.rank, board), Disambiguation.File, dest, Indices[alg[1]]), dest);
                     if (ValidRanks.Contains(alg[1])) // rank disambiguation
                        return new Move(FindMovingPiece(board, GetFinderMask(alg[0], dest.file, dest.rank, board), Disambiguation.Rank, dest, int.Parse(alg[1].ToString())), dest);
-                    throw new NotationParsingException($"Unknown notation: {alg}");
                 }
                 
                 // doubly disambiguated move: Nd3e5
                 if (ValidPieces.Contains(alg[0]))
-                    return new Move(ParseSquare($"{alg[1]}{alg[2]}"), ParseSquare($"{alg[3]}{alg[4]}"));
+                {
+                    dest = ParseSquare($"{alg[3]}{alg[4]}");
+                    src = ParseSquare($"{alg[1]}{alg[2]}");
+                    
+                    return new Move(src, dest);
+                }
                 throw new NotationParsingException($"Unknown notation: {alg}");
             
             case 6:
                 // doubly disambiguated capture: Nd3xe5
                 if (ValidPieces.Contains(alg[0]) && alg[3] == 'x')
-                    return new Move(ParseSquare($"{alg[1]}{alg[2]}"), ParseSquare($"{alg[4]}{alg[5]}"));
+                {
+                    dest = ParseSquare($"{alg[4]}{alg[5]}");
+                    src = ParseSquare($"{alg[1]}{alg[2]}");
+                    
+                    return new Move(src, dest);
+                }
                 // capture promotion: fxe8=Q
                 if (alg[1] == 'x' && alg[4] == '=' && ValidFiles.Contains(alg[0]) && validPromotions.Contains(alg[5]))
                 {
                     // capture promotion
                     dest = ParseSquare($"{alg[2]}{alg[3]}");
+                    src = (Indices[alg[0]], dest.rank - 1);
                         
-                    if (board.side == 0 && board.GetPiece(Indices[alg[0]], dest.rank - 1) == Pieces.WhitePawn)
-                        return new Move((Indices[alg[0]], dest.rank - 1), dest, pawn: true, promotion: Promotions[char.ToLower(alg[5])]);
-                    if (board.GetPiece(Indices[alg[0]], dest.rank + 1) == Pieces.BlackPawn)
-                        return new Move((Indices[alg[0]], dest.rank + 1), dest, pawn: true, promotion: Promotions[char.ToLower(alg[5])]);
+                    uint promotion = Promotions[alg[5]];
+                    if (board.side == 0 && board.GetPiece(src) == Pieces.WhitePawn)
+                        return new Move(src, dest, pawn: true, promotion: promotion);
+                    if (board.GetPiece(src) == Pieces.BlackPawn)
+                        return new Move(src, dest, pawn: true, promotion: promotion);
                 }
                 
-                throw new NotationParsingException($"Unknown notation: {alg}");
-            
-            case 7:
-                if (alg[6] == '#' || alg[6] == '+') // move is a check or checkmate
-                    return ParseMove($"{alg[0]}{alg[1]}{alg[2]}{alg[3]}{alg[4]}{alg[5]}", board);
                 throw new NotationParsingException($"Unknown notation: {alg}");
             default:
                 throw new NotationParsingException($"Unknown notation: {alg}");
