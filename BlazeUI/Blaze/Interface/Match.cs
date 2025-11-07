@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using BlazeUI.Blaze.Board_Representation;
+using BlazeUI.Blaze.Book;
 
 namespace BlazeUI.Blaze;
 
@@ -31,7 +32,7 @@ public class Match
         RefutationTable.Init((int)Math.Pow(2, 20) + 7);
         Bitboards.Init();
         ZobristHash.Init();
-        Book.Init(Books.Standard);
+        Book.Book.Init(Books.Standard);
     }
 
     // attempts to make the given move on the board, returns true if successful 

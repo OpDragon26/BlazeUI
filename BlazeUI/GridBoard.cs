@@ -10,6 +10,7 @@ using BlazeUI.Blaze;
 using Path = System.IO.Path;
 using Rectangle = Avalonia.Controls.Shapes.Rectangle;
 using BlazeUI.Blaze.Board_Representation;
+using BlazeUI.Blaze.Book;
 
 namespace BlazeUI;
 

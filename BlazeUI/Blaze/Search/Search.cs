@@ -11,7 +11,7 @@ public static class Search
     public static SearchResult BestMove(Board board, int depth, bool useBook, int bookDepth)
     {
         if (useBook)
-            if (Book.TryRetrieve(board, bookDepth, out Move? move))
+            if (Book.Book.TryRetrieve(board, bookDepth, out Move? move))
                 return new SearchResult(move!, 1, true, 0);
         
         Timer timer = new Timer();
@@ -24,11 +24,6 @@ public static class Search
         int alpha = int.MinValue;
         int beta = int.MaxValue;
         int eval = board.side == 0 ? int.MinValue : int.MaxValue;
-
-        for (int i = 0; i < moves.Length; i++)
-        {
-            
-        }
         
         Parallel.For(0, moves.Length, i =>
         {

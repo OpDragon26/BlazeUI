@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using BlazeUI.Blaze.Board_Representation;
 
-namespace BlazeUI.Blaze;
+namespace BlazeUI.Blaze.Book;
 
 public static class Book
 {
