@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 using BlazeUI.Blaze.Board_Representation;
+using BlazeUI.Blaze.Move_Generation;
 
 namespace BlazeUI.Blaze.Interface;
 
@@ -59,7 +60,7 @@ public class CLIMatch(Board board, Type type, Side side, int depth = 2, bool deb
                     Console.ReadKey();
                     break;
                 case Type.Random:
-                    Move[] moves = Search.SearchBoard(board, false).ToArray();
+                    Move[] moves = MoveGenerator.SearchBoard(board, false).ToArray();
                     TryMake(PickRandom(moves), 0);
                     break;
             }

@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using Avalonia.Controls;
-using BlazeUI.Blaze;
 using BlazeUI.Blaze.Board_Representation;
+using BlazeUI.Blaze.Move_Generation;
 
 namespace BlazeUI;
 

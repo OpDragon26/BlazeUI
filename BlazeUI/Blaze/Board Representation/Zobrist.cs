@@ -1,4 +1,5 @@
 using System;
+using BlazeUI.Blaze.Move_Generation;
 
 namespace BlazeUI.Blaze.Board_Representation;
 

@@ -3,6 +3,8 @@ using System.Linq;
 using System.Threading;
 using BlazeUI.Blaze.Board_Representation;
 using BlazeUI.Blaze.Book;
+using BlazeUI.Blaze.Search;
+using BlazeUI.Blaze.Move_Generation;
 
 namespace BlazeUI.Blaze.Interface;
 
@@ -17,7 +19,7 @@ public class Match
     
     private bool inBook;
     internal int ply;
-    public Game game;
+    public readonly Game game;
     
     internal Match(Board board, int depth, bool dynamicDepth = true, bool useBook = true, bool delayBook = false)
     {
@@ -39,7 +41,7 @@ public class Match
     // time only required for game keeping purposes
     public bool TryMake(Move move, out GameNode? node, long time = -1)
     {
-        Move[] legalMoves = Search.SearchBoard(board, false).ToArray();
+        Move[] legalMoves = MoveGenerator.SearchBoard(board, false).ToArray();
         node = null;
 
         if (!legalMoves.Contains(move))
@@ -56,7 +58,7 @@ public class Match
     
     public bool TryMake(Move move, long time = -1)
     {
-        Move[] legalMoves = Search.SearchBoard(board, false).ToArray();
+        Move[] legalMoves = MoveGenerator.SearchBoard(board, false).ToArray();
 
         if (!legalMoves.Contains(move))
             return false;
@@ -70,7 +72,7 @@ public class Match
 
     public GameNode BotMove()
     {
-        Search.SearchResult bestMove = Search.BestMove(board, depth, inBook, ply);
+        Searcher.SearchResult bestMove = Searcher.BestMove(board, depth, inBook, ply);
         
         if (bestMove.bookMove && delayBook)
             Thread.Sleep(500);
@@ -86,7 +88,7 @@ public class Match
         return game[^1];
     }
 
-    private void UpdateDepth(Search.SearchResult last)
+    private void UpdateDepth(Searcher.SearchResult last)
     {
         if (last.bookMove) return;
         if (last.move.Promotion != Pieces.Empty)

@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using BlazeUI.Blaze.Board_Representation;
 
-namespace BlazeUI.Blaze;
+namespace BlazeUI.Blaze.Evaluation;
 
-public static class Evaluation
+public static class EvaluationLookup
 {
     public static class Lookup
     {

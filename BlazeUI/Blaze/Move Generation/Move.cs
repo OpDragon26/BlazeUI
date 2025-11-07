@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using BlazeUI.Blaze.Board_Representation;
+using BlazeUI.Blaze.Utils;
 
-namespace BlazeUI.Blaze;
+namespace BlazeUI.Blaze.Move_Generation;
 
 public class Move : IComparable<Move>
 {
@@ -243,7 +244,7 @@ public class Move : IComparable<Move>
             notation += '#';
         }
 
-        else if (Search.Attacked(tempBoard.KingPositions[tempBoard.side], tempBoard, 1 - tempBoard.side))
+        else if (MoveGenerator.Attacked(tempBoard.KingPositions[tempBoard.side], tempBoard, 1 - tempBoard.side))
         {
             // check
             notation += '+';
@@ -443,7 +444,7 @@ public class Move : IComparable<Move>
     {
         int found = 0;
         (int File, int rank) last = (8,8);
-        Move[] moves = Search.FilterChecks(Search.SearchBoard(board, false), board);
+        Move[] moves = MoveGenerator.SearchBoard(board, false).ToArray();
         
         for (int rank = 7; rank >= 0; rank--)
         {
@@ -472,7 +473,7 @@ public class Move : IComparable<Move>
     {
         int count = 0;
         List<(int file, int rank)> sources = new();
-        Move[] moves = Search.FilterChecks(Search.SearchBoard(board, false), board);
+        Move[] moves = MoveGenerator.SearchBoard(board, false).ToArray();
 
         foreach (Move move in moves)
         {

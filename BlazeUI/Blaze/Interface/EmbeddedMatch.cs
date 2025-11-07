@@ -1,5 +1,6 @@
 using System.Threading;
 using BlazeUI.Blaze.Board_Representation;
+using BlazeUI.Blaze.Move_Generation;
 
 namespace BlazeUI.Blaze.Interface;
 

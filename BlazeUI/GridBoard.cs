@@ -10,9 +10,9 @@ using BlazeUI.Blaze;
 using Path = System.IO.Path;
 using Rectangle = Avalonia.Controls.Shapes.Rectangle;
 using BlazeUI.Blaze.Board_Representation;
-using BlazeUI.Blaze.Book;
 using BlazeUI.Blaze.Interface;
 using BlazeUI.Blaze.Utils;
+using BlazeUI.Blaze.Move_Generation;
 
 namespace BlazeUI;
 
@@ -70,7 +70,7 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
 
     public void PieceRaised((int x, int y) pos)
     {
-        HighLight(BitboardUtils.GetMoveBitboard(Search.SearchBoard(_match!.board, false).ToArray().Where(move => move.Source == PerspectiveConverter.Invert(pos, side)).ToArray()), side, "possible-moves");
+        HighLight(BitboardUtils.GetMoveBitboard(MoveGenerator.SearchBoard(_match!.board, false).ToArray().Where(move => move.Source == PerspectiveConverter.Invert(pos, side)).ToArray()), side, "possible-moves");
     }
 
     public void PieceReleased()
@@ -88,7 +88,7 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
         {
             ClearHighlight("last-move");
             HighlightMove(move, Colors.HighLightMove);
-            pgnDisplay.Add(_match.game.LastMove.Notate(), _match.game.LastMove.move!, new Board(_match!.board));
+            pgnDisplay.Add(_match.game.LastMove!.Notate(), _match.game.LastMove.move!, new Board(_match!.board));
             LoadBoard(_match.board, side, true);
             // Console.WriteLine("Made move " + moveString);
             StartPolling();
@@ -186,7 +186,7 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
         Clear();
         UpdateMaterial(board, perspective);
         ClearHighlight("check");
-        if (_match != null && Search.Attacked(board.KingPositions[board.side], board, 1 - board.side))
+        if (_match != null && MoveGenerator.Attacked(board.KingPositions[board.side], board, 1 - board.side))
             HighLight(BitboardUtils.GetSquare(board.KingPositions[board.side]), perspective, "check", Colors.HighLightCheck);
         
         ClearHighlight("specified");

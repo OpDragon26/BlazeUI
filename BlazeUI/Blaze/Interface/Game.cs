@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using BlazeUI.Blaze.Board_Representation;
+using BlazeUI.Blaze.Move_Generation;
 
 namespace BlazeUI.Blaze.Interface;
 

@@ -5,6 +5,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using BlazeUI.Blaze.Board_Representation;
 using BlazeUI.Blaze.Interface;
+using BlazeUI.Blaze.Search;
+using BlazeUI.Blaze.Move_Generation;
+using static BlazeUI.Blaze.Move_Generation.MoveGenerator;
 
 namespace BlazeUI.Blaze.Utils;
 
@@ -19,7 +22,7 @@ public static class Perft
 
         board.considerRepetition = false;
 
-        Move[] moves = Search.SearchBoard(board, false).ToArray();
+        Move[] moves = SearchBoard(board, false).ToArray();
 
         if (depth == 1)
             return (ulong)moves.Length;
@@ -73,9 +76,9 @@ public static class Perft
             int legalResult = 0;
             int pseudolegalResult = 0;
 
-            Move[] pseudolegal = Search.FilterChecks(Search.PseudolegalSearchBoard(board), board);
+            Move[] pseudolegal = PseudoLegalMoveGen.FilterChecks(PseudoLegalMoveGen.SearchBoard(board), board);
             results[depth] += (uint)pseudolegal.Length;
-            Move[] legal = Search.SearchBoard(board, false).ToArray();
+            Move[] legal = SearchBoard(board, false).ToArray();
 
             legalResult += legal.Length;
             pseudolegalResult += pseudolegal.Length;
@@ -99,11 +102,11 @@ public static class Perft
         {
             if (depth == 1)
             {
-                results[1] += (ulong)Search.SearchBoard(board, false).Length;
+                results[1] += (ulong)SearchBoard(board, false).Length;
                 return;
             }
             
-            Span<Move> moves = Search.SearchBoard(board, false);
+            Span<Move> moves = SearchBoard(board, false);
 
             foreach (Move move in moves)
             {
@@ -186,7 +189,7 @@ public static class Perft
 
     public static void Breakdown(Board board, int depth)
     {
-        Move[] moves = Search.SearchBoard(board, false).ToArray();
+        Move[] moves = SearchBoard(board, false).ToArray();
         Array.Sort(moves);
         ulong total = 0;
 
@@ -204,14 +207,14 @@ public static class Perft
 
     public static void BreakdownEval(Board board, int depth)
     {
-        Move[] moves = Search.SearchBoard(board, false).ToArray();
+        Move[] moves = SearchBoard(board, false).ToArray();
         Array.Sort(moves);
 
         foreach (Move move in moves)
         {
             Board moveBoard = new Board(board);
             moveBoard.MakeMove(move);
-            Console.WriteLine($"{move.GetUCI()}: {Search.Minimax(moveBoard, depth - 1, int.MinValue, int.MaxValue)}");
+            Console.WriteLine($"{move.GetUCI()}: {Searcher.Minimax(moveBoard, depth - 1, int.MinValue, int.MaxValue)}");
         }
     }
 
@@ -220,7 +223,7 @@ public static class Perft
         foreach (int examine in examination)
         {
             depth--;
-            Move[] initMoves = Search.SearchBoard(board, false).ToArray();
+            Move[] initMoves = SearchBoard(board, false).ToArray();
             Array.Sort(initMoves);
             board.MakeMove(initMoves[examine]);
             Console.Write($"{initMoves[examine].GetUCI()}, ");
@@ -231,7 +234,7 @@ public static class Perft
             Console.WriteLine("Depth too low");
         if (depth == 1)
         {
-            Move[] moves = Search.SearchBoard(board, false).ToArray();
+            Move[] moves = SearchBoard(board, false).ToArray();
             Array.Sort(moves);
             
             foreach (Move move in moves)
@@ -241,7 +244,7 @@ public static class Perft
         }
         else
         {
-            Move[] moves = Search.SearchBoard(board, false).ToArray();
+            Move[] moves = SearchBoard(board, false).ToArray();
             
             Array.Sort(moves);
             ulong total = 0;
@@ -308,8 +311,8 @@ public static class Perft
     
     public static void AnalyzeBoard(Board board)
     {
-        Move[] pseudolegal = Search.FilterChecks(Search.PseudolegalSearchBoard(board), board);
-        Move[] legal = Search.SearchBoard(board, false).ToArray();
+        Move[] pseudolegal = PseudoLegalMoveGen.FilterChecks(PseudoLegalMoveGen.SearchBoard(board), board);
+        Move[] legal = SearchBoard(board, false).ToArray();
 
         if (pseudolegal.Length != legal.Length)
             PrintMismatch(CompareResults(pseudolegal,  legal), board);
