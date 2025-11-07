@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using static BlazeUI.Blaze.Utils.BoardUtils;
 using static BlazeUI.Blaze.Utils.BoardUtils.General;
@@ -85,50 +84,14 @@ public class Board
     {
         string[] fields = FEN.Split(' ');
         
-        // piece placement data
-        string[] ranks = fields[0].Split('/');
-        for (int r = 0; r < 8; r++) // for each rank
-        {
-            // current file
-            int indexer = 0;
-
-            for (int c = 0; c < ranks[r].Length; c++) // for each character
-            {
-                if (int.TryParse(ranks[r][c].ToString(), out int v)) // if the character is a number
-                {
-                    // fill that many empty squares
-                    for (int i = 0; i < v; i++)
-                    {
-                        SetPiece(indexer++, 7-r, Pieces.Empty);
-                    }
-                }
-                else
-                {
-                    SetPiece(indexer++, 7-r, Pieces.Parse(ranks[r][c]));
-                }
-            }
-        }
-        
-        InitBoard();
-
-        // active side
-        if (fields[1] == "w")
-            side = 0;
-        else if (fields[1] == "b")
-            side = 1;
-        else
-            throw new Exception($"'{fields[1]}' is not a valid side");
-        
-        // castling availability
-        castling = ParseCastling(fields[2]);
-        
-        // En passant target square
+        board = Parsing.LoadFENPiecewise(fields[0]);
+        side = Parsing.GetActiveSide(fields[1]);
+        castling = Parsing.ParseCastling(fields[2]);
         enPassant = fields[3] == "-" ? (8, 8) : Move.ParseSquare(fields[3]);
-        
-        // half move clock
         halfMoveClock = int.Parse(fields[4]);
-
         hashKey = Hasher.ZobristHash(this);
+
+        InitBoard();
         
         this.considerRepetition = considerRepetition;
     }
@@ -310,10 +273,10 @@ public class Board
 
     private void InitBoard()
     {
-        bitboards = new BitwiseBoard(this);
-        pawns = BoardSetup.CountPawns(this);
-        KingPositions = BoardSetup.FindKings(this);
-        values = BoardSetup.CountMaterial(this);
+        bitboards = new BitwiseBoard(board);
+        pawns = BoardSetup.CountPawns(bitboards);
+        KingPositions = BoardSetup.FindKings(board);
+        values = BoardSetup.CountMaterial(board);
     }
 
     public int GetImbalance()
@@ -336,32 +299,6 @@ public class Board
         }
         else // the board position is entirely new
             repeat.Add(hashKey, 1);
-    }
-
-    private static readonly Dictionary<char, byte> CastlingAvailability = new()
-    {
-        {'K', 0b1000},
-        {'Q', 0b0100},
-        {'k', 0b0010},
-        {'q', 0b0001}
-    };
-    
-    private static byte ParseCastling(string s)
-    {
-        if (s == "-")
-            return 0;
-
-        byte c = 0;
-
-        foreach (char cc in s)
-        {
-            if (CastlingAvailability.TryGetValue(cc, out byte ca))
-                c |= ca;
-            else
-                throw new Exception($"Unable to parse FEN: Unknown castling availability char: {cc}");
-        }
-
-        return c;
     }
 
     public override bool Equals(object? obj)
@@ -408,8 +345,6 @@ public class Board
     {
         return bitboards[piece | ((uint)color << 3)];
     }
-    
-    private const uint PieceMask = 0xF; // covers the last 4 bits
     
     public uint GetPiece((int file, int rank) square) // overload that takes a tuple
     {

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using BlazeUI.Blaze.Board_Representation;
 
 namespace BlazeUI.Blaze.Utils;
@@ -7,10 +8,12 @@ public static class BoardUtils
 {
     public static class General
     {
+        public const uint PieceMask = 0xF; // covers the last 4 bits
+        
         [System.Runtime.CompilerServices.InlineArray(14)]
         public struct BitwiseBoard
         {
-            public BitwiseBoard(Board source)
+            public BitwiseBoard(PiecewiseBoard source)
             {
                 for (int file = 0; file < 8; file++)
                 for (int rank = 0; rank < 8; rank++)
@@ -32,7 +35,7 @@ public static class BoardUtils
         [System.Runtime.CompilerServices.InlineArray(8)]
         public struct PiecewiseBoard : IEquatable<PiecewiseBoard>
         {
-            private uint rank;
+            private uint row;
 
             public PiecewiseBoard(uint[] board)
             {
@@ -46,6 +49,18 @@ public static class BoardUtils
                     if (this[i] != other[i])
                         return false;
                 return true;
+            }
+            
+            // not meant to be used during search
+            public void SetPiece(int file, int rank, uint piece)
+            {
+                this[rank] &= ~(PieceMask << (file * 4)); // set the given square to 0000
+                this[rank] |= (piece << (file * 4)); // set the square to the given piece
+            }
+
+            public uint GetPiece(int file, int rank)
+            {
+                return (this[rank] >> (file * 4)) & PieceMask;
             }
         }
         
@@ -100,12 +115,15 @@ public static class BoardUtils
     
     public static class BoardSetup
     {
-        public static int CountPawns(Board board)
+        private class BoardSetupException(string message) : Exception(message) { }
+        
+        public static int CountPawns(General.BitwiseBoard board)
         {
-            return (int)(ulong.PopCount(board.AllPawns()));
+            ulong allPawns = board[Pieces.WhitePawn] | board[Pieces.BlackPawn];
+            return (int)(ulong.PopCount(allPawns));
         }
 
-        public static General.CoordinatePair FindKings(Board board)
+        public static General.CoordinatePair FindKings(General.PiecewiseBoard board)
         {
             General.CoordinatePair result = new();
             
@@ -136,7 +154,7 @@ public static class BoardUtils
             return result;
         }
 
-        public static General.ValuePair CountMaterial(Board board)
+        public static General.ValuePair CountMaterial(General.PiecewiseBoard board)
         {
             General.ValuePair material = new();
             
@@ -152,12 +170,76 @@ public static class BoardUtils
             
             return material;
         }
-        
-        private class BoardSetupException(string message) : Exception(message) { }
     }
     
     public static class Parsing
     {
-        // TODO: add parsing a board from a FEN string
+        private class BoardParsingException(string message) : Exception(message) { }
+        
+        public static General.PiecewiseBoard LoadFENPiecewise(string FENBoard)
+        {
+            General.PiecewiseBoard board = new();
+            
+            string[] ranks = FENBoard.Split('/');
+            
+            for (int r = 0; r < 8; r++) // for each rank
+            {
+                // current file
+                int indexer = 0;
+
+                for (int c = 0; c < ranks[r].Length; c++) // for each character
+                {
+                    if (int.TryParse(ranks[r][c].ToString(), out int v)) // if the character is a number
+                    {
+                        // fill that many empty squares
+                        for (int i = 0; i < v; i++)
+                        {
+                            board.SetPiece(indexer++, 7-r, Pieces.Empty);
+                        }
+                    }
+                    else
+                    {
+                        board.SetPiece(indexer++, 7-r, Pieces.Parse(ranks[r][c]));
+                    }
+                }
+            }
+            
+            return board;
+        }
+
+        public static int GetActiveSide(string side)
+        {
+            if (side == "w")
+                return 0;
+            if (side == "b")
+                return 1;
+            throw new BoardParsingException($"'{side}' is not a valid side");
+        }
+        
+        private static readonly Dictionary<char, byte> CastlingAvailability = new()
+        {
+            {'K', 0b1000},
+            {'Q', 0b0100},
+            {'k', 0b0010},
+            {'q', 0b0001}
+        };
+    
+        public static byte ParseCastling(string s)
+        {
+            if (s == "-")
+                return 0;
+
+            byte c = 0;
+
+            foreach (char cc in s)
+            {
+                if (CastlingAvailability.TryGetValue(cc, out byte ca))
+                    c |= ca;
+                else
+                    throw new BoardParsingException($"Unable to parse FEN: Unknown castling availability char: {cc}");
+            }
+
+            return c;
+        }
     }
 }
