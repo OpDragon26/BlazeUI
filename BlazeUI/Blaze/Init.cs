@@ -15,4 +15,6 @@ public static class Init
         ZobristHash.Init();
         Book.Book.Init(Books.Standard);
     }
+    
+    
 }
