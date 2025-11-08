@@ -1,6 +1,8 @@
 ﻿using System;
 
-namespace BlazeUI.Blaze;
+namespace BlazeUI.Blaze.Search;
+using static Board_Representation.ZobristHash;
+using Move_Generation;
 
 public static class History
 {
@@ -61,25 +63,25 @@ public static class RefutationTable
         Table = new HashEntry[size];
     }
 
-    public static bool TryGet(int zobrist, out HashEntry result)
+    public static bool TryGet(Zobrist zobrist, out HashEntry result)
     {
         if (!init)
             throw new InvalidOperationException("Table not initialized");
-        result = Table[zobrist % Size];
-        return result.filled && result.zobrist == zobrist;
+        result = Table[zobrist.key % Size];
+        return result.filled && result.zobrist.Equals(zobrist);
     }
 
-    public static void Set(int zobrist, Move move, byte bonus)
+    public static void Set(Zobrist zobrist, Move move, byte bonus)
     {
         if (!init)
             throw new InvalidOperationException("Table not initialized");
-        Table[zobrist % Size] = new HashEntry(zobrist, move, bonus);
+        Table[zobrist.key % Size] = new HashEntry(zobrist, move, bonus);
     }
     
-    public readonly struct HashEntry(int zobrist, Move move, byte bonus)
+    public readonly struct HashEntry(Zobrist zobrist, Move move, byte bonus)
     {
         public readonly bool filled = true;
-        public readonly int zobrist = zobrist;
+        public readonly Zobrist zobrist = zobrist;
         public readonly Move move = move;
         public readonly byte bonus = bonus;
     }

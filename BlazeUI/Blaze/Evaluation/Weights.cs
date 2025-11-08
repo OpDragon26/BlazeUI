@@ -1,4 +1,4 @@
-namespace BlazeUI.Blaze;
+namespace BlazeUI.Blaze.Evaluation;
 
 public static class Weights
 {

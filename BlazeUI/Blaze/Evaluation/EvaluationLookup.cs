@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 
-namespace BlazeUI.Blaze;
-
-public static class Evaluation
+namespace BlazeUI.Blaze.Evaluation;
+using Board_Representation;
+using Magic_Lookup;
+using Utils;
+public static class EvaluationLookup
 {
     public static class Lookup
     {

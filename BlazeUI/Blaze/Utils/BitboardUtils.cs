@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 
-namespace BlazeUI.Blaze;
+namespace BlazeUI.Blaze.Utils;
+using Board_Representation;
+using Move_Generation;
+using Magic_Lookup;
 
 public static class BitboardUtils
 {
@@ -68,7 +71,7 @@ public static class BitboardUtils
                 if (!ValidSquare(target.file, target.rank)) // if the square is outside the bounds of the board
                     break;
                 if ((blockers & GetSquare(target)) == 0) // if the targeted square is empty
-                    moves.Add(new Move(pos, target, priority: 5 + Bitboards.PriorityWeights[target.file, target.rank] * Weights.PriorityWeightMultiplier));
+                    moves.Add(new Move(pos, target, priority: 5 + Bitboards.PriorityWeights[target.file, target.rank] * Evaluation.Weights.PriorityWeightMultiplier));
                 else
                 {
                     captures |= GetSquare(target);
@@ -458,6 +461,15 @@ public static class BitboardUtils
         }
         
         return final;
+    }
+
+    public static (int file, int rank) FindSquare(ulong bitboard)
+    {
+        for (int file = 0; file < 8; file++)
+        for (int rank = 0; rank < 8; rank++)
+            if ((bitboard & GetSquare(file, rank)) != 0)
+                return (file, rank);
+        return (8, 8);
     }
     
     public static ulong[] GetSingleBits(ulong mask)

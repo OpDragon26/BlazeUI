@@ -2,22 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace BlazeUI.Blaze;
+namespace BlazeUI.Blaze.Utils;
+using Board_Representation;
+using Interface;
 
-public static class Utils
+public static class GeneralUtils
 {
     public static bool SideWon(Side side, Outcome outcome)
     {
         return (side == Side.White && outcome == Outcome.WhiteWin) || (side == Side.Black && outcome == Outcome.BlackWin);
-    }
-
-    public static string NotateLastMove(Match match)
-    {
-        if (match.game.Count == 0)
-            return string.Empty;
-        if (match.game.Count == 1)
-            return match.game[0].move.Notate(new Board(Presets.StartingBoard));
-        return match.game[^1].move.Notate(match.game[^2].board);
     }
     
     public static MaterialComparison CompareMaterial(Board board)
@@ -106,4 +99,20 @@ public static class Utils
         {0b1100,'♕'},
         {0b1101,'♔'},
     };
+    
+    public class Timer
+    {
+        private DateTime StartTime = DateTime.Now;
+
+        public void Start()
+        {
+            StartTime = DateTime.Now;
+        }
+
+        public long Stop()
+        {
+            TimeSpan elapsed = StartTime - DateTime.Now;
+            return elapsed.Milliseconds;
+        }
+    }
 }

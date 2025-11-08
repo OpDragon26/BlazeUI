@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace BlazeUI.Blaze;
+namespace BlazeUI.Blaze.Utils;
 
 public static class Batch
 {

@@ -1,15 +1,16 @@
 using System;
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Threading;
-using BlazeUI.Blaze;
+using BlazeUI.Blaze.Utils;
 
 namespace BlazeUI;
-
+using Blaze.Board_Representation;
+using Blaze.Interface;
+using Blaze.Magic_Lookup;
 public partial class MainWindow : Window
 {
     private readonly PromotionHandler _promotionHandler;
@@ -55,7 +56,10 @@ public partial class MainWindow : Window
         _pgnDisplay = new PGNDisplay(PGNPanel);
         _pieceBoard = new GridBoard(this.FindControl<Grid>("pieces")!, this.FindControl<Grid>("highlight")!, _promotionHandler, _pgnDisplay, DepthDisplay, BotMaterial, PlayerMaterial,  this);
         _pieceBoard.SetMatch(null, Side.White);
-        //Perft.TestGameSpeed(15, 6);
+        
+        //DebugUtils.TestGameSpeed(2000, 3);
+        //Environment.Exit(0);
+        
         StartNewGame();
     }
 

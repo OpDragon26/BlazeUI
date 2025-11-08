@@ -1,5 +1,5 @@
-using System;
 using Avalonia.Controls;
+using BlazeUI.Blaze.Interface;
 
 namespace BlazeUI;
 
@@ -25,7 +25,7 @@ public class PromotionHandler(Grid displayGrid)
         _selected = 0b111;
     }
 
-    public void InitImages(Blaze.Side side)
+    public void InitImages(Side side)
     {
         _queenPromotion.Source = GridBoard.GetPieceBitmap(0b100 | ((uint)side << 3));
         _rookPromotion.Source = GridBoard.GetPieceBitmap(0b001 | ((uint)side << 3));

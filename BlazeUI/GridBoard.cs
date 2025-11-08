@@ -9,6 +9,10 @@ using Avalonia.Threading;
 using BlazeUI.Blaze;
 using Path = System.IO.Path;
 using Rectangle = Avalonia.Controls.Shapes.Rectangle;
+using BlazeUI.Blaze.Board_Representation;
+using BlazeUI.Blaze.Interface;
+using BlazeUI.Blaze.Utils;
+using BlazeUI.Blaze.Move_Generation;
 
 namespace BlazeUI;
 
@@ -61,12 +65,12 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
             return;
         }
         
-        TryMakeMove(Move.GetSquare(invertedFrom) + Move.GetSquare(invertedTo));
+        TryMakeMove(MoveUtils.GetSquare(invertedFrom) + MoveUtils.GetSquare(invertedTo));
     }
 
     public void PieceRaised((int x, int y) pos)
     {
-        HighLight(BitboardUtils.GetMoveBitboard(Search.SearchBoard(_match!.board, false).ToArray().Where(move => move.Source == PerspectiveConverter.Invert(pos, side)).ToArray()), side, "possible-moves");
+        HighLight(BitboardUtils.GetMoveBitboard(MoveGenerator.SearchBoard(_match!.board, false).ToArray().Where(move => move.Source == PerspectiveConverter.Invert(pos, side)).ToArray()), side, "possible-moves");
     }
 
     public void PieceReleased()
@@ -84,7 +88,7 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
         {
             ClearHighlight("last-move");
             HighlightMove(move, Colors.HighLightMove);
-            pgnDisplay.Add(Utils.NotateLastMove(_match), _match.game[^1].move, new Board(_match!.board));
+            pgnDisplay.Add(_match.game.LastMove!.Notate(), _match.game.LastMove.move!, new Board(_match!.board));
             LoadBoard(_match.board, side, true);
             // Console.WriteLine("Made move " + moveString);
             StartPolling();
@@ -99,7 +103,7 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
         {
             window.GameOverSplash(_outcome, _match.game.Count / 2);
             LockAll(true);
-            Sound.PlaySound(Utils.SideWon(side, _outcome) ? "game-won" : "game-lost");
+            Sound.PlaySound(GeneralUtils.SideWon(side, _outcome) ? "game-won" : "game-lost");
             return true;
         }
         return false;
@@ -124,14 +128,14 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
             HandleBotMove(node);
     }
 
-    private void HandleBotMove(PGNNode node)
+    private void HandleBotMove(GameNode node)
     {
         depthDisplay.Text = $"depth {_match!.depth}";
         ClearHighlight("last-move");
-        HighlightMove(node.move, Colors.HighLightMove);
-        pgnDisplay.Add(Utils.NotateLastMove(_match), _match.game[^1].move, new Board(_match!.board));
+        HighlightMove(node.move!, Colors.HighLightMove);
+        pgnDisplay.Add(_match.game.LastMove!.Notate(), _match.game.LastMove.move!, new Board(_match!.board));
         _timer!.Stop();
-        LoadBoard(node.board, side, true);
+        LoadBoard(_match.board, side, true);
         LockAll(true);
         LockPieces(side, false);
         IsGameOver();
@@ -155,7 +159,7 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
             _timer!.Stop();
             uint piece = promotionHandler._selected;
             promotionHandler.SendBack();
-            TryMakeMove(Move.GetSquare(_promotionSquare.from) + Move.GetSquare(_promotionSquare.to) + Move.PromotionStr[piece]);
+            TryMakeMove(MoveUtils.GetSquare(_promotionSquare.from) + MoveUtils.GetSquare(_promotionSquare.to) + MoveUtils.PromotionStr[piece]);
         }
     }
 
@@ -182,7 +186,7 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
         Clear();
         UpdateMaterial(board, perspective);
         ClearHighlight("check");
-        if (_match != null && Search.Attacked(board.KingPositions[board.side], board, 1 - board.side))
+        if (_match != null && MoveGenerator.Attacked(board.KingPositions[board.side], board, 1 - board.side))
             HighLight(BitboardUtils.GetSquare(board.KingPositions[board.side]), perspective, "check", Colors.HighLightCheck);
         
         ClearHighlight("specified");
@@ -210,7 +214,7 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
 
     private void UpdateMaterial(Board board, Side perspective)
     {
-        Utils.MaterialComparison comparison = Utils.CompareMaterial(board);
+        GeneralUtils.MaterialComparison comparison = GeneralUtils.CompareMaterial(board);
 
         if (perspective == Side.White)
         {
