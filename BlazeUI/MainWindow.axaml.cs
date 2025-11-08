@@ -5,6 +5,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Threading;
+using BlazeUI.Blaze.Utils;
 
 namespace BlazeUI;
 using Blaze.Board_Representation;
@@ -56,10 +57,10 @@ public partial class MainWindow : Window
         _pieceBoard = new GridBoard(this.FindControl<Grid>("pieces")!, this.FindControl<Grid>("highlight")!, _promotionHandler, _pgnDisplay, DepthDisplay, BotMaterial, PlayerMaterial,  this);
         _pieceBoard.SetMatch(null, Side.White);
         
-        //DebugUtils.TestGameSpeed(2000, 3);
-        //Environment.Exit(0);
+        DebugUtils.TestGameSpeed(15, 6);
+        Environment.Exit(0);
         
-        StartNewGame();
+        //StartNewGame();
     }
 
     private void InitOverlays()

@@ -9,6 +9,7 @@ using Board_Representation;
 using Evaluation;
 using Move_Generation;
 using Utils;
+using static Evaluation.EvaluationData;
 
 public static class Bitboards
 {
@@ -155,30 +156,30 @@ public static class Bitboards
         public static readonly List<BitboardUtils.PinSearchResult>[,][] RookPinLookup = new List<BitboardUtils.PinSearchResult>[8,8][];
         public static readonly List<BitboardUtils.PinSearchResult>[,][] BishopPinLookup = new List<BitboardUtils.PinSearchResult>[8,8][];
 
-        public static EvaluationLookup.PawnEvaluation[] RightPawnEvalLookup = [];
-        public static EvaluationLookup.PawnEvaluation[] LeftPawnEvalLookup = [];
-        public static EvaluationLookup.PawnEvaluation[] CenterPawnEvalLookup = [];
+        public static PawnEvaluation[] RightPawnEvalLookup = [];
+        public static PawnEvaluation[] LeftPawnEvalLookup = [];
+        public static PawnEvaluation[] CenterPawnEvalLookup = [];
         
-        public static EvaluationLookup.RookEvaluation[] FirstRookEvaluationLookup = [];
-        public static EvaluationLookup.RookEvaluation[] SecondRookEvaluationLookup = [];
-        public static EvaluationLookup.RookEvaluation[] ThirdRookEvaluationLookup = [];
-        public static EvaluationLookup.RookEvaluation[] FourthRookEvaluationLookup = [];
+        public static RookEvaluation[] FirstRookEvaluationLookup = [];
+        public static RookEvaluation[] SecondRookEvaluationLookup = [];
+        public static RookEvaluation[] ThirdRookEvaluationLookup = [];
+        public static RookEvaluation[] FourthRookEvaluationLookup = [];
         
-        public static EvaluationLookup.QueenEvaluation[] FirstQueenEvaluationLookup = [];
-        public static EvaluationLookup.QueenEvaluation[] SecondQueenEvaluationLookup = [];
-        public static EvaluationLookup.QueenEvaluation[] ThirdQueenEvaluationLookup = [];
-        public static EvaluationLookup.QueenEvaluation[] FourthQueenEvaluationLookup = [];
+        public static QueenEvaluation[] FirstQueenEvaluationLookup = [];
+        public static QueenEvaluation[] SecondQueenEvaluationLookup = [];
+        public static QueenEvaluation[] ThirdQueenEvaluationLookup = [];
+        public static QueenEvaluation[] FourthQueenEvaluationLookup = [];
         
-        public static EvaluationLookup.KnightEvaluation[] FirstKnightEvaluationLookup = [];
-        public static EvaluationLookup.KnightEvaluation[] SecondKnightEvaluationLookup = [];
-        public static EvaluationLookup.KnightEvaluation[] ThirdKnightEvaluationLookup = [];
-        public static EvaluationLookup.KnightEvaluation[] FourthKnightEvaluationLookup = [];
+        public static KnightEvaluation[] FirstKnightEvaluationLookup = [];
+        public static KnightEvaluation[] SecondKnightEvaluationLookup = [];
+        public static KnightEvaluation[] ThirdKnightEvaluationLookup = [];
+        public static KnightEvaluation[] FourthKnightEvaluationLookup = [];
         
-        public static EvaluationLookup.BishopEvaluation[] FirstBishopEvaluationLookup = [];
-        public static EvaluationLookup.BishopEvaluation[] SecondBishopEvaluationLookup = [];
-        public static EvaluationLookup.BishopEvaluation[] ThirdBishopEvaluationLookup = [];
-        public static EvaluationLookup.BishopEvaluation[] FourthBishopEvaluationLookup = [];
-        public static readonly EvaluationLookup.KingEvaluation[,] KingEvaluationLookup = new EvaluationLookup.KingEvaluation[8,8];
+        public static BishopEvaluation[] FirstBishopEvaluationLookup = [];
+        public static BishopEvaluation[] SecondBishopEvaluationLookup = [];
+        public static BishopEvaluation[] ThirdBishopEvaluationLookup = [];
+        public static BishopEvaluation[] FourthBishopEvaluationLookup = [];
+        public static readonly KingEvaluation[,] KingEvaluationLookup = new KingEvaluation[8,8];
     }
 
     public const ulong File = 0x8080808080808080;
@@ -401,29 +402,29 @@ public static class Bitboards
         MagicLookupArrays.LeftPawnEvalNumber = (615594976254142229, 37, 134217609); // MagicNumbers.GenerateMagicNumberParallel(leftPawns.Distinct().ToArray(), 37, 7, false);
         MagicLookupArrays.CenterPawnEvalNumber = (15570990422680516493, 37, 134217566); // MagicNumbers.GenerateMagicNumberParallel(centerPawns.Distinct().ToArray(), 37, 7, false);
 
-        MagicLookupArrays.RightPawnEvalLookup = new EvaluationLookup.PawnEvaluation[MagicLookupArrays.RightPawnEvalNumber.highest+ 1];
-        MagicLookupArrays.LeftPawnEvalLookup = new EvaluationLookup.PawnEvaluation[MagicLookupArrays.LeftPawnEvalNumber.highest + 1];
-        MagicLookupArrays.CenterPawnEvalLookup = new EvaluationLookup.PawnEvaluation[MagicLookupArrays.CenterPawnEvalNumber.highest + 1];
+        MagicLookupArrays.RightPawnEvalLookup = new PawnEvaluation[MagicLookupArrays.RightPawnEvalNumber.highest+ 1];
+        MagicLookupArrays.LeftPawnEvalLookup = new PawnEvaluation[MagicLookupArrays.LeftPawnEvalNumber.highest + 1];
+        MagicLookupArrays.CenterPawnEvalLookup = new PawnEvaluation[MagicLookupArrays.CenterPawnEvalNumber.highest + 1];
         
         progress = new(15, "Generating pawn evaluations 1/3");
-        (EvaluationLookup.PawnEvaluation eval, ulong origin)[] RightPawnEvals = Batch.Select(rightPawns, p =>
-            (EvaluationLookup.GeneratePawnEval(p, EvaluationLookup.Section.Right), p), 8);
+        (PawnEvaluation eval, ulong origin)[] RightPawnEvals = Batch.Select(rightPawns, p =>
+            (EvaluationPrecomputer.GeneratePawnEval(p, Section.Right), p), 8);
         foreach (var eval in RightPawnEvals)
         {
             MagicLookupArrays.RightPawnEvalLookup[(eval.origin * MagicLookupArrays.RightPawnEvalNumber.magicNumber) >> MagicLookupArrays.RightPawnEvalNumber.push] = eval.eval;
         }
         
         progress = new(35, "Generating pawn evaluations 2/3");
-        (EvaluationLookup.PawnEvaluation eval, ulong origin)[] LeftPawnEvals = Batch.Select(leftPawns, p =>
-            (EvaluationLookup.GeneratePawnEval(p, EvaluationLookup.Section.Left), p), 8);
+        (PawnEvaluation eval, ulong origin)[] LeftPawnEvals = Batch.Select(leftPawns, p =>
+            (EvaluationPrecomputer.GeneratePawnEval(p, Section.Left), p), 8);
         foreach (var eval in LeftPawnEvals)
         {
             MagicLookupArrays.LeftPawnEvalLookup[(eval.origin * MagicLookupArrays.LeftPawnEvalNumber.magicNumber) >> MagicLookupArrays.LeftPawnEvalNumber.push] = eval.eval;
         }
         
         progress = new(55, "Generating pawn evaluations 3/3");
-        (EvaluationLookup.PawnEvaluation eval, ulong origin)[] CenterPawnEvals = Batch.Select(centerPawns, p =>
-            (EvaluationLookup.GeneratePawnEval(p, EvaluationLookup.Section.Center), p), 8);
+        (PawnEvaluation eval, ulong origin)[] CenterPawnEvals = Batch.Select(centerPawns, p =>
+            (EvaluationPrecomputer.GeneratePawnEval(p, Section.Center), p), 8);
         foreach (var eval in CenterPawnEvals)
         {
             MagicLookupArrays.CenterPawnEvalLookup[(eval.origin * MagicLookupArrays.CenterPawnEvalNumber.magicNumber) >> MagicLookupArrays.CenterPawnEvalNumber.push] = eval.eval;
@@ -436,56 +437,56 @@ public static class Bitboards
         List<ulong> thirdSlice = BitboardUtils.Combinations(ThirdSlice, 9);
         List<ulong> fourthSlice = BitboardUtils.Combinations(FourthSlice, 9);
         
-        MagicLookupArrays.FirstRookEvaluationLookup = new EvaluationLookup.RookEvaluation[firstSlice.Max() + 1];
-        MagicLookupArrays.SecondRookEvaluationLookup = new EvaluationLookup.RookEvaluation[secondSlice.Max(n => n >> 16) + 1];
-        MagicLookupArrays.ThirdRookEvaluationLookup = new EvaluationLookup.RookEvaluation[thirdSlice.Max(n => n >> 32) + 1];
-        MagicLookupArrays.FourthRookEvaluationLookup = new EvaluationLookup.RookEvaluation[fourthSlice.Max(n => n >> 48) + 1];
+        MagicLookupArrays.FirstRookEvaluationLookup = new RookEvaluation[firstSlice.Max() + 1];
+        MagicLookupArrays.SecondRookEvaluationLookup = new RookEvaluation[secondSlice.Max(n => n >> 16) + 1];
+        MagicLookupArrays.ThirdRookEvaluationLookup = new RookEvaluation[thirdSlice.Max(n => n >> 32) + 1];
+        MagicLookupArrays.FourthRookEvaluationLookup = new RookEvaluation[fourthSlice.Max(n => n >> 48) + 1];
         
-        MagicLookupArrays.FirstQueenEvaluationLookup = new EvaluationLookup.QueenEvaluation[firstSlice.Max() + 1];
-        MagicLookupArrays.SecondQueenEvaluationLookup = new EvaluationLookup.QueenEvaluation[secondSlice.Max(n => n >> 16) + 1];
-        MagicLookupArrays.ThirdQueenEvaluationLookup = new EvaluationLookup.QueenEvaluation[thirdSlice.Max(n => n >> 32) + 1];
-        MagicLookupArrays.FourthQueenEvaluationLookup = new EvaluationLookup.QueenEvaluation[fourthSlice.Max(n => n >> 48) + 1];
+        MagicLookupArrays.FirstQueenEvaluationLookup = new QueenEvaluation[firstSlice.Max() + 1];
+        MagicLookupArrays.SecondQueenEvaluationLookup = new QueenEvaluation[secondSlice.Max(n => n >> 16) + 1];
+        MagicLookupArrays.ThirdQueenEvaluationLookup = new QueenEvaluation[thirdSlice.Max(n => n >> 32) + 1];
+        MagicLookupArrays.FourthQueenEvaluationLookup = new QueenEvaluation[fourthSlice.Max(n => n >> 48) + 1];
         
-        MagicLookupArrays.FirstKnightEvaluationLookup = new EvaluationLookup.KnightEvaluation[firstSlice.Max() + 1];
-        MagicLookupArrays.SecondKnightEvaluationLookup = new EvaluationLookup.KnightEvaluation[secondSlice.Max(n => n >> 16) + 1];
-        MagicLookupArrays.ThirdKnightEvaluationLookup = new EvaluationLookup.KnightEvaluation[thirdSlice.Max(n => n >> 32) + 1];
-        MagicLookupArrays.FourthKnightEvaluationLookup = new EvaluationLookup.KnightEvaluation[fourthSlice.Max(n => n >> 48) + 1];
+        MagicLookupArrays.FirstKnightEvaluationLookup = new KnightEvaluation[firstSlice.Max() + 1];
+        MagicLookupArrays.SecondKnightEvaluationLookup = new KnightEvaluation[secondSlice.Max(n => n >> 16) + 1];
+        MagicLookupArrays.ThirdKnightEvaluationLookup = new KnightEvaluation[thirdSlice.Max(n => n >> 32) + 1];
+        MagicLookupArrays.FourthKnightEvaluationLookup = new KnightEvaluation[fourthSlice.Max(n => n >> 48) + 1];
         
-        MagicLookupArrays.FirstBishopEvaluationLookup = new EvaluationLookup.BishopEvaluation[firstSlice.Max() + 1];
-        MagicLookupArrays.SecondBishopEvaluationLookup = new EvaluationLookup.BishopEvaluation[secondSlice.Max(n => n >> 16) + 1];
-        MagicLookupArrays.ThirdBishopEvaluationLookup = new EvaluationLookup.BishopEvaluation[thirdSlice.Max(n => n >> 32) + 1];
-        MagicLookupArrays.FourthBishopEvaluationLookup = new EvaluationLookup.BishopEvaluation[fourthSlice.Max(n => n >> 48) + 1];
+        MagicLookupArrays.FirstBishopEvaluationLookup = new BishopEvaluation[firstSlice.Max() + 1];
+        MagicLookupArrays.SecondBishopEvaluationLookup = new BishopEvaluation[secondSlice.Max(n => n >> 16) + 1];
+        MagicLookupArrays.ThirdBishopEvaluationLookup = new BishopEvaluation[thirdSlice.Max(n => n >> 32) + 1];
+        MagicLookupArrays.FourthBishopEvaluationLookup = new BishopEvaluation[fourthSlice.Max(n => n >> 48) + 1];
         
         Batch.ForEach(firstSlice, combination =>
         {
-            MagicLookupArrays.FirstRookEvaluationLookup[combination] = EvaluationLookup.GenerateRookEval(combination, EvaluationLookup.Slice.First);
-            MagicLookupArrays.FirstQueenEvaluationLookup[combination] = EvaluationLookup.GenerateStandardEval<EvaluationLookup.QueenEvaluation>(combination, EvaluationLookup.Slice.First, Pieces.WhiteQueen, Pieces.BlackQueen);
-            MagicLookupArrays.FirstKnightEvaluationLookup[combination] = EvaluationLookup.GenerateStandardEval<EvaluationLookup.KnightEvaluation>(combination, EvaluationLookup.Slice.First, Pieces.WhiteKnight, Pieces.BlackKnight);
-            MagicLookupArrays.FirstBishopEvaluationLookup[combination] = EvaluationLookup.GenerateStandardEval<EvaluationLookup.BishopEvaluation>(combination, EvaluationLookup.Slice.First, Pieces.WhiteBishop, Pieces.BlackBishop);
+            MagicLookupArrays.FirstRookEvaluationLookup[combination] = EvaluationPrecomputer.GenerateRookEval(combination, Slice.First);
+            MagicLookupArrays.FirstQueenEvaluationLookup[combination] = EvaluationPrecomputer.GenerateStandardEval<QueenEvaluation>(combination, Slice.First, Pieces.WhiteQueen);
+            MagicLookupArrays.FirstKnightEvaluationLookup[combination] = EvaluationPrecomputer.GenerateStandardEval<KnightEvaluation>(combination, Slice.First, Pieces.WhiteKnight);
+            MagicLookupArrays.FirstBishopEvaluationLookup[combination] = EvaluationPrecomputer.GenerateStandardEval<BishopEvaluation>(combination, Slice.First, Pieces.WhiteBishop);
         }, 8);
         
         Batch.ForEach(secondSlice, combination =>
         {
-            MagicLookupArrays.SecondRookEvaluationLookup[combination >> 16] = EvaluationLookup.GenerateRookEval(combination, EvaluationLookup.Slice.Second);
-            MagicLookupArrays.SecondQueenEvaluationLookup[combination >> 16] = EvaluationLookup.GenerateStandardEval<EvaluationLookup.QueenEvaluation>(combination, EvaluationLookup.Slice.Second, Pieces.WhiteQueen, Pieces.BlackQueen);
-            MagicLookupArrays.SecondKnightEvaluationLookup[combination >> 16] = EvaluationLookup.GenerateStandardEval<EvaluationLookup.KnightEvaluation>(combination, EvaluationLookup.Slice.Second, Pieces.WhiteKnight, Pieces.BlackKnight);
-            MagicLookupArrays.SecondBishopEvaluationLookup[combination >> 16] = EvaluationLookup.GenerateStandardEval<EvaluationLookup.BishopEvaluation>(combination, EvaluationLookup.Slice.Second, Pieces.WhiteBishop, Pieces.BlackBishop);
+            MagicLookupArrays.SecondRookEvaluationLookup[combination >> 16] = EvaluationPrecomputer.GenerateRookEval(combination, Slice.Second);
+            MagicLookupArrays.SecondQueenEvaluationLookup[combination >> 16] = EvaluationPrecomputer.GenerateStandardEval<QueenEvaluation>(combination, Slice.Second, Pieces.WhiteQueen);
+            MagicLookupArrays.SecondKnightEvaluationLookup[combination >> 16] = EvaluationPrecomputer.GenerateStandardEval<KnightEvaluation>(combination, Slice.Second, Pieces.WhiteKnight);
+            MagicLookupArrays.SecondBishopEvaluationLookup[combination >> 16] = EvaluationPrecomputer.GenerateStandardEval<BishopEvaluation>(combination, Slice.Second, Pieces.WhiteBishop);
         }, 8);
         
         Batch.ForEach(thirdSlice, combination =>
         {
-            MagicLookupArrays.ThirdRookEvaluationLookup[combination >> 32] = EvaluationLookup.GenerateRookEval(combination, EvaluationLookup.Slice.Third);
-            MagicLookupArrays.ThirdQueenEvaluationLookup[combination >> 32] = EvaluationLookup.GenerateStandardEval<EvaluationLookup.QueenEvaluation>(combination, EvaluationLookup.Slice.Third, Pieces.WhiteQueen, Pieces.BlackQueen);
-            MagicLookupArrays.ThirdKnightEvaluationLookup[combination >> 32] = EvaluationLookup.GenerateStandardEval<EvaluationLookup.KnightEvaluation>(combination, EvaluationLookup.Slice.Third, Pieces.WhiteKnight, Pieces.BlackKnight);
-            MagicLookupArrays.ThirdBishopEvaluationLookup[combination >> 32] = EvaluationLookup.GenerateStandardEval<EvaluationLookup.BishopEvaluation>(combination, EvaluationLookup.Slice.Third, Pieces.WhiteBishop, Pieces.BlackBishop);
+            MagicLookupArrays.ThirdRookEvaluationLookup[combination >> 32] = EvaluationPrecomputer.GenerateRookEval(combination, Slice.Third);
+            MagicLookupArrays.ThirdQueenEvaluationLookup[combination >> 32] = EvaluationPrecomputer.GenerateStandardEval<QueenEvaluation>(combination, Slice.Third, Pieces.WhiteQueen);
+            MagicLookupArrays.ThirdKnightEvaluationLookup[combination >> 32] = EvaluationPrecomputer.GenerateStandardEval<KnightEvaluation>(combination, Slice.Third, Pieces.WhiteKnight);
+            MagicLookupArrays.ThirdBishopEvaluationLookup[combination >> 32] = EvaluationPrecomputer.GenerateStandardEval<BishopEvaluation>(combination, Slice.Third, Pieces.WhiteBishop);
         }, 8);
         
         Batch.ForEach(fourthSlice, combination =>
         {
-            MagicLookupArrays.FourthRookEvaluationLookup[combination >> 48] = EvaluationLookup.GenerateRookEval(combination, EvaluationLookup.Slice.Fourth);
-            MagicLookupArrays.FourthQueenEvaluationLookup[combination >> 48] = EvaluationLookup.GenerateStandardEval<EvaluationLookup.QueenEvaluation>(combination, EvaluationLookup.Slice.Fourth, Pieces.WhiteQueen, Pieces.BlackQueen);
-            MagicLookupArrays.FourthKnightEvaluationLookup[combination >> 48] = EvaluationLookup.GenerateStandardEval<EvaluationLookup.KnightEvaluation>(combination, EvaluationLookup.Slice.Fourth, Pieces.WhiteKnight, Pieces.BlackKnight);
-            MagicLookupArrays.FourthBishopEvaluationLookup[combination >> 48] = EvaluationLookup.GenerateStandardEval<EvaluationLookup.BishopEvaluation>(combination, EvaluationLookup.Slice.Fourth, Pieces.WhiteBishop, Pieces.BlackBishop);
+            MagicLookupArrays.FourthRookEvaluationLookup[combination >> 48] = EvaluationPrecomputer.GenerateRookEval(combination, Slice.Fourth);
+            MagicLookupArrays.FourthQueenEvaluationLookup[combination >> 48] = EvaluationPrecomputer.GenerateStandardEval<QueenEvaluation>(combination, Slice.Fourth, Pieces.WhiteQueen);
+            MagicLookupArrays.FourthKnightEvaluationLookup[combination >> 48] = EvaluationPrecomputer.GenerateStandardEval<KnightEvaluation>(combination, Slice.Fourth, Pieces.WhiteKnight);
+            MagicLookupArrays.FourthBishopEvaluationLookup[combination >> 48] = EvaluationPrecomputer.GenerateStandardEval<BishopEvaluation>(combination, Slice.Fourth, Pieces.WhiteBishop);
         }, 8);
 
         progress = new(85, "Initializing magic lookup...");
@@ -607,8 +608,6 @@ public static class Bitboards
                         BitboardUtils.GetBitboardMoves(KingCombinations[file, rank][i], (file, rank), 5);
                     MagicLookupArrays.KingCaptureLookup[file, rank][(KingCombinations[file, rank][i] * MagicLookupArrays.KingMove[file, rank].magicNumber) >> MagicLookupArrays.KingMove[file, rank].push] =
                         BitboardUtils.GetBitboardMoves(KingCombinations[file, rank][i], (file, rank), 3, capture: true);
-                    MagicLookupArrays.KingSafetyLookup[file, rank][(KingCombinations[file, rank][i] * MagicLookupArrays.KingMove[file, rank].magicNumber) >> MagicLookupArrays.KingMove[file, rank].push] =
-                        Weights.KingSafetyBonuses[UInt64.PopCount(KingCombinations[file, rank][i])];
                 }
 
                 // pin lines
@@ -675,13 +674,14 @@ public static class Bitboards
                             BitboardUtils.GetBitboardMoves(move, (file, rank), 5, pawn: true);
                 }
 
-                MagicLookupArrays.KingEvaluationLookup[file, rank] = new EvaluationLookup.KingEvaluation
-                {
-                    wEval = (int)(Pieces.Value[Pieces.WhiteKing] * Weights.MaterialMultiplier) + Weights.Pieces[Pieces.WhiteKing, file, rank],
-                    bEval = (int)(Pieces.Value[Pieces.BlackKing] * Weights.MaterialMultiplier) - Weights.Pieces[Pieces.WhiteKing, file, 7 - rank],
-                    wEvalEndgame = (int)(Pieces.Value[Pieces.WhiteKing] * Weights.MaterialMultiplier) + Weights.EndgamePieces[Pieces.WhiteKing, file, rank],
-                    bEvalEndgame = (int)(Pieces.Value[Pieces.BlackKing] * Weights.MaterialMultiplier) - Weights.EndgamePieces[Pieces.WhiteKing, file, 7 - rank],
-                };
+                MagicLookupArrays.KingEvaluationLookup[file, rank] = new KingEvaluation
+                (
+                    (int)(Pieces.Value[Pieces.WhiteKing] * Weights.MaterialMultiplier) + PestoEval.GetWhiteMgEval(Pieces.WhiteKing, file, rank),
+                    (int)(Pieces.Value[Pieces.BlackKing] * Weights.MaterialMultiplier) - PestoEval.GetBlackMgEval(Pieces.WhiteKing, file, rank),
+                    (int)(Pieces.Value[Pieces.WhiteKing] * Weights.MaterialMultiplier) + PestoEval.GetWhiteEgEval(Pieces.WhiteKing, file, rank),
+                    (int)(Pieces.Value[Pieces.BlackKing] * Weights.MaterialMultiplier) - PestoEval.GetBlackEgEval(Pieces.WhiteKing, file, rank)
+                );
+
 
                 //Console.WriteLine($"Square done {++done}/64");
                 // pawn moves

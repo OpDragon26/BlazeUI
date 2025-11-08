@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 
 namespace BlazeUI.Blaze.Magic_Lookup;
-using Evaluation;
 using Move_Generation;
 using Utils;
+using static  Evaluation.EvaluationData;
 
 public static class MagicLookup
 {
@@ -187,103 +187,103 @@ public static class MagicLookup
     }
     
 
-    public static EvaluationLookup.PawnEvaluation PawnEvaluationLookupRight(ulong pawns)
+    public static PawnEvaluation PawnEvaluationLookupRight(ulong pawns)
     {
         return Bitboards.MagicLookupArrays.RightPawnEvalLookup[((pawns & Bitboards.RightPawns) * Bitboards.MagicLookupArrays.RightPawnEvalNumber.magicNumber) >> Bitboards.MagicLookupArrays.RightPawnEvalNumber.push];
     }
     
-    public static EvaluationLookup.PawnEvaluation PawnEvaluationLookupLeft(ulong pawns)
+    public static PawnEvaluation PawnEvaluationLookupLeft(ulong pawns)
     {
         return Bitboards.MagicLookupArrays.LeftPawnEvalLookup[((pawns & Bitboards.LeftPawns) * Bitboards.MagicLookupArrays.LeftPawnEvalNumber.magicNumber) >> Bitboards.MagicLookupArrays.LeftPawnEvalNumber.push];
     }
     
-    public static EvaluationLookup.PawnEvaluation PawnEvaluationLookupCenter(ulong pawns)
+    public static PawnEvaluation PawnEvaluationLookupCenter(ulong pawns)
     {
         return Bitboards.MagicLookupArrays.CenterPawnEvalLookup[((pawns & Bitboards.CenterPawns) * Bitboards.MagicLookupArrays.CenterPawnEvalNumber.magicNumber) >> Bitboards.MagicLookupArrays.CenterPawnEvalNumber.push];
     }
 
-    public static EvaluationLookup.RookEvaluation FirstRookEvalLookup(ulong rooks)
+    public static RookEvaluation FirstRookEvalLookup(ulong rooks)
     {
         return Bitboards.MagicLookupArrays.FirstRookEvaluationLookup[rooks & Bitboards.FirstSlice];
     }
 
-    public static EvaluationLookup.RookEvaluation SecondRookEvalLookup(ulong rooks)
+    public static RookEvaluation SecondRookEvalLookup(ulong rooks)
     {
         return Bitboards.MagicLookupArrays.SecondRookEvaluationLookup[(rooks & Bitboards.SecondSlice) >> 16];
     }
 
-    public static EvaluationLookup.RookEvaluation ThirdRookEvalLookup(ulong rooks)
+    public static RookEvaluation ThirdRookEvalLookup(ulong rooks)
     {
         return Bitboards.MagicLookupArrays.ThirdRookEvaluationLookup[(rooks & Bitboards.ThirdSlice) >> 32];
     }
 
-    public static EvaluationLookup.RookEvaluation FourthRookEvalLookup(ulong rooks)
+    public static RookEvaluation FourthRookEvalLookup(ulong rooks)
     {
         return Bitboards.MagicLookupArrays.FourthRookEvaluationLookup[(rooks & Bitboards.FourthSlice) >> 48];
     }
     
     
-    public static EvaluationLookup.QueenEvaluation FirstQueenEvalLookup(ulong queen)
+    public static QueenEvaluation FirstQueenEvalLookup(ulong queen)
     {
         return Bitboards.MagicLookupArrays.FirstQueenEvaluationLookup[queen & Bitboards.FirstSlice];
     }
 
-    public static EvaluationLookup.QueenEvaluation SecondQueenEvalLookup(ulong queen)
+    public static QueenEvaluation SecondQueenEvalLookup(ulong queen)
     {
         return Bitboards.MagicLookupArrays.SecondQueenEvaluationLookup[(queen & Bitboards.SecondSlice) >> 16];
     }
 
-    public static EvaluationLookup.QueenEvaluation ThirdQueenEvalLookup(ulong queen)
+    public static QueenEvaluation ThirdQueenEvalLookup(ulong queen)
     {
         return Bitboards.MagicLookupArrays.ThirdQueenEvaluationLookup[(queen & Bitboards.ThirdSlice) >> 32];
     }
 
-    public static EvaluationLookup.QueenEvaluation FourthQueenEvalLookup(ulong queen)
+    public static QueenEvaluation FourthQueenEvalLookup(ulong queen)
     {
         return Bitboards.MagicLookupArrays.FourthQueenEvaluationLookup[(queen & Bitboards.FourthSlice) >> 48];
     }
     
-    public static EvaluationLookup.KnightEvaluation FirstKnightEvalLookup(ulong knights)
+    public static KnightEvaluation FirstKnightEvalLookup(ulong knights)
     {
         return Bitboards.MagicLookupArrays.FirstKnightEvaluationLookup[knights & Bitboards.FirstSlice];
     }
 
-    public static EvaluationLookup.KnightEvaluation SecondKnightEvalLookup(ulong knights)
+    public static KnightEvaluation SecondKnightEvalLookup(ulong knights)
     {
         return Bitboards.MagicLookupArrays.SecondKnightEvaluationLookup[(knights & Bitboards.SecondSlice) >> 16];
     }
 
-    public static EvaluationLookup.KnightEvaluation ThirdKnightEvalLookup(ulong knights)
+    public static KnightEvaluation ThirdKnightEvalLookup(ulong knights)
     {
         return Bitboards.MagicLookupArrays.ThirdKnightEvaluationLookup[(knights & Bitboards.ThirdSlice) >> 32];
     }
 
-    public static EvaluationLookup.KnightEvaluation FourthKnightEvalLookup(ulong knights)
+    public static KnightEvaluation FourthKnightEvalLookup(ulong knights)
     {
         return Bitboards.MagicLookupArrays.FourthKnightEvaluationLookup[(knights & Bitboards.FourthSlice) >> 48];
     }
     
-    public static EvaluationLookup.BishopEvaluation FirstBishopEvalLookup(ulong bishops)
+    public static BishopEvaluation FirstBishopEvalLookup(ulong bishops)
     {
         return Bitboards.MagicLookupArrays.FirstBishopEvaluationLookup[bishops & Bitboards.FirstSlice];
     }
 
-    public static EvaluationLookup.BishopEvaluation SecondBishopEvalLookup(ulong bishops)
+    public static BishopEvaluation SecondBishopEvalLookup(ulong bishops)
     {
         return Bitboards.MagicLookupArrays.SecondBishopEvaluationLookup[(bishops & Bitboards.SecondSlice) >> 16];
     }
 
-    public static EvaluationLookup.BishopEvaluation ThirdBishopEvalLookup(ulong bishops)
+    public static BishopEvaluation ThirdBishopEvalLookup(ulong bishops)
     {
         return Bitboards.MagicLookupArrays.ThirdBishopEvaluationLookup[(bishops & Bitboards.ThirdSlice) >> 32];
     }
 
-    public static EvaluationLookup.BishopEvaluation FourthBishopEvalLookup(ulong bishops)
+    public static BishopEvaluation FourthBishopEvalLookup(ulong bishops)
     {
         return Bitboards.MagicLookupArrays.FourthBishopEvaluationLookup[(bishops & Bitboards.FourthSlice) >> 48];
     }
 
-    public static EvaluationLookup.KingEvaluation KingEvalLookup((int file, int rank) pos)
+    public static KingEvaluation KingEvalLookup((int file, int rank) pos)
     {
         return Bitboards.MagicLookupArrays.KingEvaluationLookup[pos.file, pos.rank];
     }
