@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using BlazeUI.Blaze.Utils;
 
 namespace BlazeUI.Blaze.Magic_Lookup;
@@ -7,11 +8,14 @@ public static class Masks
 {
     public static readonly ulong[,] RookMasks = new ulong[8,8];
     public static readonly ulong[,] BishopMasks = new ulong[8,8];
+    public static readonly ulong[,] KnightMasks = new ulong[8,8];
+    public static readonly ulong[,] KingMasks = new ulong[8,8];
     
     public static readonly ulong[,] WhitePawnMoveMasks = new ulong[8,8];
     public static readonly ulong[,] BlackPawnMoveMasks = new ulong[8,8];
     public static readonly ulong[,] WhitePawnCaptureMasks = new ulong[8,8];
     public static readonly ulong[,] BlackPawnCaptureMasks = new ulong[8,8];
+    public static ulong[]? EnPassantMasks; // contains both the source and the destination
     
     public static readonly ulong[,] SmallRookMasks = new ulong[8,8];
     public static readonly ulong[,] SmallBishopMasks = new ulong[8,8];
@@ -31,8 +35,8 @@ public static class Masks
     public const ulong UpDiagonal = 0x102040810204080;
     public const ulong DownDiagonal = 0x8040201008040201;
 
-    public const ulong SmallFile = 0x80808080808000;
-    public const ulong SmallRank = 0x7E00000000000000;
+    private const ulong SmallFile = 0x80808080808000;
+    private const ulong SmallRank = 0x7E00000000000000;
 
     public const ulong KingSafetyAppliesWhite = 0xC7C7000000000000; 
     public const ulong KingSafetyAppliesBlack = 0xC7C7;
@@ -48,6 +52,8 @@ public static class Masks
 
     public static void Init()
     {
+        List<ulong> enPassantBitboards = new();
+        
         // The last bit also has to be evaluated in every direction, since it matters whether it's blocked or not
         for (int file = 0; file < 8; file++)
         for (int rank = 0; rank < 8; rank++)
@@ -74,6 +80,29 @@ public static class Masks
             
             SmallRookMasks[file, rank] = ((SmallRank >> (rank * 8)) ^ (SmallFile >> (7 - file))) & ~GetSquare(file, rank);
             SmallBishopMasks[file, rank] = (relativeUD ^ relativeDD) & ~Frame;
+            
+            // knight masks
+            KnightMasks[file, rank] = GetMask((file, rank), KnightPattern);
+            
+            // king masks
+            ulong kingMask = ulong.MaxValue;
+                        
+            for (int k = 0; k < 8; k++)
+            {
+                if (!(k == file || k == file - 1 || k == file + 1))
+                {
+                    kingMask &= ~(File >> (7 - k));
+                }
+                            
+                if (!(k == rank || k == rank - 1 || k == rank + 1))
+                {
+                    kingMask &= ~(Rank >> (k * 8));
+                }
+            }
+                
+            kingMask &= ~GetSquare(file, rank);
+                
+            KingMasks[file, rank] = kingMask;
             
             // white pawns
             ulong wpmMask = 0;
@@ -126,6 +155,20 @@ public static class Masks
                 
             NeighbourMasks[file] = neighborMask;
             SurroundMasks[file] = neighborMask | GetFile(file);
+            
+            if (rank == 4) // white en passant rank
+            {
+                if (ValidSquare(file + 1, 5)) enPassantBitboards.Add(GetSquare(file, rank) | GetSquare(file + 1, 5));
+                if (ValidSquare(file - 1, 5)) enPassantBitboards.Add(GetSquare(file, rank) | GetSquare(file - 1, 5));
+            }
+                
+            if (rank == 3) // black en passant rank
+            {
+                if (ValidSquare(file + 1, 2)) enPassantBitboards.Add(GetSquare(file, rank) | GetSquare(file + 1, 2));
+                if (ValidSquare(file - 1, 2)) enPassantBitboards.Add(GetSquare(file, rank) | GetSquare(file - 1, 2));
+            }
         }
+        
+        EnPassantMasks = enPassantBitboards.ToArray();
     }
 }

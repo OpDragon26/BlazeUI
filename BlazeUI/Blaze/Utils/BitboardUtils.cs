@@ -415,7 +415,7 @@ public static class BitboardUtils
         for (int file = 0; file < 8; file++)
         for (int rank = 0; rank < 8; rank++)
             if ((squares & GetSquare(file, rank)) != 0)
-                result |= PathLookup[pos.file, pos.rank, file, rank] & ~GetSquare(pos);
+                result |= PathFinder.PathLookup[pos.file, pos.rank, file, rank] & ~GetSquare(pos);
         
         return result;
     }

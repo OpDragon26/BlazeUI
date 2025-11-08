@@ -28,11 +28,11 @@ public static class MoveUtils
     {
         return c switch
         {
-            'N' => new Finder(Bitboards.KnightMasks[file, rank], Pieces.WhiteKnight, Pieces.BlackKnight),
+            'N' => new Finder(Masks.KnightMasks[file, rank], Pieces.WhiteKnight, Pieces.BlackKnight),
             'B' => new Finder(MagicLookup.BishopLookupMoves((file, rank), board.AllPieces()).captures, Pieces.WhiteBishop, Pieces.BlackBishop),
             'Q' => new Finder(MagicLookup.RookLookupMoves((file, rank), board.AllPieces()).captures | MagicLookup.BishopLookupMoves((file, rank), board.AllPieces()).captures, Pieces.WhiteQueen, Pieces.BlackQueen),
             'R' => new Finder(MagicLookup.RookLookupMoves((file, rank), board.AllPieces()).captures, Pieces.WhiteRook, Pieces.BlackRook),
-            'K' => new Finder(Bitboards.KingMasks[file, rank], Pieces.WhiteKing, Pieces.BlackKing),
+            'K' => new Finder(Masks.KingMasks[file, rank], Pieces.WhiteKing, Pieces.BlackKing),
             _ => throw new NotationParsingException($"Unknown piece: {c}")
         };
     }
@@ -49,11 +49,11 @@ public static class MoveUtils
     {
         return piece switch
         {
-            Pieces.WhiteKnight => new Finder(Bitboards.KnightMasks[file, rank], Pieces.WhiteKnight, Pieces.BlackKnight),
+            Pieces.WhiteKnight => new Finder(Masks.KnightMasks[file, rank], Pieces.WhiteKnight, Pieces.BlackKnight),
             Pieces.WhiteBishop => new Finder(MagicLookup.BishopLookupMoves((file, rank), board.AllPieces()).captures, Pieces.WhiteBishop, Pieces.BlackBishop),
             Pieces.WhiteQueen => new Finder(MagicLookup.RookLookupMoves((file, rank), board.AllPieces()).captures | MagicLookup.BishopLookupMoves((file, rank), board.AllPieces()).captures, Pieces.WhiteQueen, Pieces.BlackQueen),
             Pieces.WhiteRook => new Finder(MagicLookup.RookLookupMoves((file, rank), board.AllPieces()).captures, Pieces.WhiteRook, Pieces.BlackRook),
-            Pieces.WhiteKing => new Finder(Bitboards.KingMasks[file, rank], Pieces.WhiteKing, Pieces.BlackKing),
+            Pieces.WhiteKing => new Finder(Masks.KingMasks[file, rank], Pieces.WhiteKing, Pieces.BlackKing),
             _ => throw new NotationParsingException($"Unknown piece: {piece}")
         };
     }

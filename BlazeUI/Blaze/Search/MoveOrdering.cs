@@ -50,11 +50,11 @@ public static class MoveOrdering
                     priority += 50;
                 break;
             case Pieces.WhiteKnight:
-                if ((Bitboards.KnightMasks[move.Destination.file, move.Destination.rank] & BitboardUtils.GetSquare(board.KingPositions[1])) != 0)
+                if ((Masks.KnightMasks[move.Destination.file, move.Destination.rank] & BitboardUtils.GetSquare(board.KingPositions[1])) != 0)
                     priority += 50;
                 break;
             case Pieces.BlackKnight:
-                if ((Bitboards.KnightMasks[move.Destination.file, move.Destination.rank] & BitboardUtils.GetSquare(board.KingPositions[0])) != 0)
+                if ((Masks.KnightMasks[move.Destination.file, move.Destination.rank] & BitboardUtils.GetSquare(board.KingPositions[0])) != 0)
                     priority += 50;
                 break;
             case Pieces.WhiteBishop:

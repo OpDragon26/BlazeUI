@@ -38,14 +38,14 @@ public static class EvalUtils
 
     public static int EvaluateRookMobility(int file, int rank, int index)
     {
-        ulong controlled = Bitboards.SmallRookBitboards[file, rank][index];
+        ulong controlled = Combinations.SmallRookBitboards[file, rank][index];
         return (int)(ulong.PopCount(controlled) * Weights.MobilityMultiplier
                      + ulong.PopCount(controlled & CenterControlMask) * Weights.CenterControlMultiplier);
     }
 
     public static int EvaluateBishopMobility(int file, int rank, int index)
     {
-        ulong controlled = Bitboards.SmallBishopBitboards[file, rank][index];
+        ulong controlled = Combinations.SmallBishopBitboards[file, rank][index];
         return (int)(ulong.PopCount(controlled) * Weights.MobilityMultiplier
                      + ulong.PopCount(controlled & CenterControlMask) * Weights.CenterControlMultiplier);
     }

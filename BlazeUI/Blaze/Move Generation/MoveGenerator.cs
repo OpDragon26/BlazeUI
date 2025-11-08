@@ -261,9 +261,9 @@ public static class MoveGenerator
     {
         ulong rookAttack = MagicLookup.RookLookupCaptureBitboards(pos, board.AllPieces()) & (board.GetBitboard(side, Pieces.WhiteRook) | board.GetBitboard(side, Pieces.WhiteQueen));
         ulong bishopAttack = MagicLookup.BishopLookupCaptureBitboards(pos, board.AllPieces()) & (board.GetBitboard(side, Pieces.WhiteBishop) | board.GetBitboard(side, Pieces.WhiteQueen));
-        ulong knightAttacks = Bitboards.KnightMasks[pos.file, pos.rank] & board.GetBitboard(side, Pieces.WhiteKnight);
+        ulong knightAttacks = Masks.KnightMasks[pos.file, pos.rank] & board.GetBitboard(side, Pieces.WhiteKnight);
         ulong pawnAttacks = side == 0 ? Masks.BlackPawnCaptureMasks[pos.file, pos.rank] & board.bitboards[Pieces.WhitePawn] : Masks.WhitePawnCaptureMasks[pos.file, pos.rank] & board.bitboards[Pieces.BlackPawn];
-        ulong kingAttacks = Bitboards.KingMasks[pos.file, pos.rank] & board.GetBitboard(side, Pieces.WhiteKing);
+        ulong kingAttacks = Masks.KingMasks[pos.file, pos.rank] & board.GetBitboard(side, Pieces.WhiteKing);
 
         return (rookAttack | bishopAttack | knightAttacks | pawnAttacks | kingAttacks) != 0;
     }
@@ -279,11 +279,11 @@ public static class MoveGenerator
             case Pieces.WhiteBishop:
                 return MagicLookup.BishopMoveBitboardLookup(pos, board.AllPieces());
             case Pieces.WhiteKnight:
-                return Bitboards.KnightMasks[pos.file, pos.rank];
+                return Masks.KnightMasks[pos.file, pos.rank];
             case Pieces.WhiteQueen:
                 return MagicLookup.RookMoveBitboardLookup(pos, board.AllPieces()) | MagicLookup.BishopMoveBitboardLookup(pos, board.AllPieces());
             case Pieces.WhiteKing:
-                return Bitboards.KingMasks[pos.file, pos.rank];
+                return Masks.KingMasks[pos.file, pos.rank];
             default:
                 throw new Exception($"Unknown piece: {piece & Pieces.TypeMask}");
         }
@@ -300,11 +300,11 @@ public static class MoveGenerator
             case Pieces.WhiteBishop:
                 return MagicLookup.BishopMoveBitboardLookup(pos, board.AllPieces() & ~BitboardUtils.GetSquare(skipSquare));
             case Pieces.WhiteKnight:
-                return Bitboards.KnightMasks[pos.file, pos.rank];
+                return Masks.KnightMasks[pos.file, pos.rank];
             case Pieces.WhiteQueen:
                 return MagicLookup.RookMoveBitboardLookup(pos, board.AllPieces() & ~BitboardUtils.GetSquare(skipSquare)) | MagicLookup.BishopMoveBitboardLookup(pos, board.AllPieces() & ~BitboardUtils.GetSquare(skipSquare));
             case Pieces.WhiteKing:
-                return Bitboards.KingMasks[pos.file, pos.rank];
+                return Masks.KingMasks[pos.file, pos.rank];
             default:
                 throw new Exception($"Unknown piece: {piece & Pieces.TypeMask}");
         }
@@ -314,9 +314,9 @@ public static class MoveGenerator
     {
         ulong rookAttack = MagicLookup.RookLookupCaptureBitboards(pos, board.AllPieces()) & (board.GetBitboard(side, Pieces.WhiteRook) | board.GetBitboard(side, Pieces.WhiteQueen));
         ulong bishopAttack = MagicLookup.BishopLookupCaptureBitboards(pos, board.AllPieces()) & (board.GetBitboard(side, Pieces.WhiteBishop) | board.GetBitboard(side, Pieces.WhiteQueen));
-        ulong knightAttacks = Bitboards.KnightMasks[pos.file, pos.rank] & board.GetBitboard(side, Pieces.WhiteKnight);
+        ulong knightAttacks = Masks.KnightMasks[pos.file, pos.rank] & board.GetBitboard(side, Pieces.WhiteKnight);
         ulong pawnAttacks = side == 0 ? Masks.BlackPawnCaptureMasks[pos.file, pos.rank] & board.bitboards[Pieces.WhitePawn] : Masks.WhitePawnCaptureMasks[pos.file, pos.rank] & board.bitboards[Pieces.BlackPawn];
-        ulong kingAttacks = Bitboards.KingMasks[pos.file, pos.rank] & board.GetBitboard(side, Pieces.WhiteKing);
+        ulong kingAttacks = Masks.KingMasks[pos.file, pos.rank] & board.GetBitboard(side, Pieces.WhiteKing);
 
         ulong allAttackers = rookAttack | bishopAttack | knightAttacks | pawnAttacks | kingAttacks;
         
@@ -331,7 +331,7 @@ public static class MoveGenerator
             for (int file = 7; file >= 0; file--)
             {
                 if ((allAttackers & BitboardUtils.GetSquare(file, rank)) != 0)
-                    attackLines |= Bitboards.PathLookup[pos.file, pos.rank, file, rank] & ~BitboardUtils.GetSquare(pos);
+                    attackLines |= PathFinder.PathLookup[pos.file, pos.rank, file, rank] & ~BitboardUtils.GetSquare(pos);
             }
         }
 
