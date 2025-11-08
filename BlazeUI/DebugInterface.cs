@@ -12,11 +12,12 @@ public static class DebugInterface
     public static void Execute()
     {
         Blaze.Init.Start();
-        //DebugUtils.TestGameSpeed(15, 6);
+        
+        DebugUtils.TestGameSpeed(15, 6);
         
         //Examine("rnbqk1nr/ppppppbp/6p1/8/3PP3/8/PPP2PPP/RNBQKBNR w KQkq - 1 3");
         
-        SingleGame();
+        //SingleGame();
         
         /*
         Board testBoard = new("rnbqk1nr/ppppppbp/6p1/8/3PP3/8/PPP2PPP/RNBQKBNR w KQkq - 1 3");

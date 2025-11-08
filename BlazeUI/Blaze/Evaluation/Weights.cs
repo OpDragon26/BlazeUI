@@ -2,19 +2,25 @@ namespace BlazeUI.Blaze.Evaluation;
 
 public static class Weights
 {
-    public const float MaterialMultiplier = 1.5f;
     
     public const float MobilityMultiplier = 0.2f;
     public const float CenterControlMultiplier = 1.5f;
     
-    public const int IsolatedPawnPenalty = 2;
+    public const int MgIsolatedPawnPenalty = 2;
+    public const int EgIsolatedPawnPenalty = 4;
+    public const int MgDoublePawnPenalty = 5;
+    public const int EgDoublePawnPenalty = 8;
+    
     public const int OpenFileAdvantage = 20;
-    public const int NoCastlingPenalty = 5;
-
+    public const int NoCastlingPenalty = 20;
+    public const int CastlingBonus = 25;
+    
     public const int PriorityWeightMultiplier = 15;
 
     public static readonly int[] MgPassedBonus = [0, 10, 10, 25, 35, 45, 50, 0];
     public static readonly int[] EgPassedBonus = [0, 15, 15, 35, 45, 60, 90, 0];
+    
+    public static readonly int[] KingSafetyPenalty = [100, 60, 30, 0, 0, 0];
 }
 
 public static class PestoEval
@@ -39,8 +45,8 @@ public static class PestoEval
         return EgTable[piece, 7 - rank, file];
     }
 
-    public static readonly int[] MgValue = [82, 477, 337, 365, 1025, 0];
-    public static readonly int[] EgValue = [94, 512, 281, 297, 936, 0];
+    public static readonly int[] MgValue = [98, 487, 347, 365, 1025, 0];
+    public static readonly int[] EgValue = [109, 512, 281, 297, 936, 0];
     public static readonly int[] PhaseIncrement = [0, 2, 1, 1, 4, 0];
     
     private static readonly int[,,] MgTable =
@@ -49,21 +55,21 @@ public static class PestoEval
             {  0,   0,   0,   0,   0,   0,  0,   0},
             { 98, 134,  61,  95,  68, 126, 34, -11},
             { -6,   7,  26,  31,  65,  56, 25, -20},
-            {-14,  13,   6,  21,  23,  12, 17, -23},
-            {-27,  -2,  -5,  12,  17,   6, 10, -25},
+            {-14,  13,   6,  31,  33,  12, 17, -23},
+            {-27,  -2,  -5,  22,  27,   6, 10, -25},
             {-26,  -4,  -4, -10,   3,   3, 33, -12},
-            {-35,  -1, -20, -23, -15,  24, 38, -22},
+            {-35,  -1, -20, -33, -25,  24, 38, -22},
             {  0,   0,   0,   0,   0,   0,  0,   0},
         },
         { // rook
             { 32,  42,  32,  51, 63,  9,  31,  43},
-            { 27,  32,  58,  62, 80, 67,  26,  44},
+            { 57,  62,  78,  72, 80, 77,  46,  54},
             { -5,  19,  26,  36, 17, 45,  61,  16},
             {-24, -11,   7,  26, 24, 35,  -8, -20},
             {-36, -26, -12,  -1,  9, -7,   6, -23},
             {-45, -25, -16, -17,  3,  0,  -5, -33},
-            {-44, -16, -20,  -9, -1, 11,  -6, -71},
-            {-19, -13,   1,  17, 16,  7, -37, -26},
+            {-54, -16, -20,  -9, -1, 11,  -6, -71},
+            {-39, -13,   21,  37, 36,  37, -37, -46},
         },
         { // knight
             {-167, -89, -34, -49,  61, -97, -15, -107},
@@ -101,9 +107,9 @@ public static class PestoEval
             { -9,  24,   2, -16, -20,   6,  22, -22},
             {-17, -20, -12, -27, -30, -25, -14, -36},
             {-49,  -1, -27, -39, -46, -44, -33, -51},
-            {-14, -14, -22, -46, -44, -30, -15, -27},
-            {  1,   7,  -8, -64, -43, -16,   9,   8},
-            {-15,  36,  12, -54,   8, -28,  24,  14},
+            {-14, -14, -32, -46, -44, -40, -15, -27},
+            {  1,   7, -28, -74, -63, -36,   9,   8},
+            { 14,  66,  12, -64,   8, -48,  44,  14},
         },
     };
 
