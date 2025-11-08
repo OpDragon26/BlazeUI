@@ -6,7 +6,7 @@ namespace BlazeUI.Blaze.Utils;
 using Board_Representation;
 using Interface;
 
-public static class GeneralUtils
+public static class General
 {
     public static bool SideWon(Side side, Outcome outcome)
     {
@@ -102,17 +102,28 @@ public static class GeneralUtils
     
     public class Timer
     {
-        private DateTime StartTime = DateTime.Now;
+        private long StartTime;
 
         public void Start()
         {
-            StartTime = DateTime.Now;
+            StartTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         }
 
         public long Stop()
         {
-            TimeSpan elapsed = StartTime - DateTime.Now;
-            return elapsed.Milliseconds;
+            return DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - StartTime;
+        }
+    }
+    
+    public class CompletionPoint
+    {
+        public int Percentage;
+        public string Message = "";
+
+        public void Set(int percentage, string message)
+        {
+            Percentage = percentage;
+            Message = message;
         }
     }
 }

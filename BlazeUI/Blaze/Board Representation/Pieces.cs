@@ -26,6 +26,21 @@ public static class Pieces
     public const uint TypeMask = 0b111;
     public const uint ColorMask = 0b1000;
 
+    public static uint Flip(uint piece)
+    {
+        return 0b1000 ^ piece;
+    }
+
+    public static int ColorOf(uint piece)
+    {
+        return (int)(piece >> 3);
+    }
+
+    public static uint TypeOf(uint piece)
+    {
+        return piece & TypeMask;
+    }
+    
     public static readonly int[] Value =
     [
         100, // 0

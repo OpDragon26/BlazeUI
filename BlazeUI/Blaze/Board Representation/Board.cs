@@ -63,7 +63,7 @@ public class Board
         this.considerRepetition = considerRepetition;
     }
     
-    public Board(Board board, bool permChange = false) // clone board
+    public Board(Board board) // clone board
     {
         this.board = board.board;
         side = board.side;
@@ -75,7 +75,7 @@ public class Board
         pawns = board.pawns;
         values = board.values;
         if (considerRepetition)
-            repeat = permChange ? new() : new(board.repeat);
+            repeat = new(board.repeat);
         hashKey = board.hashKey;
         castled = board.castled;
         considerRepetition = board.considerRepetition;
@@ -102,6 +102,9 @@ public class Board
         halfMoveClock++;
         if (considerRepetition)
         {
+            if (move.Pawn || GetPiece(move.Destination) != Pieces.Empty)
+                repeat.Clear();
+            
             hashKey.Update(move, GetPiece(move.Source), GetPiece(move.Destination), side, castling, enPassant.file);
             Add();
         }
@@ -140,10 +143,7 @@ public class Board
         
         Clear(move.Source);
         enPassant = (8, 8);
-        byte saveCastling = castling;
         castling &= move.CastlingBan;
-        if (saveCastling != castling || move.Pawn || move.Capture)
-            repeat.Clear();
         
         switch (move.Type)
         {
@@ -314,7 +314,7 @@ public class Board
         return (board[rank] >> (file * 4)) & PieceMask;
     }
 
-    public void Clear((int file, int rank) square) // overload that takes a tuple
+    private void Clear((int file, int rank) square) // overload that takes a tuple
     {
         board[square.rank] |= (PieceMask << (square.file * 4)); // set the given square to 1111
     }

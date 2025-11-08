@@ -4,10 +4,8 @@ using System.Threading;
 
 namespace BlazeUI.Blaze.Interface;
 using Board_Representation;
-using Book;
 using Search;
 using Move_Generation;
-using Magic_Lookup;
 
 public class Match
 {
@@ -32,10 +30,7 @@ public class Match
         this.delayBook = delayBook;
         game = new(new(board));
         
-        RefutationTable.Init((int)Math.Pow(2, 20) + 7);
-        Bitboards.Init();
-        ZobristHash.Init();
-        Book.Init(Books.Standard);
+        Init.Start();
     }
 
     // attempts to make the given move on the board, returns true if successful 
@@ -92,9 +87,9 @@ public class Match
     private void UpdateDepth(Searcher.SearchResult last)
     {
         if (last.bookMove) return;
-        if (last.move.Promotion != Pieces.Empty)
+        if (last.move.Promotion != 0b111)
             depth--;
-
+        
         int increase = Thresholds[depthFloor, 0];
         int decrease = board.IsEndgame() ? Thresholds[depthFloor, 2] : Thresholds[depthFloor, 1];
 

@@ -2,132 +2,146 @@ namespace BlazeUI.Blaze.Evaluation;
 using Board_Representation;
 using Magic_Lookup;
 using Utils;
+using static Weights;
+using static PestoEval;
+using static Board_Representation.Pieces;
+using static Utils.EvalUtils;
 
 public static class Evaluator
 {
     // returns the heuristic evaluation of the board
     public static int StaticEvaluate(Board board)
     {
-        int eval = 0;
-
-        ulong all = board.AllPieces();
+        Eval eval = new();
         
-        if (!board.IsEndgame())
+        ulong allPieces = board.AllPieces();
+        ulong pawns = board.AllPawns();
+
+        for (int file = 0; file < 8; file++)
         {
-            // pawns
-            eval += EvaluationLookup.Lookup.PawnRegular(0, board.bitboards[Pieces.WhitePawn], board.bitboards[Pieces.BlackPawn]);
-            eval += EvaluationLookup.Lookup.PawnRegular(1, board.bitboards[Pieces.BlackPawn], board.bitboards[Pieces.WhitePawn]);
-            
-            // rooks
-            eval += EvaluationLookup.Lookup.RookRegular(0, board.bitboards[Pieces.WhiteRook], all, 
-                board.bitboards[Pieces.WhitePawn], board.bitboards[Pieces.BlackPawn]);
-            eval += EvaluationLookup.Lookup.RookRegular(1, board.bitboards[Pieces.BlackRook], all, 
-                board.bitboards[Pieces.BlackPawn], board.bitboards[Pieces.WhitePawn]);
-            
-            // queens
-            eval += EvaluationLookup.Lookup.QueenRegular(0, board.bitboards[Pieces.WhiteQueen], all);
-            eval += EvaluationLookup.Lookup.QueenRegular(1, board.bitboards[Pieces.BlackQueen], all);
-            
-            // knight
-            eval += EvaluationLookup.Lookup.KnightRegular(0, board.bitboards[Pieces.WhiteKnight], all);
-            eval += EvaluationLookup.Lookup.KnightRegular(1, board.bitboards[Pieces.BlackKnight], all);
-            
-            // bishop
-            eval += EvaluationLookup.Lookup.BishopRegular(0, board.bitboards[Pieces.WhiteBishop], all);
-            eval += EvaluationLookup.Lookup.BishopRegular(1, board.bitboards[Pieces.BlackBishop], all);
-            
-            // king
-            eval += MagicLookup.KingEvalLookup(board.KingPositions[0]).wEval;
-            eval += MagicLookup.KingEvalLookup(board.KingPositions[1]).bEval;
-            
-            for (int file = 0; file < 8; file++)
+            if ((allPieces & BitboardUtils.GetFile(file)) == 0)
+                continue;
+
+            int whitePawns = CountPawns(board.bitboards[WhitePawn], file);
+            int blackPawns = CountPawns(board.bitboards[BlackPawn], file);
+
+            if (whitePawns != 0)
             {
-                // counts pawns on the file and applies a penalty for multiple on one file
-                eval += Weights.DoublePawnPenalties[ulong.PopCount(BitboardUtils.GetFile(file) & board.bitboards[Pieces.WhitePawn])];
-                eval -= Weights.DoublePawnPenalties[ulong.PopCount(BitboardUtils.GetFile(file) & board.bitboards[Pieces.BlackPawn])];
+                eval.MgWhite -= whitePawns * MgDoublePawnPenalty;
+                eval.EgWhite -= whitePawns * EgDoublePawnPenalty;
+                if (IsPawnIsolated(board.bitboards[WhitePawn], file))
+                {
+                    eval.MgWhite -= whitePawns * MgIsolatedPawnPenalty;
+                    eval.EgWhite -= whitePawns * EgIsolatedPawnPenalty;
+                }
             }
 
-            // add or take eval according to which side has castled
-            if ((board.castled & 0b10) != 0) // white castled
-                eval += Weights.CastlingBonus;
-            else
+            if (blackPawns != 0)
             {
-                if ((board.castling & 0b1000) != 0) // can't short castle
-                    eval -= Weights.NoCastlingPenalty;
-                if ((board.castling & 0b100) != 0) // can't long castle
-                    eval -= Weights.NoCastlingPenalty;
+                eval.MgBlack -= blackPawns * MgDoublePawnPenalty;
+                eval.EgBlack -= blackPawns * EgDoublePawnPenalty;
+                if (IsPawnIsolated(board.bitboards[BlackPawn], file))
+                {
+                    eval.MgBlack -= blackPawns * MgIsolatedPawnPenalty;
+                    eval.EgBlack -= blackPawns * EgIsolatedPawnPenalty;
+                }
             }
             
-            if ((board.castled & 0b1) != 0) // black castled
-                eval -= Weights.CastlingBonus;
-            else
+            for (int rank = 0; rank < 8; rank++)
             {
-                if ((board.castling & 0b10) != 0) // can't short castle
-                    eval += Weights.NoCastlingPenalty;
-                if ((board.castling & 0b1) != 0) // can't long castle
-                    eval += Weights.NoCastlingPenalty;
-            }
-            
-            
-            // check if white's king is in the right spot (likely castled) to have its safety evaluated
-            if ((Bitboards.KingSafetyAppliesWhite & BitboardUtils.GetSquare(board.KingPositions[0])) != 0)
-            {
-                // add to the eval based on the safety of white's king
-                eval += MagicLookup.KingSafetyBonusLookup(board.KingPositions[0], board.WhitePieces());
-                if ((Bitboards.KingMasks[board.KingPositions[0].file, board.KingPositions[0].rank] & board.BlackPieces()) != 0) // if there is an enemy piece adjacent to the king
-                    eval -= 30;
-            
-                // take from eval if the pawns in front of the king are missing
-                foreach (int file in Bitboards.AdjacentFiles[board.KingPositions[0].file])
-                    if ((BitboardUtils.GetFile(file) & board.bitboards[Pieces.WhitePawn]) == 0)
-                        eval -= 30;
-            }
+                if ((allPieces & BitboardUtils.GetSquare(file, rank)) != 0)
+                {
+                    uint piece = board.GetPiece(file, rank);
+                    eval.GamePhase += PhaseIncrement[TypeOf(piece)];
+                    
+                    if (ColorOf(piece) == 0)
+                    {
+                        eval.MgWhite += MgValue[piece] + GetWhiteMgEval(piece, file, rank);
+                        eval.EgWhite += EgValue[piece] + GetWhiteEgEval(piece, file, rank);
 
-            if ((Bitboards.KingSafetyAppliesBlack & BitboardUtils.GetSquare(board.KingPositions[1])) != 0)
-            {
-                eval -= MagicLookup.KingSafetyBonusLookup(board.KingPositions[1], board.BlackPieces());
-                if ((Bitboards.KingMasks[board.KingPositions[1].file, board.KingPositions[1].rank] & board.WhitePieces()) != 0) // if there is an enemy piece adjacent to the king
-                    eval += 30;
-            
-                foreach (int file in Bitboards.AdjacentFiles[board.KingPositions[1].file])
-                    if ((BitboardUtils.GetFile(file) & board.bitboards[Pieces.BlackPawn]) == 0)
-                        eval += 30;
+                        if (piece == WhitePawn &&
+                            IsPawnPassedWhite(board.bitboards[BlackPawn], file, rank))
+                        {
+                            eval.MgWhite += MgPassedBonus[rank];
+                            eval.EgWhite += EgPassedBonus[rank];
+                        }
+                        
+                        else if (piece == WhiteRook && (pawns & BitboardUtils.GetFile(file)) == 0)
+                            eval.MgWhite += OpenFileAdvantage;
+                    }
+                    else
+                    {
+                        piece = TypeOf(piece);
+                        eval.MgBlack += MgValue[piece] + GetBlackMgEval(piece, file, rank);
+                        eval.EgBlack += EgValue[piece] + GetBlackEgEval(piece, file, rank);
+                        
+                        if (piece == WhitePawn &&
+                            IsPawnPassedBlack(board.bitboards[WhitePawn], file, rank))
+                        {
+                            eval.MgBlack += MgPassedBonus[7 - rank];
+                            eval.EgBlack += EgPassedBonus[7 - rank];
+                        }
+                        
+                        else if (piece == WhiteRook && (pawns & BitboardUtils.GetFile(file)) == 0)
+                            eval.MgBlack += OpenFileAdvantage;
+                    }
+                }
             }
         }
+        
+        // add or take eval according to which side has castled
+        if ((board.castled & 0b10) != 0) // white castled
+            eval.MgWhite += CastlingBonus;
         else
         {
-            // pawns
-            eval += EvaluationLookup.Lookup.PawnEndgame(0, board.bitboards[Pieces.WhitePawn], board.bitboards[Pieces.BlackPawn]);
-            eval += EvaluationLookup.Lookup.PawnEndgame(1, board.bitboards[Pieces.BlackPawn], board.bitboards[Pieces.WhitePawn]);
-            
-            // rooks
-            eval += EvaluationLookup.Lookup.RookEndgame(0, board.bitboards[Pieces.WhiteRook], all);
-            eval += EvaluationLookup.Lookup.RookEndgame(1, board.bitboards[Pieces.BlackRook], all);
-            
-            // queens
-            eval += EvaluationLookup.Lookup.QueenEndgame(0, board.bitboards[Pieces.WhiteQueen], all);
-            eval += EvaluationLookup.Lookup.QueenEndgame(1, board.bitboards[Pieces.BlackQueen], all);
-            
-            // knights
-            eval += EvaluationLookup.Lookup.KnightEndgame(0, board.bitboards[Pieces.WhiteKnight], all);
-            eval += EvaluationLookup.Lookup.KnightEndgame(1, board.bitboards[Pieces.BlackKnight], all);
-            
-            // bishops
-            eval += EvaluationLookup.Lookup.BishopEndgame(0, board.bitboards[Pieces.WhiteBishop], all);
-            eval += EvaluationLookup.Lookup.BishopEndgame(1, board.bitboards[Pieces.BlackBishop], all);
-            
-            // king
-            eval += MagicLookup.KingEvalLookup(board.KingPositions[0]).wEvalEndgame;
-            eval += MagicLookup.KingEvalLookup(board.KingPositions[1]).bEvalEndgame;
-            
-            for (int file = 0; file < 8; file++)
-            {
-                // counts pawns on the file and applies a penalty for multiple on one file
-                eval += Weights.DoublePawnPenalties[ulong.PopCount(BitboardUtils.GetFile(file) & board.bitboards[Pieces.WhitePawn])];
-                eval -= Weights.DoublePawnPenalties[ulong.PopCount(BitboardUtils.GetFile(file) & board.bitboards[Pieces.BlackPawn])];
-            }
+            if ((board.castling & 0b1000) != 0) // can't short castle
+                eval.MgWhite -= NoCastlingPenalty;
+            if ((board.castling & 0b100) != 0) // can't long castle
+                eval.MgWhite -= NoCastlingPenalty;
         }
+            
+        if ((board.castled & 0b1) != 0) // black castled
+            eval.MgWhite += CastlingBonus;
+        else
+        {
+            if ((board.castling & 0b10) != 0) // can't short castle
+                eval.MgBlack -= NoCastlingPenalty;
+            if ((board.castling & 0b1) != 0) // can't long castle
+                eval.MgBlack -= NoCastlingPenalty;
+        }
+        
+        // check if white's king is in the right spot (likely castled) to have its safety evaluated
+        if ((Bitboards.KingSafetyAppliesWhite & BitboardUtils.GetSquare(board.KingPositions[0])) != 0)
+            // take from eval if the pawns in front of the king are missing
+            eval.MgWhite -= WhiteKingSafetyPenalty(board.KingPositions[0].file, board.bitboards[WhitePawn]);
+        else
+            eval.MgWhite -= NoCastlingPenalty;
 
-        return eval;
+        if ((Bitboards.KingSafetyAppliesBlack & BitboardUtils.GetSquare(board.KingPositions[1])) != 0)
+            eval.MgWhite -= BlackKingSafetyPenalty(board.KingPositions[1].file, board.bitboards[BlackPawn]);
+        else
+            eval.MgBlack -= NoCastlingPenalty;
+
+        return eval.Calculate();
+    }
+
+    private struct Eval
+    {
+        public int MgWhite;
+        public int MgBlack;
+        public int EgWhite;
+        public int EgBlack;
+        public int GamePhase;
+
+        public int Calculate()
+        {
+            int mgScore = MgWhite - MgBlack;
+            int egScore = EgWhite - EgBlack;
+            if (GamePhase > 24)
+                GamePhase = 24;
+            int egPhase = 24 - GamePhase;
+
+            return (mgScore * GamePhase + egScore * egPhase) / 24;
+        }
     }
 }

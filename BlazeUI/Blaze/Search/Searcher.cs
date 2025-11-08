@@ -6,7 +6,7 @@ namespace BlazeUI.Blaze.Search;
 using Board_Representation;
 using Evaluation;
 using Move_Generation;
-using static Utils.GeneralUtils;
+using static Utils.General;
 using static Move_Generation.MoveGenerator;
 
 public static class Searcher

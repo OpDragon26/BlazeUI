@@ -103,7 +103,7 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
         {
             window.GameOverSplash(_outcome, _match.game.Count / 2);
             LockAll(true);
-            Sound.PlaySound(GeneralUtils.SideWon(side, _outcome) ? "game-won" : "game-lost");
+            Sound.PlaySound(General.SideWon(side, _outcome) ? "game-won" : "game-lost");
             return true;
         }
         return false;
@@ -214,7 +214,7 @@ public class GridBoard(Grid grid, Grid highlightGrid, PromotionHandler promotion
 
     private void UpdateMaterial(Board board, Side perspective)
     {
-        GeneralUtils.MaterialComparison comparison = GeneralUtils.CompareMaterial(board);
+        General.MaterialComparison comparison = General.CompareMaterial(board);
 
         if (perspective == Side.White)
         {

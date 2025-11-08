@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace BlazeUI.Blaze.Magic_Lookup;
 using Board_Representation;
-using Evaluation;
 using Move_Generation;
 using Utils;
+using static Utils.BitboardUtils;
 
 public static class Bitboards
 {
@@ -70,19 +70,8 @@ public static class Bitboards
     
     public static readonly ulong[] PassedPawnMasks = new ulong[8];
     public static readonly ulong[] NeighbourMasks = new ulong[8];
+    public static readonly ulong[] SurroundMasks = new ulong[8];
     public static readonly ulong[,,,] PathLookup =  new ulong[8,8,8,8];
-    
-    public const ulong RightPawns = 0xf0f0f0f0f0f000;
-    public const ulong LeftPawns = 0xf0f0f0f0f0f00;
-    public const ulong CenterPawns = 0x3c3c3c3c3c3c00;
-    public const ulong LeftPawnMask = 0x7070707070700;
-    public const ulong RightPawnMask = 0xe0e0e0e0e0e000;
-    public const ulong CenterPawnMask = 0x18181818181800;
-
-    public const ulong FirstSlice =  0xffff;
-    public const ulong SecondSlice = 0xffff0000;
-    public const ulong ThirdSlice =  0xffff00000000;
-    public const ulong FourthSlice = 0xffff000000000000;
 
     public const ulong CenterControlMask = 0x3c3c3c3c0000;
     
@@ -97,10 +86,8 @@ public static class Bitboards
         {1,2,3,4,4,3,2,1},
         {0,1,2,3,3,2,1,0},
     };
-
-    public static readonly int[][] AdjacentFiles = [[0,1], [0,1,2], [1,2,3], [2,3,4], [3,4,5], [4,5,6], [5,6,7], [6,7]];
     
-    public static class MagicLookupArrays
+    public static class Lookup
     {
         public static readonly (ulong magicNumber, int push, int highest)[,] RookMove = new (ulong magicNumber, int push, int highest)[8,8];
         public static readonly (ulong magicNumber, int push, int highest)[,] BishopMove = new (ulong magicNumber, int push, int highest)[8,8];
@@ -118,10 +105,6 @@ public static class Bitboards
         public static readonly (ulong magicNumber, int push, int highest)[,] BlockCaptureNumbers = new (ulong magicNumber, int push, int highest)[8,8];
         public static (ulong magicNumber, int push, int highest) BlockMoveNumber;
         public static (ulong magicNumber, int push, int highest) AttackLineNumber;
-        
-        public static (ulong magicNumber, int push, int highest) RightPawnEvalNumber;
-        public static (ulong magicNumber, int push, int highest) LeftPawnEvalNumber;
-        public static (ulong magicNumber, int push, int highest) CenterPawnEvalNumber;
         
         public static readonly (Move[] moves, ulong captures)[,][] RookLookup = new (Move[] moves, ulong captures)[8,8][];
         public static readonly (Move[] moves, ulong captures)[,][] BishopLookup = new (Move[] moves, ulong captures)[8,8][];
@@ -141,7 +124,6 @@ public static class Bitboards
         public static readonly ulong[,][] BishopBitboardLookup = new ulong[8,8][];
         public static readonly int[,][] RookMobilityLookupArray = new int[8,8][];
         public static readonly int[,][] BishopMobilityLookupArray = new int[8,8][];
-        public static readonly int[,] KnightMobilityLookup = new int[8,8];
         public static Move[] EnPassantLookupArray = [];
         public static readonly int[,][] KingSafetyLookup = new int[8,8][];
         public static readonly Move[,][] BlockCaptureMoveLookup = new Move[8,8][];
@@ -152,33 +134,8 @@ public static class Bitboards
         
         public static readonly ulong[,][] RookPinLineBitboardLookup =  new ulong[8,8][];
         public static readonly ulong[,][] BishopPinLineBitboardLookup = new ulong[8,8][];
-        public static readonly List<BitboardUtils.PinSearchResult>[,][] RookPinLookup = new List<BitboardUtils.PinSearchResult>[8,8][];
-        public static readonly List<BitboardUtils.PinSearchResult>[,][] BishopPinLookup = new List<BitboardUtils.PinSearchResult>[8,8][];
-
-        public static EvaluationLookup.PawnEvaluation[] RightPawnEvalLookup = [];
-        public static EvaluationLookup.PawnEvaluation[] LeftPawnEvalLookup = [];
-        public static EvaluationLookup.PawnEvaluation[] CenterPawnEvalLookup = [];
-        
-        public static EvaluationLookup.RookEvaluation[] FirstRookEvaluationLookup = [];
-        public static EvaluationLookup.RookEvaluation[] SecondRookEvaluationLookup = [];
-        public static EvaluationLookup.RookEvaluation[] ThirdRookEvaluationLookup = [];
-        public static EvaluationLookup.RookEvaluation[] FourthRookEvaluationLookup = [];
-        
-        public static EvaluationLookup.QueenEvaluation[] FirstQueenEvaluationLookup = [];
-        public static EvaluationLookup.QueenEvaluation[] SecondQueenEvaluationLookup = [];
-        public static EvaluationLookup.QueenEvaluation[] ThirdQueenEvaluationLookup = [];
-        public static EvaluationLookup.QueenEvaluation[] FourthQueenEvaluationLookup = [];
-        
-        public static EvaluationLookup.KnightEvaluation[] FirstKnightEvaluationLookup = [];
-        public static EvaluationLookup.KnightEvaluation[] SecondKnightEvaluationLookup = [];
-        public static EvaluationLookup.KnightEvaluation[] ThirdKnightEvaluationLookup = [];
-        public static EvaluationLookup.KnightEvaluation[] FourthKnightEvaluationLookup = [];
-        
-        public static EvaluationLookup.BishopEvaluation[] FirstBishopEvaluationLookup = [];
-        public static EvaluationLookup.BishopEvaluation[] SecondBishopEvaluationLookup = [];
-        public static EvaluationLookup.BishopEvaluation[] ThirdBishopEvaluationLookup = [];
-        public static EvaluationLookup.BishopEvaluation[] FourthBishopEvaluationLookup = [];
-        public static readonly EvaluationLookup.KingEvaluation[,] KingEvaluationLookup = new EvaluationLookup.KingEvaluation[8,8];
+        public static readonly List<PinSearchResult>[,][] RookPinLookup = new List<PinSearchResult>[8,8][];
+        public static readonly List<PinSearchResult>[,][] BishopPinLookup = new List<PinSearchResult>[8,8][];
     }
 
     public const ulong File = 0x8080808080808080;
@@ -193,38 +150,39 @@ public static class Bitboards
     public const ulong KingSafetyAppliesWhite = 0xC7C7000000000000; 
     public const ulong KingSafetyAppliesBlack = 0xC7C7;
 
+    public const ulong WhiteSafetyPawns = 0xffff0000000000;
+    public const ulong BlackSafetyPawns = 0xffff00;
+
     public static bool begunInit;
     public static bool init;
     private static bool inProgress;
-    public static CompletionPoint progress;
 
-    public static void Init()
+    public static void Init(General.CompletionPoint progress)
     {
         if (begunInit) return;
         begunInit = true;
         List<ulong> enPassantBitboards = new List<ulong>();
         List<ulong> blockMoveList = new();
-        GeneralUtils.Timer t = new GeneralUtils.Timer();
+        General.Timer t = new General.Timer();
         t.Start();
         
-        Console.WriteLine("Initializing magic bitboards");
-        
+        //Console.WriteLine("Initializing magic bitboards");
+        progress.Set(0, "Generating masks...");
         // Create the masks for every square on the board
-        progress = new(0, "Generating masks...");
         for (int rank = 0; rank < 8; rank++)
         {
             for (int file = 7; file >= 0; file--)
             {
                 // The last bit also has to be evaluated in every direction, since it matters whether it's blocked or not
                 RookMasks[file, rank] = (Rank >> (rank * 8)) ^ (File >> (7 - file));
-                RookBlockers[file, rank] = BitboardUtils.Combinations(RookMasks[file, rank]);
+                RookBlockers[file, rank] = Combinations(RookMasks[file, rank]);
                 RookMoves[file, rank] = new (Move[] moves, ulong captures)[RookBlockers[file, rank].Length];
                 
                 List<ulong> rCombinations = new List<ulong>();
                 for (int i = 0; i < RookBlockers[file, rank].Length; i++) // for every blocker combination
                 {
-                    RookMoves[file, rank][i] = BitboardUtils.GetMoves(RookBlockers[file, rank][i], (file, rank), Pieces.WhiteRook);
-                    rCombinations.AddRange(BitboardUtils.Combinations(RookMoves[file, rank][i].captures));
+                    RookMoves[file, rank][i] = GetMoves(RookBlockers[file, rank][i], (file, rank), Pieces.WhiteRook);
+                    rCombinations.AddRange(Combinations(RookMoves[file, rank][i].captures));
                 }
                 RookCaptureCombinations[file, rank] = rCombinations.Distinct().ToArray();
                 //RookCaptureCombinations[file, rank] = rCombinations.ToArray();
@@ -247,33 +205,32 @@ public static class Bitboards
                     relativeDD <<= -DDPush * 8;
                 
                 BishopMasks[file, rank] = relativeUD ^ relativeDD;
-                BishopBlockers[file, rank] = BitboardUtils.Combinations(BishopMasks[file, rank]);
+                BishopBlockers[file, rank] = Combinations(BishopMasks[file, rank]);
                 BishopMoves[file, rank] = new (Move[] moves, ulong captures)[BishopBlockers[file, rank].Length];
                 
                 List<ulong> bCombinations = new List<ulong>();
                 for (int i = 0; i < BishopBlockers[file, rank].Length; i++)
                 {
-                    BishopMoves[file, rank][i] = BitboardUtils.GetMoves(BishopBlockers[file, rank][i], (file, rank), Pieces.WhiteBishop);
-                    bCombinations.AddRange(BitboardUtils.Combinations(BishopMoves[file, rank][i].captures));
+                    BishopMoves[file, rank][i] = GetMoves(BishopBlockers[file, rank][i], (file, rank), Pieces.WhiteBishop);
+                    bCombinations.AddRange(Combinations(BishopMoves[file, rank][i].captures));
                 }
                 BishopCaptureCombinations[file, rank] = bCombinations.Distinct().ToArray();
                 
-                SmallRookMasks[file, rank] = ((SmallRank >> (rank * 8)) ^ (SmallFile >> (7 - file))) & ~BitboardUtils.GetSquare(file, rank);
-                SmallRookCombinations[file, rank] = BitboardUtils.Combinations(SmallRookMasks[file, rank]);
+                SmallRookMasks[file, rank] = ((SmallRank >> (rank * 8)) ^ (SmallFile >> (7 - file))) & ~GetSquare(file, rank);
+                SmallRookCombinations[file, rank] = Combinations(SmallRookMasks[file, rank]);
                 SmallRookBitboards[file, rank] = new ulong[SmallRookCombinations[file, rank].Length];
                 for (int i = 0; i < SmallRookCombinations[file, rank].Length; i++)
-                    SmallRookBitboards[file, rank][i] = BitboardUtils.GetMoveBitboards(SmallRookCombinations[file, rank][i], (file, rank), Pieces.WhiteRook);
+                    SmallRookBitboards[file, rank][i] = GetMoveBitboards(SmallRookCombinations[file, rank][i], (file, rank), Pieces.WhiteRook);
                 
                 SmallBishopMasks[file, rank] = (relativeUD ^ relativeDD) & ~Frame;
-                SmallBishopCombinations[file, rank] = BitboardUtils.Combinations(SmallBishopMasks[file, rank]);
+                SmallBishopCombinations[file, rank] = Combinations(SmallBishopMasks[file, rank]);
                 SmallBishopBitboards[file, rank] = new ulong[SmallBishopCombinations[file, rank].Length];
                 for (int i = 0; i < SmallBishopCombinations[file, rank].Length; i++)
-                    SmallBishopBitboards[file, rank][i] = BitboardUtils.GetMoveBitboards(SmallBishopCombinations[file, rank][i], (file, rank), Pieces.WhiteBishop);
+                    SmallBishopBitboards[file, rank][i] = GetMoveBitboards(SmallBishopCombinations[file, rank][i], (file, rank), Pieces.WhiteBishop);
                 
                 // knight masks
-                KnightMasks[file, rank] = BitboardUtils.GetMask((file, rank), BitboardUtils.KnightPattern);
-                MagicLookupArrays.KnightMobilityLookup[file, rank] = EvaluationLookup.EvaluateKnightMobility(file, rank);
-                KnightCombinations[file, rank] = BitboardUtils.Combinations(KnightMasks[file, rank]);
+                KnightMasks[file, rank] = GetMask((file, rank), KnightPattern);
+                KnightCombinations[file, rank] = Combinations(KnightMasks[file, rank]);
                 
                 // king masks
                 ulong kingMask = ulong.MaxValue;
@@ -291,62 +248,62 @@ public static class Bitboards
                     }
                 }
                 
-                kingMask &= ~BitboardUtils.GetSquare(file, rank);
+                kingMask &= ~GetSquare(file, rank);
                 
                 KingMasks[file, rank] = kingMask;
-                KingCombinations[file, rank] = BitboardUtils.Combinations(kingMask);
+                KingCombinations[file, rank] = Combinations(kingMask);
                 
                 // blocking checks
                 
                 // captures
-                BlockCaptures[file, rank] = BitboardUtils.GetSingleBits(RookMasks[file, rank] | BishopMasks[file, rank] | KnightMasks[file, rank]);
+                BlockCaptures[file, rank] = GetSingleBits(RookMasks[file, rank] | BishopMasks[file, rank] | KnightMasks[file, rank]);
                 
                 // regular moves
-                blockMoveList.AddRange(BitboardUtils.Combinations(relativeUD, 3));
-                blockMoveList.AddRange(BitboardUtils.Combinations(relativeDD, 3));
-                blockMoveList.AddRange(BitboardUtils.Combinations(Rank >> (rank * 8), 3));
-                blockMoveList.AddRange(BitboardUtils.Combinations(File >> (7 - file), 3));
-                blockMoveList.AddRange(BitboardUtils.Combinations(KnightMasks[file, rank], 3));
+                blockMoveList.AddRange(Combinations(relativeUD, 3));
+                blockMoveList.AddRange(Combinations(relativeDD, 3));
+                blockMoveList.AddRange(Combinations(Rank >> (rank * 8), 3));
+                blockMoveList.AddRange(Combinations(File >> (7 - file), 3));
+                blockMoveList.AddRange(Combinations(KnightMasks[file, rank], 3));
                 
                 // pawn moves
                 
                 // white pawns
                 ulong wpmMask = 0;
                 ulong wpcMask = 0;
-                wpmMask |= BitboardUtils.GetSquare(file, rank + 1);
-                if (BitboardUtils.ValidSquare(file + 1, rank + 1)) wpcMask |= BitboardUtils.GetSquare(file + 1, rank + 1);
-                if (BitboardUtils.ValidSquare(file - 1, rank + 1)) wpcMask |= BitboardUtils.GetSquare(file - 1, rank + 1);
+                wpmMask |= GetSquare(file, rank + 1);
+                if (ValidSquare(file + 1, rank + 1)) wpcMask |= GetSquare(file + 1, rank + 1);
+                if (ValidSquare(file - 1, rank + 1)) wpcMask |= GetSquare(file - 1, rank + 1);
                 
-                if (rank == 1) wpmMask |= BitboardUtils.GetSquare(file, rank + 2);
+                if (rank == 1) wpmMask |= GetSquare(file, rank + 2);
                 
                 WhitePawnMoveMasks[file, rank] = wpmMask;
-                WhitePawnMoveCombinations[file, rank] = BitboardUtils.Combinations(wpmMask);
+                WhitePawnMoveCombinations[file, rank] = Combinations(wpmMask);
                 WhitePawnCaptureMasks[file, rank] = wpcMask;
-                WhitePawnCaptureCombinations[file, rank] = BitboardUtils.Combinations(wpcMask);
+                WhitePawnCaptureCombinations[file, rank] = Combinations(wpcMask);
                 if (rank == 4) // white en passant rank
                 {
-                    if (BitboardUtils.ValidSquare(file + 1, 5)) enPassantBitboards.Add(BitboardUtils.GetSquare(file, rank) | BitboardUtils.GetSquare(file + 1, 5));
-                    if (BitboardUtils.ValidSquare(file - 1, 5)) enPassantBitboards.Add(BitboardUtils.GetSquare(file, rank) | BitboardUtils.GetSquare(file - 1, 5));
+                    if (ValidSquare(file + 1, 5)) enPassantBitboards.Add(GetSquare(file, rank) | GetSquare(file + 1, 5));
+                    if (ValidSquare(file - 1, 5)) enPassantBitboards.Add(GetSquare(file, rank) | GetSquare(file - 1, 5));
                 }
                 
                 // black pawns
                 ulong bpmMask = 0;
                 ulong bpcMask = 0;
-                bpmMask |= BitboardUtils.GetSquare(file, rank - 1);
-                if (BitboardUtils.ValidSquare(file + 1, rank - 1)) bpcMask |= BitboardUtils.GetSquare(file + 1, rank - 1);
-                if (BitboardUtils.ValidSquare(file - 1, rank - 1)) bpcMask |= BitboardUtils.GetSquare(file - 1, rank - 1);
+                bpmMask |= GetSquare(file, rank - 1);
+                if (ValidSquare(file + 1, rank - 1)) bpcMask |= GetSquare(file + 1, rank - 1);
+                if (ValidSquare(file - 1, rank - 1)) bpcMask |= GetSquare(file - 1, rank - 1);
                 
-                if (rank == 6) bpmMask |= BitboardUtils.GetSquare(file, rank - 2);
+                if (rank == 6) bpmMask |= GetSquare(file, rank - 2);
                 
                 BlackPawnMoveMasks[file, rank] = bpmMask;
-                BlackPawnMoveCombinations[file, rank] = BitboardUtils.Combinations(bpmMask);
+                BlackPawnMoveCombinations[file, rank] = Combinations(bpmMask);
                 BlackPawnCaptureMasks[file, rank] = bpcMask;
-                BlackPawnCaptureCombinations[file, rank] = BitboardUtils.Combinations(bpcMask);
+                BlackPawnCaptureCombinations[file, rank] = Combinations(bpcMask);
                 
                 if (rank == 3) // black en passant rank
                 {
-                    if (BitboardUtils.ValidSquare(file + 1, 2)) enPassantBitboards.Add(BitboardUtils.GetSquare(file, rank) | BitboardUtils.GetSquare(file + 1, 2));
-                    if (BitboardUtils.ValidSquare(file - 1, 2)) enPassantBitboards.Add(BitboardUtils.GetSquare(file, rank) | BitboardUtils.GetSquare(file - 1, 2));
+                    if (ValidSquare(file + 1, 2)) enPassantBitboards.Add(GetSquare(file, rank) | GetSquare(file + 1, 2));
+                    if (ValidSquare(file - 1, 2)) enPassantBitboards.Add(GetSquare(file, rank) | GetSquare(file - 1, 2));
                 }
                 
                 if (rank != 0) // only needs to be checked once per file
@@ -378,124 +335,29 @@ public static class Bitboards
                 }
                 
                 NeighbourMasks[file] = neighborMask;
+                SurroundMasks[file] = neighborMask | GetFile(file);
             }
         }
-
-        progress = new(10, "Generating block moves");
+        
+        progress.Set(30, "Generating block moves...");
+        
         BlockMoves = blockMoveList.Distinct().ToArray();
-        MagicLookupArrays.BlockMoveNumber = (4154364917966041783, 46, 262133); //MagicNumbers.GenerateRepeat(BlockMoves, 1, 46);
+        Lookup.BlockMoveNumber = (4154364917966041783, 46, 262133); //MagicNumbers.GenerateRepeat(BlockMoves, 1, 46);
         EnPassantMasks = enPassantBitboards.ToArray();
-        MagicLookupArrays.EnPassantNumbers = (15417481889308385644, 58, 63); // MagicNumbers.GenerateRepeat(EnPassantMasks, 10000);
-        MagicLookupArrays.EnPassantLookupArray = new Move[MagicLookupArrays.EnPassantNumbers.highest + 1];
+        Lookup.EnPassantNumbers = (15417481889308385644, 58, 63); // MagicNumbers.GenerateRepeat(EnPassantMasks, 10000);
+        Lookup.EnPassantLookupArray = new Move[Lookup.EnPassantNumbers.highest + 1];
         foreach (ulong mask in EnPassantMasks) // for each possible en passant
         {
-            MagicLookupArrays.EnPassantLookupArray[(mask * MagicLookupArrays.EnPassantNumbers.magicNumber) >> MagicLookupArrays.EnPassantNumbers.push] = BitboardUtils.GetEnPassantMoves(mask);
+            Lookup.EnPassantLookupArray[(mask * Lookup.EnPassantNumbers.magicNumber) >> Lookup.EnPassantNumbers.push] = GetEnPassantMoves(mask);
         }
-        
-        // pawn eval combinations
-        ulong[] rightPawns = BitboardUtils.Combinations(RightPawns, 8).Distinct().ToArray();
-        ulong[] leftPawns = BitboardUtils.Combinations(LeftPawns, 8).Distinct().ToArray();
-        ulong[] centerPawns = BitboardUtils.Combinations(CenterPawns, 8).Distinct().ToArray();
-        
-        MagicLookupArrays.RightPawnEvalNumber = (17067507152026048335, 37, 134217725); // MagicNumbers.GenerateMagicNumberParallel(rightPawns.Distinct().ToArray(),37 ,7, false);
-        MagicLookupArrays.LeftPawnEvalNumber = (615594976254142229, 37, 134217609); // MagicNumbers.GenerateMagicNumberParallel(leftPawns.Distinct().ToArray(), 37, 7, false);
-        MagicLookupArrays.CenterPawnEvalNumber = (15570990422680516493, 37, 134217566); // MagicNumbers.GenerateMagicNumberParallel(centerPawns.Distinct().ToArray(), 37, 7, false);
 
-        MagicLookupArrays.RightPawnEvalLookup = new EvaluationLookup.PawnEvaluation[MagicLookupArrays.RightPawnEvalNumber.highest+ 1];
-        MagicLookupArrays.LeftPawnEvalLookup = new EvaluationLookup.PawnEvaluation[MagicLookupArrays.LeftPawnEvalNumber.highest + 1];
-        MagicLookupArrays.CenterPawnEvalLookup = new EvaluationLookup.PawnEvaluation[MagicLookupArrays.CenterPawnEvalNumber.highest + 1];
-        
-        progress = new(15, "Generating pawn evaluations 1/3");
-        (EvaluationLookup.PawnEvaluation eval, ulong origin)[] RightPawnEvals = Batch.Select(rightPawns, p =>
-            (EvaluationLookup.GeneratePawnEval(p, EvaluationLookup.Section.Right), p), 8);
-        foreach (var eval in RightPawnEvals)
-        {
-            MagicLookupArrays.RightPawnEvalLookup[(eval.origin * MagicLookupArrays.RightPawnEvalNumber.magicNumber) >> MagicLookupArrays.RightPawnEvalNumber.push] = eval.eval;
-        }
-        
-        progress = new(35, "Generating pawn evaluations 2/3");
-        (EvaluationLookup.PawnEvaluation eval, ulong origin)[] LeftPawnEvals = Batch.Select(leftPawns, p =>
-            (EvaluationLookup.GeneratePawnEval(p, EvaluationLookup.Section.Left), p), 8);
-        foreach (var eval in LeftPawnEvals)
-        {
-            MagicLookupArrays.LeftPawnEvalLookup[(eval.origin * MagicLookupArrays.LeftPawnEvalNumber.magicNumber) >> MagicLookupArrays.LeftPawnEvalNumber.push] = eval.eval;
-        }
-        
-        progress = new(55, "Generating pawn evaluations 3/3");
-        (EvaluationLookup.PawnEvaluation eval, ulong origin)[] CenterPawnEvals = Batch.Select(centerPawns, p =>
-            (EvaluationLookup.GeneratePawnEval(p, EvaluationLookup.Section.Center), p), 8);
-        foreach (var eval in CenterPawnEvals)
-        {
-            MagicLookupArrays.CenterPawnEvalLookup[(eval.origin * MagicLookupArrays.CenterPawnEvalNumber.magicNumber) >> MagicLookupArrays.CenterPawnEvalNumber.push] = eval.eval;
-        }
-        
-        progress = new(75, "Generating piece evaluations...");
-        
-        List<ulong> firstSlice = BitboardUtils.Combinations(FirstSlice, 9);
-        List<ulong> secondSlice = BitboardUtils.Combinations(SecondSlice, 9);
-        List<ulong> thirdSlice = BitboardUtils.Combinations(ThirdSlice, 9);
-        List<ulong> fourthSlice = BitboardUtils.Combinations(FourthSlice, 9);
-        
-        MagicLookupArrays.FirstRookEvaluationLookup = new EvaluationLookup.RookEvaluation[firstSlice.Max() + 1];
-        MagicLookupArrays.SecondRookEvaluationLookup = new EvaluationLookup.RookEvaluation[secondSlice.Max(n => n >> 16) + 1];
-        MagicLookupArrays.ThirdRookEvaluationLookup = new EvaluationLookup.RookEvaluation[thirdSlice.Max(n => n >> 32) + 1];
-        MagicLookupArrays.FourthRookEvaluationLookup = new EvaluationLookup.RookEvaluation[fourthSlice.Max(n => n >> 48) + 1];
-        
-        MagicLookupArrays.FirstQueenEvaluationLookup = new EvaluationLookup.QueenEvaluation[firstSlice.Max() + 1];
-        MagicLookupArrays.SecondQueenEvaluationLookup = new EvaluationLookup.QueenEvaluation[secondSlice.Max(n => n >> 16) + 1];
-        MagicLookupArrays.ThirdQueenEvaluationLookup = new EvaluationLookup.QueenEvaluation[thirdSlice.Max(n => n >> 32) + 1];
-        MagicLookupArrays.FourthQueenEvaluationLookup = new EvaluationLookup.QueenEvaluation[fourthSlice.Max(n => n >> 48) + 1];
-        
-        MagicLookupArrays.FirstKnightEvaluationLookup = new EvaluationLookup.KnightEvaluation[firstSlice.Max() + 1];
-        MagicLookupArrays.SecondKnightEvaluationLookup = new EvaluationLookup.KnightEvaluation[secondSlice.Max(n => n >> 16) + 1];
-        MagicLookupArrays.ThirdKnightEvaluationLookup = new EvaluationLookup.KnightEvaluation[thirdSlice.Max(n => n >> 32) + 1];
-        MagicLookupArrays.FourthKnightEvaluationLookup = new EvaluationLookup.KnightEvaluation[fourthSlice.Max(n => n >> 48) + 1];
-        
-        MagicLookupArrays.FirstBishopEvaluationLookup = new EvaluationLookup.BishopEvaluation[firstSlice.Max() + 1];
-        MagicLookupArrays.SecondBishopEvaluationLookup = new EvaluationLookup.BishopEvaluation[secondSlice.Max(n => n >> 16) + 1];
-        MagicLookupArrays.ThirdBishopEvaluationLookup = new EvaluationLookup.BishopEvaluation[thirdSlice.Max(n => n >> 32) + 1];
-        MagicLookupArrays.FourthBishopEvaluationLookup = new EvaluationLookup.BishopEvaluation[fourthSlice.Max(n => n >> 48) + 1];
-        
-        Batch.ForEach(firstSlice, combination =>
-        {
-            MagicLookupArrays.FirstRookEvaluationLookup[combination] = EvaluationLookup.GenerateRookEval(combination, EvaluationLookup.Slice.First);
-            MagicLookupArrays.FirstQueenEvaluationLookup[combination] = EvaluationLookup.GenerateStandardEval<EvaluationLookup.QueenEvaluation>(combination, EvaluationLookup.Slice.First, Pieces.WhiteQueen, Pieces.BlackQueen);
-            MagicLookupArrays.FirstKnightEvaluationLookup[combination] = EvaluationLookup.GenerateStandardEval<EvaluationLookup.KnightEvaluation>(combination, EvaluationLookup.Slice.First, Pieces.WhiteKnight, Pieces.BlackKnight);
-            MagicLookupArrays.FirstBishopEvaluationLookup[combination] = EvaluationLookup.GenerateStandardEval<EvaluationLookup.BishopEvaluation>(combination, EvaluationLookup.Slice.First, Pieces.WhiteBishop, Pieces.BlackBishop);
-        }, 8);
-        
-        Batch.ForEach(secondSlice, combination =>
-        {
-            MagicLookupArrays.SecondRookEvaluationLookup[combination >> 16] = EvaluationLookup.GenerateRookEval(combination, EvaluationLookup.Slice.Second);
-            MagicLookupArrays.SecondQueenEvaluationLookup[combination >> 16] = EvaluationLookup.GenerateStandardEval<EvaluationLookup.QueenEvaluation>(combination, EvaluationLookup.Slice.Second, Pieces.WhiteQueen, Pieces.BlackQueen);
-            MagicLookupArrays.SecondKnightEvaluationLookup[combination >> 16] = EvaluationLookup.GenerateStandardEval<EvaluationLookup.KnightEvaluation>(combination, EvaluationLookup.Slice.Second, Pieces.WhiteKnight, Pieces.BlackKnight);
-            MagicLookupArrays.SecondBishopEvaluationLookup[combination >> 16] = EvaluationLookup.GenerateStandardEval<EvaluationLookup.BishopEvaluation>(combination, EvaluationLookup.Slice.Second, Pieces.WhiteBishop, Pieces.BlackBishop);
-        }, 8);
-        
-        Batch.ForEach(thirdSlice, combination =>
-        {
-            MagicLookupArrays.ThirdRookEvaluationLookup[combination >> 32] = EvaluationLookup.GenerateRookEval(combination, EvaluationLookup.Slice.Third);
-            MagicLookupArrays.ThirdQueenEvaluationLookup[combination >> 32] = EvaluationLookup.GenerateStandardEval<EvaluationLookup.QueenEvaluation>(combination, EvaluationLookup.Slice.Third, Pieces.WhiteQueen, Pieces.BlackQueen);
-            MagicLookupArrays.ThirdKnightEvaluationLookup[combination >> 32] = EvaluationLookup.GenerateStandardEval<EvaluationLookup.KnightEvaluation>(combination, EvaluationLookup.Slice.Third, Pieces.WhiteKnight, Pieces.BlackKnight);
-            MagicLookupArrays.ThirdBishopEvaluationLookup[combination >> 32] = EvaluationLookup.GenerateStandardEval<EvaluationLookup.BishopEvaluation>(combination, EvaluationLookup.Slice.Third, Pieces.WhiteBishop, Pieces.BlackBishop);
-        }, 8);
-        
-        Batch.ForEach(fourthSlice, combination =>
-        {
-            MagicLookupArrays.FourthRookEvaluationLookup[combination >> 48] = EvaluationLookup.GenerateRookEval(combination, EvaluationLookup.Slice.Fourth);
-            MagicLookupArrays.FourthQueenEvaluationLookup[combination >> 48] = EvaluationLookup.GenerateStandardEval<EvaluationLookup.QueenEvaluation>(combination, EvaluationLookup.Slice.Fourth, Pieces.WhiteQueen, Pieces.BlackQueen);
-            MagicLookupArrays.FourthKnightEvaluationLookup[combination >> 48] = EvaluationLookup.GenerateStandardEval<EvaluationLookup.KnightEvaluation>(combination, EvaluationLookup.Slice.Fourth, Pieces.WhiteKnight, Pieces.BlackKnight);
-            MagicLookupArrays.FourthBishopEvaluationLookup[combination >> 48] = EvaluationLookup.GenerateStandardEval<EvaluationLookup.BishopEvaluation>(combination, EvaluationLookup.Slice.Fourth, Pieces.WhiteBishop, Pieces.BlackBishop);
-        }, 8);
-
-        progress = new(85, "Initializing magic lookup...");
         
         // attack line lookup
-        ulong[] attackLines = BitboardUtils.GetValidCombinations(64, 2).ToArray();
-        MagicLookupArrays.AttackLineNumber = (8710915622236860111, 48, 65530); //MagicNumbers.GenerateRepeat(attackLines.Distinct().ToArray(), 1);
+        ulong[] attackLines = GetValidCombinations(64, 2).ToArray();
+        Lookup.AttackLineNumber = (8710915622236860111, 48, 65530); //MagicNumbers.GenerateRepeat(attackLines.Distinct().ToArray(), 1);
         
         //Console.WriteLine("Generating Magic Numbers");
-        
+        progress.Set(45, "Loading magic lookup...");
         //int done = 0;
         // create magic numbers and add to lookup
         Parallel.For(0, 8, rank =>
@@ -503,236 +365,224 @@ public static class Bitboards
             Parallel.For(0, 8, file =>
             {
                 // attack line lookup
-                MagicLookupArrays.AttackLineLookup[file, rank] =
-                    new ulong[MagicLookupArrays.AttackLineNumber.highest + 1];
+                Lookup.AttackLineLookup[file, rank] =
+                    new ulong[Lookup.AttackLineNumber.highest + 1];
                 foreach (ulong line in attackLines)
                 {
-                    MagicLookupArrays.AttackLineLookup[file, rank]
-                            [(line * MagicLookupArrays.AttackLineNumber.magicNumber) >> MagicLookupArrays.AttackLineNumber.push] = BitboardUtils.GetAttackLines((file, rank), line);
+                    Lookup.AttackLineLookup[file, rank]
+                            [(line * Lookup.AttackLineNumber.magicNumber) >> Lookup.AttackLineNumber.push] = GetAttackLines((file, rank), line);
                 }
 
                 // rook numbers
-                MagicLookupArrays.RookMove[file, rank] = MagicNumbers.RookNumbers[file, rank];
-                MagicLookupArrays.RookLookup[file, rank] = new (Move[] moves, ulong captures)[MagicLookupArrays.RookMove[file, rank].highest + 1];
-                MagicLookupArrays.RookLookupCapturesArray[file, rank] = new ulong[MagicLookupArrays.RookMove[file, rank].highest + 1];
+                Lookup.RookMove[file, rank] = MagicNumbers.RookNumbers[file, rank];
+                Lookup.RookLookup[file, rank] = new (Move[] moves, ulong captures)[Lookup.RookMove[file, rank].highest + 1];
+                Lookup.RookLookupCapturesArray[file, rank] = new ulong[Lookup.RookMove[file, rank].highest + 1];
 
                 for (int i = 0; i < RookBlockers[file, rank].Length; i++) // for each blocker
                 {
-                    MagicLookupArrays.RookLookup[file, rank]
-                        [(RookBlockers[file, rank][i] * MagicLookupArrays.RookMove[file, rank].magicNumber) >> MagicLookupArrays.RookMove[file, rank].push] = RookMoves[file, rank][i];
-                    MagicLookupArrays.RookLookupCapturesArray[file, rank]
-                        [(RookBlockers[file, rank][i] * MagicLookupArrays.RookMove[file, rank].magicNumber) >> MagicLookupArrays.RookMove[file, rank].push] = RookMoves[file, rank][i].captures;
+                    Lookup.RookLookup[file, rank]
+                        [(RookBlockers[file, rank][i] * Lookup.RookMove[file, rank].magicNumber) >> Lookup.RookMove[file, rank].push] = RookMoves[file, rank][i];
+                    Lookup.RookLookupCapturesArray[file, rank]
+                        [(RookBlockers[file, rank][i] * Lookup.RookMove[file, rank].magicNumber) >> Lookup.RookMove[file, rank].push] = RookMoves[file, rank][i].captures;
                 }
 
                 // bishop numbers
-                MagicLookupArrays.BishopMove[file, rank] = MagicNumbers.BishopNumbers[file, rank];
-                MagicLookupArrays.BishopLookup[file, rank] = new (Move[] moves, ulong captures)[MagicLookupArrays.BishopMove[file, rank].highest + 1];
-                MagicLookupArrays.BishopLookupCapturesArray[file, rank] = new ulong[MagicLookupArrays.BishopMove[file, rank].highest + 1];
+                Lookup.BishopMove[file, rank] = MagicNumbers.BishopNumbers[file, rank];
+                Lookup.BishopLookup[file, rank] = new (Move[] moves, ulong captures)[Lookup.BishopMove[file, rank].highest + 1];
+                Lookup.BishopLookupCapturesArray[file, rank] = new ulong[Lookup.BishopMove[file, rank].highest + 1];
 
                 for (int i = 0; i < BishopBlockers[file, rank].Length; i++) // for each blocker
                 {
-                    MagicLookupArrays.BishopLookup[file, rank]
-                        [(BishopBlockers[file, rank][i] * MagicLookupArrays.BishopMove[file, rank].magicNumber) >> MagicLookupArrays.BishopMove[file, rank].push] = BishopMoves[file, rank][i];
-                    MagicLookupArrays.BishopLookupCapturesArray[file, rank]
-                            [(BishopBlockers[file, rank][i] * MagicLookupArrays.BishopMove[file, rank].magicNumber) >> MagicLookupArrays.BishopMove[file, rank].push] = BishopMoves[file, rank][i].captures;
+                    Lookup.BishopLookup[file, rank]
+                        [(BishopBlockers[file, rank][i] * Lookup.BishopMove[file, rank].magicNumber) >> Lookup.BishopMove[file, rank].push] = BishopMoves[file, rank][i];
+                    Lookup.BishopLookupCapturesArray[file, rank]
+                            [(BishopBlockers[file, rank][i] * Lookup.BishopMove[file, rank].magicNumber) >> Lookup.BishopMove[file, rank].push] = BishopMoves[file, rank][i].captures;
                 }
 
                 // rook captures
-                MagicLookupArrays.RookCapture[file, rank] = MagicNumbers.RookCaptureNumbers[file, rank]; // MagicNumbers.GenerateRepeat(RookCaptureCombinations[file, rank], 1000);
-                MagicLookupArrays.RookCaptureLookup[file, rank] = new Move[MagicLookupArrays.RookCapture[file, rank].highest + 1][];
+                Lookup.RookCapture[file, rank] = MagicNumbers.RookCaptureNumbers[file, rank]; // MagicNumbers.GenerateRepeat(RookCaptureCombinations[file, rank], 1000);
+                Lookup.RookCaptureLookup[file, rank] = new Move[Lookup.RookCapture[file, rank].highest + 1][];
 
                 for (int i = 0; i < RookCaptureCombinations[file, rank].Length; i++) // for each blocker
                 {
-                    MagicLookupArrays.RookCaptureLookup[file, rank]
-                        [(RookCaptureCombinations[file, rank][i] * MagicLookupArrays.RookCapture[file, rank].magicNumber) >> MagicLookupArrays.RookCapture[file, rank].push] = BitboardUtils.GetBitboardMoves(RookCaptureCombinations[file, rank][i], (file, rank), 50, capture: true);
+                    Lookup.RookCaptureLookup[file, rank]
+                        [(RookCaptureCombinations[file, rank][i] * Lookup.RookCapture[file, rank].magicNumber) >> Lookup.RookCapture[file, rank].push] = GetBitboardMoves(RookCaptureCombinations[file, rank][i], (file, rank), 50, capture: true);
                 }
 
                 // bishop captures
-                MagicLookupArrays.BishopCapture[file, rank] = MagicNumbers.BishopCaptureNumbers[file, rank]; // MagicNumbers.GenerateRepeat(BishopCaptureCombinations[file, rank], 1000);
-                MagicLookupArrays.BishopCaptureLookup[file, rank] = new Move[MagicLookupArrays.BishopCapture[file, rank].highest + 1][];
+                Lookup.BishopCapture[file, rank] = MagicNumbers.BishopCaptureNumbers[file, rank]; // MagicNumbers.GenerateRepeat(BishopCaptureCombinations[file, rank], 1000);
+                Lookup.BishopCaptureLookup[file, rank] = new Move[Lookup.BishopCapture[file, rank].highest + 1][];
 
                 for (int i = 0; i < BishopCaptureCombinations[file, rank].Length; i++) // for each blocker
                 {
-                    MagicLookupArrays.BishopCaptureLookup[file, rank][(BishopCaptureCombinations[file, rank][i] * MagicLookupArrays.BishopCapture[file, rank].magicNumber) >> MagicLookupArrays.BishopCapture[file, rank].push] =
-                        BitboardUtils.GetBitboardMoves(BishopCaptureCombinations[file, rank][i], (file, rank), 50, capture: true);
+                    Lookup.BishopCaptureLookup[file, rank][(BishopCaptureCombinations[file, rank][i] * Lookup.BishopCapture[file, rank].magicNumber) >> Lookup.BishopCapture[file, rank].push] =
+                        GetBitboardMoves(BishopCaptureCombinations[file, rank][i], (file, rank), 50, capture: true);
                 }
 
-                MagicLookupArrays.RookBitboardNumbers[file, rank] = MagicNumbers.RookBitboardNumbers[file, rank];
-                MagicLookupArrays.RookBitboardLookup[file, rank] = new ulong[MagicLookupArrays.RookBitboardNumbers[file, rank].highest + 1];
-                MagicLookupArrays.RookMobilityLookupArray[file, rank] = new int[MagicLookupArrays.RookBitboardNumbers[file, rank].highest + 1];
+                Lookup.RookBitboardNumbers[file, rank] = MagicNumbers.RookBitboardNumbers[file, rank];
+                Lookup.RookBitboardLookup[file, rank] = new ulong[Lookup.RookBitboardNumbers[file, rank].highest + 1];
+                Lookup.RookMobilityLookupArray[file, rank] = new int[Lookup.RookBitboardNumbers[file, rank].highest + 1];
 
                 for (int i = 0; i < SmallRookCombinations[file, rank].Length; i++) // for each blocker
                 {
-                    MagicLookupArrays.RookBitboardLookup[file, rank][(SmallRookCombinations[file, rank][i] * MagicLookupArrays.RookBitboardNumbers[file, rank].magicNumber) >> MagicLookupArrays.RookBitboardNumbers[file, rank].push] = 
+                    Lookup.RookBitboardLookup[file, rank][(SmallRookCombinations[file, rank][i] * Lookup.RookBitboardNumbers[file, rank].magicNumber) >> Lookup.RookBitboardNumbers[file, rank].push] = 
                         SmallRookBitboards[file, rank][i];
-                    MagicLookupArrays.RookMobilityLookupArray[file, rank][(SmallRookCombinations[file, rank][i] * MagicLookupArrays.RookBitboardNumbers[file, rank].magicNumber) >> MagicLookupArrays.RookBitboardNumbers[file, rank].push] = 
-                        EvaluationLookup.EvaluateRookMobility(file, rank, i);
+                    Lookup.RookMobilityLookupArray[file, rank][(SmallRookCombinations[file, rank][i] * Lookup.RookBitboardNumbers[file, rank].magicNumber) >> Lookup.RookBitboardNumbers[file, rank].push] = 
+                        EvalUtils.EvaluateRookMobility(file, rank, i);
                 }
 
-                MagicLookupArrays.BishopBitboardNumbers[file, rank] = MagicNumbers.BishopBitboardNumbers[file, rank];
-                MagicLookupArrays.BishopBitboardLookup[file, rank] = new ulong[MagicLookupArrays.BishopBitboardNumbers[file, rank].highest + 1];
-                MagicLookupArrays.BishopMobilityLookupArray[file, rank] = new int[MagicLookupArrays.BishopBitboardNumbers[file, rank].highest + 1];
+                Lookup.BishopBitboardNumbers[file, rank] = MagicNumbers.BishopBitboardNumbers[file, rank];
+                Lookup.BishopBitboardLookup[file, rank] = new ulong[Lookup.BishopBitboardNumbers[file, rank].highest + 1];
+                Lookup.BishopMobilityLookupArray[file, rank] = new int[Lookup.BishopBitboardNumbers[file, rank].highest + 1];
 
                 for (int i = 0; i < SmallBishopCombinations[file, rank].Length; i++) // for each blocker
                 {
-                    MagicLookupArrays.BishopBitboardLookup[file, rank][(SmallBishopCombinations[file, rank][i] * MagicLookupArrays.BishopBitboardNumbers[file, rank].magicNumber) >> MagicLookupArrays.BishopBitboardNumbers[file, rank].push] = 
+                    Lookup.BishopBitboardLookup[file, rank][(SmallBishopCombinations[file, rank][i] * Lookup.BishopBitboardNumbers[file, rank].magicNumber) >> Lookup.BishopBitboardNumbers[file, rank].push] = 
                         SmallBishopBitboards[file, rank][i];
-                    MagicLookupArrays.BishopMobilityLookupArray[file, rank][(SmallBishopCombinations[file, rank][i] * MagicLookupArrays.BishopBitboardNumbers[file, rank].magicNumber) >> MagicLookupArrays.BishopBitboardNumbers[file, rank].push] = 
-                        EvaluationLookup.EvaluateBishopMobility(file, rank, i);
+                    Lookup.BishopMobilityLookupArray[file, rank][(SmallBishopCombinations[file, rank][i] * Lookup.BishopBitboardNumbers[file, rank].magicNumber) >> Lookup.BishopBitboardNumbers[file, rank].push] = 
+                        EvalUtils.EvaluateBishopMobility(file, rank, i);
                 }
 
                 // knight moves
                 // since the potential captures and moves are based on the same combinations, the same magic numbers can be used
-                MagicLookupArrays.KnightMove[file, rank] = MagicNumbers.KnightNumbers[file, rank];
-                MagicLookupArrays.KnightLookup[file, rank] = new Move[MagicLookupArrays.KnightMove[file, rank].highest + 1][];
-                MagicLookupArrays.KnightCaptureLookup[file, rank] = new Move[MagicLookupArrays.KnightMove[file, rank].highest + 1][];
+                Lookup.KnightMove[file, rank] = MagicNumbers.KnightNumbers[file, rank];
+                Lookup.KnightLookup[file, rank] = new Move[Lookup.KnightMove[file, rank].highest + 1][];
+                Lookup.KnightCaptureLookup[file, rank] = new Move[Lookup.KnightMove[file, rank].highest + 1][];
 
                 for (int i = 0; i < KnightCombinations[file, rank].Length; i++) // for each combination
                 {
-                    MagicLookupArrays.KnightLookup[file, rank][(KnightCombinations[file, rank][i] * MagicLookupArrays.KnightMove[file, rank].magicNumber) >> MagicLookupArrays.KnightMove[file, rank].push] = 
-                        BitboardUtils.GetBitboardMoves(KnightCombinations[file, rank][i], (file, rank), 5);
-                    MagicLookupArrays.KnightCaptureLookup[file, rank][(KnightCombinations[file, rank][i] * MagicLookupArrays.KnightMove[file, rank].magicNumber) >> MagicLookupArrays.KnightMove[file, rank].push] = 
-                        BitboardUtils.GetBitboardMoves(KnightCombinations[file, rank][i], (file, rank), 50, capture: true);
+                    Lookup.KnightLookup[file, rank][(KnightCombinations[file, rank][i] * Lookup.KnightMove[file, rank].magicNumber) >> Lookup.KnightMove[file, rank].push] = 
+                        GetBitboardMoves(KnightCombinations[file, rank][i], (file, rank), 5);
+                    Lookup.KnightCaptureLookup[file, rank][(KnightCombinations[file, rank][i] * Lookup.KnightMove[file, rank].magicNumber) >> Lookup.KnightMove[file, rank].push] = 
+                        GetBitboardMoves(KnightCombinations[file, rank][i], (file, rank), 50, capture: true);
                 }
 
                 // king moves
-                MagicLookupArrays.KingMove[file, rank] = MagicNumbers.KingNumbers[file, rank]; // MagicNumbers.GenerateRepeat(KingCombinations[file, rank], 5000);
-                MagicLookupArrays.KingLookup[file, rank] = new Move[MagicLookupArrays.KingMove[file, rank].highest + 1][];
-                MagicLookupArrays.KingCaptureLookup[file, rank] = new Move[MagicLookupArrays.KingMove[file, rank].highest + 1][];
-                MagicLookupArrays.KingSafetyLookup[file, rank] = new int[MagicLookupArrays.KingMove[file, rank].highest + 1];
+                Lookup.KingMove[file, rank] = MagicNumbers.KingNumbers[file, rank]; // MagicNumbers.GenerateRepeat(KingCombinations[file, rank], 5000);
+                Lookup.KingLookup[file, rank] = new Move[Lookup.KingMove[file, rank].highest + 1][];
+                Lookup.KingCaptureLookup[file, rank] = new Move[Lookup.KingMove[file, rank].highest + 1][];
+                Lookup.KingSafetyLookup[file, rank] = new int[Lookup.KingMove[file, rank].highest + 1];
 
                 for (int i = 0; i < KingCombinations[file, rank].Length; i++) // for each combination
                 {
-                    MagicLookupArrays.KingLookup[file, rank][(KingCombinations[file, rank][i] * MagicLookupArrays.KingMove[file, rank].magicNumber) >> MagicLookupArrays.KingMove[file, rank].push] =
-                        BitboardUtils.GetBitboardMoves(KingCombinations[file, rank][i], (file, rank), 5);
-                    MagicLookupArrays.KingCaptureLookup[file, rank][(KingCombinations[file, rank][i] * MagicLookupArrays.KingMove[file, rank].magicNumber) >> MagicLookupArrays.KingMove[file, rank].push] =
-                        BitboardUtils.GetBitboardMoves(KingCombinations[file, rank][i], (file, rank), 3, capture: true);
-                    MagicLookupArrays.KingSafetyLookup[file, rank][(KingCombinations[file, rank][i] * MagicLookupArrays.KingMove[file, rank].magicNumber) >> MagicLookupArrays.KingMove[file, rank].push] =
-                        Weights.KingSafetyBonuses[UInt64.PopCount(KingCombinations[file, rank][i])];
+                    Lookup.KingLookup[file, rank][(KingCombinations[file, rank][i] * Lookup.KingMove[file, rank].magicNumber) >> Lookup.KingMove[file, rank].push] =
+                        GetBitboardMoves(KingCombinations[file, rank][i], (file, rank), 5);
+                    Lookup.KingCaptureLookup[file, rank][(KingCombinations[file, rank][i] * Lookup.KingMove[file, rank].magicNumber) >> Lookup.KingMove[file, rank].push] =
+                        GetBitboardMoves(KingCombinations[file, rank][i], (file, rank), 3, capture: true);
                 }
 
                 // pin lines
                 // rook pin lines
-                MagicLookupArrays.RookPinLineBitboardLookup[file, rank] = new ulong[MagicLookupArrays.RookMove[file, rank].highest + 1];
+                Lookup.RookPinLineBitboardLookup[file, rank] = new ulong[Lookup.RookMove[file, rank].highest + 1];
 
                 for (int i = 0; i < RookBlockers[file, rank].Length; i++) // for each blocker
                 {
-                    MagicLookupArrays.RookPinLineBitboardLookup[file, rank][(RookBlockers[file, rank][i] * MagicLookupArrays.RookMove[file, rank].magicNumber) >> MagicLookupArrays.RookMove[file, rank].push] =
-                        BitboardUtils.GetPinLine(RookBlockers[file, rank][i], (file, rank), Pieces.WhiteRook);
+                    Lookup.RookPinLineBitboardLookup[file, rank][(RookBlockers[file, rank][i] * Lookup.RookMove[file, rank].magicNumber) >> Lookup.RookMove[file, rank].push] =
+                        GetPinLine(RookBlockers[file, rank][i], (file, rank), Pieces.WhiteRook);
                 }
 
                 // bishop pin lines
-                MagicLookupArrays.BishopPinLineBitboardLookup[file, rank] = new ulong[MagicLookupArrays.BishopMove[file, rank].highest + 1];
+                Lookup.BishopPinLineBitboardLookup[file, rank] = new ulong[Lookup.BishopMove[file, rank].highest + 1];
 
                 for (int i = 0; i < BishopBlockers[file, rank].Length; i++) // for each blocker
                 {
-                    MagicLookupArrays.BishopPinLineBitboardLookup[file, rank][(BishopBlockers[file, rank][i] * MagicLookupArrays.BishopMove[file, rank].magicNumber) >> MagicLookupArrays.BishopMove[file, rank].push] =
-                        BitboardUtils.GetPinLine(BishopBlockers[file, rank][i], (file, rank), Pieces.WhiteBishop);
+                    Lookup.BishopPinLineBitboardLookup[file, rank][(BishopBlockers[file, rank][i] * Lookup.BishopMove[file, rank].magicNumber) >> Lookup.BishopMove[file, rank].push] =
+                        GetPinLine(BishopBlockers[file, rank][i], (file, rank), Pieces.WhiteBishop);
                 }
 
                 // pin search
-                MagicLookupArrays.RookPinLookup[file, rank] = new List<BitboardUtils.PinSearchResult>[MagicLookupArrays.RookMove[file, rank].highest + 1];
+                Lookup.RookPinLookup[file, rank] = new List<PinSearchResult>[Lookup.RookMove[file, rank].highest + 1];
 
                 for (int i = 0; i < RookBlockers[file, rank].Length; i++)
                 {
-                    MagicLookupArrays.RookPinLookup[file, rank][(RookBlockers[file, rank][i] * MagicLookupArrays.RookMove[file, rank].magicNumber) >> MagicLookupArrays.RookMove[file, rank].push] =
-                        BitboardUtils.GeneratePinResult((file, rank), RookBlockers[file, rank][i], Pieces.WhiteRook);
+                    Lookup.RookPinLookup[file, rank][(RookBlockers[file, rank][i] * Lookup.RookMove[file, rank].magicNumber) >> Lookup.RookMove[file, rank].push] =
+                        GeneratePinResult((file, rank), RookBlockers[file, rank][i], Pieces.WhiteRook);
                 }
 
-                MagicLookupArrays.BishopPinLookup[file, rank] = new List<BitboardUtils.PinSearchResult>[MagicLookupArrays.BishopMove[file, rank].highest + 1];
+                Lookup.BishopPinLookup[file, rank] = new List<PinSearchResult>[Lookup.BishopMove[file, rank].highest + 1];
 
                 for (int i = 0; i < BishopBlockers[file, rank].Length; i++)
                 {
-                    MagicLookupArrays.BishopPinLookup[file, rank][(BishopBlockers[file, rank][i] * MagicLookupArrays.BishopMove[file, rank].magicNumber) >> MagicLookupArrays.BishopMove[file, rank].push] =
-                        BitboardUtils.GeneratePinResult((file, rank), BishopBlockers[file, rank][i], Pieces.WhiteBishop);
+                    Lookup.BishopPinLookup[file, rank][(BishopBlockers[file, rank][i] * Lookup.BishopMove[file, rank].magicNumber) >> Lookup.BishopMove[file, rank].push] =
+                        GeneratePinResult((file, rank), BishopBlockers[file, rank][i], Pieces.WhiteBishop);
                 }
 
                 // blocking checks
                 // block captures
-                MagicLookupArrays.BlockCaptureNumbers[file, rank] = MagicNumbers.BlockCaptureNumbers[file, rank]; //MagicNumbers.GenerateRepeat(BlockCaptures[file, rank], 10000);
-                MagicLookupArrays.BlockCaptureMoveLookup[file, rank] = new Move[MagicLookupArrays.BlockCaptureNumbers[file, rank].highest + 1];
-                MagicLookupArrays.BlockCaptureMovePawnLookup[file, rank] = new Move[MagicLookupArrays.BlockCaptureNumbers[file, rank].highest + 1][];
+                Lookup.BlockCaptureNumbers[file, rank] = MagicNumbers.BlockCaptureNumbers[file, rank]; //MagicNumbers.GenerateRepeat(BlockCaptures[file, rank], 10000);
+                Lookup.BlockCaptureMoveLookup[file, rank] = new Move[Lookup.BlockCaptureNumbers[file, rank].highest + 1];
+                Lookup.BlockCaptureMovePawnLookup[file, rank] = new Move[Lookup.BlockCaptureNumbers[file, rank].highest + 1][];
 
                 for (int i = 0; i < BlockCaptures[file, rank].Length; i++)
                 {
-                    MagicLookupArrays.BlockCaptureMoveLookup[file, rank][(BlockCaptures[file, rank][i] * MagicLookupArrays.BlockCaptureNumbers[file, rank].magicNumber) >> MagicLookupArrays.BlockCaptureNumbers[file, rank].push] =
-                        BitboardUtils.GetBitboardMoves(BlockCaptures[file, rank][i], (file, rank), 25)[0];
+                    Lookup.BlockCaptureMoveLookup[file, rank][(BlockCaptures[file, rank][i] * Lookup.BlockCaptureNumbers[file, rank].magicNumber) >> Lookup.BlockCaptureNumbers[file, rank].push] =
+                        GetBitboardMoves(BlockCaptures[file, rank][i], (file, rank), 25)[0];
                     if (rank != 0 && rank != 7)
-                        MagicLookupArrays.BlockCaptureMovePawnLookup[file, rank][(BlockCaptures[file, rank][i] * MagicLookupArrays.BlockCaptureNumbers[file, rank].magicNumber) >> MagicLookupArrays.BlockCaptureNumbers[file, rank].push] =
-                            BitboardUtils.GetBitboardMoves(BlockCaptures[file, rank][i], (file, rank), 25, pawn: true, capture: true);
+                        Lookup.BlockCaptureMovePawnLookup[file, rank][(BlockCaptures[file, rank][i] * Lookup.BlockCaptureNumbers[file, rank].magicNumber) >> Lookup.BlockCaptureNumbers[file, rank].push] =
+                            GetBitboardMoves(BlockCaptures[file, rank][i], (file, rank), 25, pawn: true, capture: true);
                 }
 
                 // block moves
-                MagicLookupArrays.BlockMoveLookup[file, rank] = new Move[MagicLookupArrays.BlockMoveNumber.highest + 1][];
-                MagicLookupArrays.BlockMovePawnLookup[file, rank] = new Move[MagicLookupArrays.BlockMoveNumber.highest + 1][];
+                Lookup.BlockMoveLookup[file, rank] = new Move[Lookup.BlockMoveNumber.highest + 1][];
+                Lookup.BlockMovePawnLookup[file, rank] = new Move[Lookup.BlockMoveNumber.highest + 1][];
 
                 foreach (ulong move in BlockMoves)
                 {
-                    MagicLookupArrays.BlockMoveLookup[file, rank][(move * MagicLookupArrays.BlockMoveNumber.magicNumber) >> MagicLookupArrays.BlockMoveNumber.push] =
-                        BitboardUtils.GetBitboardMoves(move, (file, rank), 5);
+                    Lookup.BlockMoveLookup[file, rank][(move * Lookup.BlockMoveNumber.magicNumber) >> Lookup.BlockMoveNumber.push] =
+                        GetBitboardMoves(move, (file, rank), 5);
                     if (rank != 0 && rank != 7)
-                        MagicLookupArrays.BlockMovePawnLookup[file, rank][(move * MagicLookupArrays.BlockMoveNumber.magicNumber) >> MagicLookupArrays.BlockMoveNumber.push] =
-                            BitboardUtils.GetBitboardMoves(move, (file, rank), 5, pawn: true);
+                        Lookup.BlockMovePawnLookup[file, rank][(move * Lookup.BlockMoveNumber.magicNumber) >> Lookup.BlockMoveNumber.push] =
+                            GetBitboardMoves(move, (file, rank), 5, pawn: true);
                 }
-
-                MagicLookupArrays.KingEvaluationLookup[file, rank] = new EvaluationLookup.KingEvaluation
-                {
-                    wEval = (int)(Pieces.Value[Pieces.WhiteKing] * Weights.MaterialMultiplier) + Weights.Pieces[Pieces.WhiteKing, file, rank],
-                    bEval = (int)(Pieces.Value[Pieces.BlackKing] * Weights.MaterialMultiplier) - Weights.Pieces[Pieces.WhiteKing, file, 7 - rank],
-                    wEvalEndgame = (int)(Pieces.Value[Pieces.WhiteKing] * Weights.MaterialMultiplier) + Weights.EndgamePieces[Pieces.WhiteKing, file, rank],
-                    bEvalEndgame = (int)(Pieces.Value[Pieces.BlackKing] * Weights.MaterialMultiplier) - Weights.EndgamePieces[Pieces.WhiteKing, file, 7 - rank],
-                };
-
+                
                 //Console.WriteLine($"Square done {++done}/64");
                 // pawn moves
                 if (rank != 0 && rank != 7)
                 {
                     // white pawns
                     // moves
-                    MagicLookupArrays.WhitePawnMove[file, rank] = MagicNumbers.WhitePawnMoveNumbers[file, rank];
-                    MagicLookupArrays.WhitePawnLookup[file, rank] = new Move[MagicLookupArrays.WhitePawnMove[file, rank].highest + 1][];
+                    Lookup.WhitePawnMove[file, rank] = MagicNumbers.WhitePawnMoveNumbers[file, rank];
+                    Lookup.WhitePawnLookup[file, rank] = new Move[Lookup.WhitePawnMove[file, rank].highest + 1][];
 
                     for (int i = 0; i < WhitePawnMoveCombinations[file, rank].Length; i++) // for each combination
                     {
-                        MagicLookupArrays.WhitePawnLookup[file, rank][(WhitePawnMoveCombinations[file, rank][i] * MagicLookupArrays.WhitePawnMove[file, rank].magicNumber) >> MagicLookupArrays.WhitePawnMove[file, rank].push] = 
-                            BitboardUtils.GetPawnMoves(WhitePawnMoveCombinations[file, rank][i], (file, rank), 0);
+                        Lookup.WhitePawnLookup[file, rank][(WhitePawnMoveCombinations[file, rank][i] * Lookup.WhitePawnMove[file, rank].magicNumber) >> Lookup.WhitePawnMove[file, rank].push] = 
+                            GetPawnMoves(WhitePawnMoveCombinations[file, rank][i], (file, rank), 0);
                     }
 
                     // captures
-                    MagicLookupArrays.WhitePawnCapture[file, rank] = MagicNumbers.WhiteCaptureMoveNumbers[file, rank];
-                    MagicLookupArrays.WhitePawnCaptureLookup[file, rank] = new Move[MagicLookupArrays.WhitePawnCapture[file, rank].highest + 1][];
+                    Lookup.WhitePawnCapture[file, rank] = MagicNumbers.WhiteCaptureMoveNumbers[file, rank];
+                    Lookup.WhitePawnCaptureLookup[file, rank] = new Move[Lookup.WhitePawnCapture[file, rank].highest + 1][];
 
                     for (int i = 0; i < WhitePawnCaptureCombinations[file, rank].Length; i++) // for each combination
                     {
-                        MagicLookupArrays.WhitePawnCaptureLookup[file, rank][(WhitePawnCaptureCombinations[file, rank][i] * MagicLookupArrays.WhitePawnCapture[file, rank].magicNumber) >> MagicLookupArrays.WhitePawnCapture[file, rank].push] =
-                            BitboardUtils.GetPawnCaptures(WhitePawnCaptureCombinations[file, rank][i], (file, rank), 0);
+                        Lookup.WhitePawnCaptureLookup[file, rank][(WhitePawnCaptureCombinations[file, rank][i] * Lookup.WhitePawnCapture[file, rank].magicNumber) >> Lookup.WhitePawnCapture[file, rank].push] =
+                            GetPawnCaptures(WhitePawnCaptureCombinations[file, rank][i], (file, rank), 0);
                     }
 
                     // black pawns
                     // moves
-                    MagicLookupArrays.BlackPawnMove[file, rank] = MagicNumbers.BlackPawnMoveNumbers[file, rank];
-                    MagicLookupArrays.BlackPawnLookup[file, rank] = new Move[MagicLookupArrays.BlackPawnMove[file, rank].highest + 1][];
+                    Lookup.BlackPawnMove[file, rank] = MagicNumbers.BlackPawnMoveNumbers[file, rank];
+                    Lookup.BlackPawnLookup[file, rank] = new Move[Lookup.BlackPawnMove[file, rank].highest + 1][];
 
                     for (int i = 0; i < BlackPawnMoveCombinations[file, rank].Length; i++) // for each combination
                     {
-                        MagicLookupArrays.BlackPawnLookup[file, rank][(BlackPawnMoveCombinations[file, rank][i] * MagicLookupArrays.BlackPawnMove[file, rank].magicNumber) >> MagicLookupArrays.BlackPawnMove[file, rank].push] =
-                            BitboardUtils.GetPawnMoves(BlackPawnMoveCombinations[file, rank][i], (file, rank), 1);
+                        Lookup.BlackPawnLookup[file, rank][(BlackPawnMoveCombinations[file, rank][i] * Lookup.BlackPawnMove[file, rank].magicNumber) >> Lookup.BlackPawnMove[file, rank].push] =
+                            GetPawnMoves(BlackPawnMoveCombinations[file, rank][i], (file, rank), 1);
                     }
 
                     // captures
-                    MagicLookupArrays.BlackPawnCapture[file, rank] = MagicNumbers.BlackCaptureMoveNumbers[file, rank];
-                    MagicLookupArrays.BlackPawnCaptureLookup[file, rank] = new Move[MagicLookupArrays.BlackPawnCapture[file, rank].highest + 1][];
+                    Lookup.BlackPawnCapture[file, rank] = MagicNumbers.BlackCaptureMoveNumbers[file, rank];
+                    Lookup.BlackPawnCaptureLookup[file, rank] = new Move[Lookup.BlackPawnCapture[file, rank].highest + 1][];
 
                     for (int i = 0; i < BlackPawnCaptureCombinations[file, rank].Length; i++) // for each combination
                     {
-                        MagicLookupArrays.BlackPawnCaptureLookup[file, rank][(BlackPawnCaptureCombinations[file, rank][i] * MagicLookupArrays.BlackPawnCapture[file, rank].magicNumber) >> MagicLookupArrays.BlackPawnCapture[file, rank].push] =
-                            BitboardUtils.GetPawnCaptures(BlackPawnCaptureCombinations[file, rank][i], (file, rank), 1);
+                        Lookup.BlackPawnCaptureLookup[file, rank][(BlackPawnCaptureCombinations[file, rank][i] * Lookup.BlackPawnCapture[file, rank].magicNumber) >> Lookup.BlackPawnCapture[file, rank].push] =
+                            GetPawnCaptures(BlackPawnCaptureCombinations[file, rank][i], (file, rank), 1);
                     }
                 }
             });
         });
-
-        progress = new(95, "Generating paths...");
         
         // init pathfinder
         for (int startRank = 0; startRank < 8; startRank++)
@@ -754,7 +604,7 @@ public static class Bitboards
                 int moveBy = startRank < endRank ? 1 : -1;
                 do
                 {
-                    path |= BitboardUtils.GetSquare(startFile, current);
+                    path |= GetSquare(startFile, current);
                     current += moveBy;
                 } while (current != endRank);
             }
@@ -765,7 +615,7 @@ public static class Bitboards
                 int moveBy = startFile < endFile ? 1 : -1;
                 do
                 {
-                    path |= BitboardUtils.GetSquare(current, startRank);
+                    path |= GetSquare(current, startRank);
                     current += moveBy;
                 } while (current != endFile);
             }
@@ -777,7 +627,7 @@ public static class Bitboards
                 (int file, int rank) moveBy = startRank < endRank ? (1, 1) : (-1, -1);
                 do
                 {
-                    path |= BitboardUtils.GetSquare(currentFile, currentRank);
+                    path |= GetSquare(currentFile, currentRank);
                     currentFile += moveBy.file;
                     currentRank += moveBy.rank;
                 } while ((currentFile, currentRank) != (endFile, endRank));
@@ -790,7 +640,7 @@ public static class Bitboards
                 (int file, int rank) moveBy = startRank < endRank ? (-1, 1) : (1, -1);
                 do
                 {
-                    path |= BitboardUtils.GetSquare(currentFile, currentRank);
+                    path |= GetSquare(currentFile, currentRank);
                     currentFile += moveBy.file;
                     currentRank += moveBy.rank;
                 } while ((currentFile, currentRank) != (endFile, endRank));
@@ -798,13 +648,12 @@ public static class Bitboards
 
             // in an L shape
             if (path != 0 || (Math.Abs(startFile - endFile) == 1 && Math.Abs(startRank - endRank) == 2) || (Math.Abs(startFile - endFile) == 2 && Math.Abs(startRank - endRank) == 1)) 
-                path |= BitboardUtils.GetSquare(startFile, startRank) | BitboardUtils.GetSquare(endFile, endRank);
+                path |= GetSquare(startFile, startRank) | GetSquare(endFile, endRank);
             
             PathLookup[startFile, startRank, endFile, endRank] = path;
         }
 
-        progress = new(100, "Finished!");
-        Console.WriteLine($"Bitboards initialized in {t.Stop()}ms");
+        //Console.WriteLine($"Bitboards initialized in {t.Stop()}ms");
         Thread.Sleep(20);
         init = true;
     }
@@ -816,7 +665,7 @@ public static class Bitboards
         Thread t = new Thread(() =>
         {
             inProgress = true;
-            Init();
+            Blaze.Init.Start();
             inProgress = false;
         });
         t.Start();
@@ -825,11 +674,5 @@ public static class Bitboards
     public static bool Poll()
     {
         return init;
-    }
-    
-    public readonly struct CompletionPoint(int percentage, string message)
-    {
-        public readonly int percentage = percentage;
-        public readonly string message = message;
     }
 }

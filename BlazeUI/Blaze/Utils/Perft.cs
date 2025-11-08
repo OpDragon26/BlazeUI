@@ -8,15 +8,14 @@ namespace BlazeUI.Blaze.Utils;
 using Board_Representation;
 using Move_Generation;
 using static Move_Generation.MoveGenerator;
-using Magic_Lookup;
 
 public static class Perft
 {
     public static ulong RunSingle(int depth, Board board, bool testDifference, bool multiThreaded, PerftTest? comparison, bool printResult = true)
     {
-        Bitboards.Init();
+        Init.Start();
         PerftResult Result = new(depth);
-        GeneralUtils.Timer timer = new();
+        General.Timer timer = new();
         timer.Start();
 
         board.considerRepetition = false;

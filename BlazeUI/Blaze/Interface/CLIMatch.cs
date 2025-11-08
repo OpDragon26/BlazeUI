@@ -69,7 +69,7 @@ public class CLIMatch(Board board, Type type, Side side, int depth = 2, bool deb
 
     private void PlayerTurn()
     {
-        GeneralUtils.Timer t = new();
+        General.Timer t = new();
         t.Start();
         while (true)
         {
