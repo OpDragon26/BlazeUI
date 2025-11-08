@@ -20,11 +20,11 @@ public static class Evaluator
         Lookup.WhiteKnightLookup(board.bitboards[Pieces.WhiteKnight], board.AllPieces(), ref eval);
         Lookup.BlackKnightLookup(board.bitboards[Pieces.BlackKnight], board.AllPieces(), ref eval);
 
-        Lookup.WhiteBishopLookup(board.bitboards[Pieces.WhiteKnight], board.AllPieces(), ref eval);
-        Lookup.BlackBishopLookup(board.bitboards[Pieces.BlackKnight], board.AllPieces(), ref eval);
+        Lookup.WhiteBishopLookup(board.bitboards[Pieces.WhiteBishop], board.AllPieces(), ref eval);
+        Lookup.BlackBishopLookup(board.bitboards[Pieces.BlackBishop], board.AllPieces(), ref eval);
         
-        Lookup.WhiteQueenLookup(board.bitboards[Pieces.WhiteKnight], board.AllPieces(), ref eval);
-        Lookup.BlackQueenLookup(board.bitboards[Pieces.BlackKnight], board.AllPieces(), ref eval);
+        Lookup.WhiteQueenLookup(board.bitboards[Pieces.WhiteQueen], board.AllPieces(), ref eval);
+        Lookup.BlackQueenLookup(board.bitboards[Pieces.BlackQueen], board.AllPieces(), ref eval);
         
         MagicLookup.KingEvalLookup(board.KingPositions[0]).WhiteFinal(ref eval);
         MagicLookup.KingEvalLookup(board.KingPositions[1]).BlackFinal(ref eval);

@@ -102,17 +102,16 @@ public static class GeneralUtils
     
     public class Timer
     {
-        private DateTime StartTime = DateTime.Now;
+        private long StartTime = 0;
 
         public void Start()
         {
-            StartTime = DateTime.Now;
+            StartTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         }
 
         public long Stop()
         {
-            TimeSpan elapsed = StartTime - DateTime.Now;
-            return elapsed.Milliseconds;
+            return DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - StartTime;
         }
     }
 }

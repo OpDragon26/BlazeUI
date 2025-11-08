@@ -32,10 +32,7 @@ public class Match
         this.delayBook = delayBook;
         game = new(new(board));
         
-        RefutationTable.Init((int)Math.Pow(2, 20) + 7);
-        Bitboards.Init();
-        ZobristHash.Init();
-        Book.Init(Books.Standard);
+        Init.Start();
     }
 
     // attempts to make the given move on the board, returns true if successful 
@@ -92,17 +89,23 @@ public class Match
     private void UpdateDepth(Searcher.SearchResult last)
     {
         if (last.bookMove) return;
-        if (last.move.Promotion != Pieces.Empty)
+        if (last.move.Promotion != 0b111)
             depth--;
 
+        Console.WriteLine("Depth adjustment attempt");
+        
         int increase = Thresholds[depthFloor, 0];
         int decrease = board.IsEndgame() ? Thresholds[depthFloor, 2] : Thresholds[depthFloor, 1];
 
+        Console.WriteLine($"window {increase} to {decrease}");
+        Console.WriteLine($"Depth before: {depth}");
+        
         if (last.time < increase) // the move took a short time, increase depth
             depth++;
         else if (last.time > decrease) // the move took a long time, decrease depth
             depth--;
         depth = Math.Clamp(depth, depthFloor, depthCeiling);
+        Console.WriteLine($"Depth after: {depth}");
     }
 
     public static Game RandomGame(int depth)

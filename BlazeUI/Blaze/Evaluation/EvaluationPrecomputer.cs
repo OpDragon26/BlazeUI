@@ -178,4 +178,15 @@ public static class EvaluationPrecomputer
             
         return eval;
     }
+
+    public static KingEvaluation GenerateKingEval(int file, int rank)
+    {
+        return new KingEvaluation
+        (
+            (int)(PestoEval.EgValue[Pieces.WhiteKing] * Weights.MaterialMultiplier) + PestoEval.GetWhiteMgEval(Pieces.WhiteKing, file, rank),
+             (int)(-PestoEval.EgValue[Pieces.WhiteKing] * Weights.MaterialMultiplier) - PestoEval.GetBlackMgEval(Pieces.WhiteKing, file, rank),
+             (int)(PestoEval.EgValue[Pieces.WhiteKing] * Weights.MaterialMultiplier) + PestoEval.GetWhiteEgEval(Pieces.WhiteKing, file, rank),
+             (int)(-PestoEval.EgValue[Pieces.WhiteKing] * Weights.MaterialMultiplier) - PestoEval.GetBlackEgEval(Pieces.WhiteKing, file, rank)
+        );
+    }
 }

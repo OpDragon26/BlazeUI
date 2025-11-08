@@ -674,14 +674,7 @@ public static class Bitboards
                             BitboardUtils.GetBitboardMoves(move, (file, rank), 5, pawn: true);
                 }
 
-                MagicLookupArrays.KingEvaluationLookup[file, rank] = new KingEvaluation
-                (
-                    (int)(Pieces.Value[Pieces.WhiteKing] * Weights.MaterialMultiplier) + PestoEval.GetWhiteMgEval(Pieces.WhiteKing, file, rank),
-                    (int)(Pieces.Value[Pieces.BlackKing] * Weights.MaterialMultiplier) - PestoEval.GetBlackMgEval(Pieces.WhiteKing, file, rank),
-                    (int)(Pieces.Value[Pieces.WhiteKing] * Weights.MaterialMultiplier) + PestoEval.GetWhiteEgEval(Pieces.WhiteKing, file, rank),
-                    (int)(Pieces.Value[Pieces.BlackKing] * Weights.MaterialMultiplier) - PestoEval.GetBlackEgEval(Pieces.WhiteKing, file, rank)
-                );
-
+                MagicLookupArrays.KingEvaluationLookup[file, rank] = EvaluationPrecomputer.GenerateKingEval(file, rank);
 
                 //Console.WriteLine($"Square done {++done}/64");
                 // pawn moves

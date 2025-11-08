@@ -56,19 +56,24 @@ public static class DebugUtils
             Console.WriteLine($"{move.GetUCI()}: {Searcher.Minimax(moveBoard, depth - 1, int.MinValue, int.MaxValue)}");
         }
     }
-    
-    public static void BreakdownWithExamine(Board board, int depth, int[] examination)
-    {
-        foreach (int examine in examination)
-        {
-            depth--;
-            Move[] initMoves = MoveGenerator.SearchBoard(board, false).ToArray();
-            Array.Sort(initMoves);
-            board.MakeMove(initMoves[examine]);
-            Console.Write($"{initMoves[examine].GetUCI()}, ");
-        }
-        Console.WriteLine();
 
+    public static void ExamineEval(Board board, int depth)
+    {
+        if (depth < 1)
+            return;
+        
+        BreakdownEval(board, depth);
+        
+        Console.Write("Examine: ");
+        string input = Console.ReadLine()!;
+        board.MakeMove(new Move(input, board));
+        ExamineEval(board, depth - 1);
+    }
+    
+    public static void BreakdownWithExamine(Board board, int depth)
+    {
+        Console.WriteLine();
+        
         if (depth < 1)
             Console.WriteLine("Depth too low");
         if (depth == 1)

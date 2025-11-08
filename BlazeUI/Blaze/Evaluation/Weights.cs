@@ -2,9 +2,9 @@ namespace BlazeUI.Blaze.Evaluation;
 
 public static class Weights
 {
-    public const float MaterialMultiplier = 1f;
+    public const float MaterialMultiplier = 1.5f;
     
-    public const float MobilityMultiplier = 1f;
+    public const float MobilityMultiplier = 0.2f;
     public const float CenterControlMultiplier = 1.5f;
     
     public const int IsolatedPawnPenalty = 2;
