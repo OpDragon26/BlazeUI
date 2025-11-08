@@ -10,7 +10,7 @@ public static class MagicLookup
     {
         return Bitboards.Lookup.RookLookup[pos.file, pos.rank]
         [
-            ((blockers & Bitboards.RookMasks[pos.file, pos.rank]) // blocker combination
+            ((blockers & Masks.RookMasks[pos.file, pos.rank]) // blocker combination
              * Bitboards.Lookup.RookMove[pos.file, pos.rank].magicNumber) >> Bitboards.Lookup.RookMove[pos.file, pos.rank].push
         ];
     }
@@ -19,7 +19,7 @@ public static class MagicLookup
     {
         return Bitboards.Lookup.BishopLookup[pos.file, pos.rank]
         [
-            ((blockers & Bitboards.BishopMasks[pos.file, pos.rank]) // blocker combination
+            ((blockers & Masks.BishopMasks[pos.file, pos.rank]) // blocker combination
             * Bitboards.Lookup.BishopMove[pos.file, pos.rank].magicNumber) >> Bitboards.Lookup.BishopMove[pos.file, pos.rank].push
         ];
     }
@@ -33,13 +33,13 @@ public static class MagicLookup
     public static ulong RookLookupCaptureBitboards((int file, int rank) pos, ulong blockers)
     {
         return Bitboards.Lookup.RookLookupCapturesArray[pos.file, pos.rank]
-            [((blockers & Bitboards.RookMasks[pos.file, pos.rank]) * Bitboards.Lookup.RookMove[pos.file, pos.rank].magicNumber) >> Bitboards.Lookup.RookMove[pos.file, pos.rank].push];
+            [((blockers & Masks.RookMasks[pos.file, pos.rank]) * Bitboards.Lookup.RookMove[pos.file, pos.rank].magicNumber) >> Bitboards.Lookup.RookMove[pos.file, pos.rank].push];
     }
     
     public static ulong BishopLookupCaptureBitboards((int file, int rank) pos, ulong blockers)
     {
         return Bitboards.Lookup.BishopLookupCapturesArray[pos.file, pos.rank]
-            [((blockers & Bitboards.BishopMasks[pos.file, pos.rank]) * Bitboards.Lookup.BishopMove[pos.file, pos.rank].magicNumber) >> Bitboards.Lookup.BishopMove[pos.file, pos.rank].push];
+            [((blockers & Masks.BishopMasks[pos.file, pos.rank]) * Bitboards.Lookup.BishopMove[pos.file, pos.rank].magicNumber) >> Bitboards.Lookup.BishopMove[pos.file, pos.rank].push];
     }
     
     public static ref Move[] BishopLookupCaptures((int file, int rank) pos, ulong captures)
@@ -75,25 +75,25 @@ public static class MagicLookup
     public static ref Move[] WhitePawnLookupMoves((int file, int rank) pos, ulong blockers)
     {
         return ref Bitboards.Lookup.WhitePawnLookup[pos.file, pos.rank]
-            [((blockers & Bitboards.WhitePawnMoveMasks[pos.file, pos.rank]) * Bitboards.Lookup.WhitePawnMove[pos.file, pos.rank].magicNumber) >> Bitboards.Lookup.WhitePawnMove[pos.file, pos.rank].push];
+            [((blockers & Masks.WhitePawnMoveMasks[pos.file, pos.rank]) * Bitboards.Lookup.WhitePawnMove[pos.file, pos.rank].magicNumber) >> Bitboards.Lookup.WhitePawnMove[pos.file, pos.rank].push];
     }
 
     public static ref Move[] BlackPawnLookupMoves((int file, int rank) pos, ulong blockers)
     {
         return ref Bitboards.Lookup.BlackPawnLookup[pos.file, pos.rank]
-            [((blockers & Bitboards.BlackPawnMoveMasks[pos.file, pos.rank]) * Bitboards.Lookup.BlackPawnMove[pos.file, pos.rank].magicNumber) >> Bitboards.Lookup.BlackPawnMove[pos.file, pos.rank].push];
+            [((blockers & Masks.BlackPawnMoveMasks[pos.file, pos.rank]) * Bitboards.Lookup.BlackPawnMove[pos.file, pos.rank].magicNumber) >> Bitboards.Lookup.BlackPawnMove[pos.file, pos.rank].push];
     }
     
     public static ref Move[] WhitePawnLookupCaptures((int file, int rank) pos, ulong enemy)
     {
         return ref Bitboards.Lookup.WhitePawnCaptureLookup[pos.file, pos.rank]
-            [((enemy & Bitboards.WhitePawnCaptureMasks[pos.file, pos.rank]) * Bitboards.Lookup.WhitePawnCapture[pos.file, pos.rank].magicNumber) >> Bitboards.Lookup.WhitePawnCapture[pos.file, pos.rank].push];
+            [((enemy & Masks.WhitePawnCaptureMasks[pos.file, pos.rank]) * Bitboards.Lookup.WhitePawnCapture[pos.file, pos.rank].magicNumber) >> Bitboards.Lookup.WhitePawnCapture[pos.file, pos.rank].push];
     }
     
     public static ref Move[] BlackPawnLookupCaptures((int file, int rank) pos, ulong enemy)
     {
         return ref Bitboards.Lookup.BlackPawnCaptureLookup[pos.file, pos.rank]
-            [((enemy & Bitboards.BlackPawnCaptureMasks[pos.file, pos.rank]) * Bitboards.Lookup.BlackPawnCapture[pos.file, pos.rank].magicNumber) >> Bitboards.Lookup.BlackPawnCapture[pos.file, pos.rank].push];
+            [((enemy & Masks.BlackPawnCaptureMasks[pos.file, pos.rank]) * Bitboards.Lookup.BlackPawnCapture[pos.file, pos.rank].magicNumber) >> Bitboards.Lookup.BlackPawnCapture[pos.file, pos.rank].push];
     }
     
     public static ref Move EnPassantLookup(ulong enPassant)
@@ -110,49 +110,49 @@ public static class MagicLookup
     public static ulong RookMoveBitboardLookup((int file, int rank) pos, ulong blockers)
     {
         return Bitboards.Lookup.RookBitboardLookup[pos.file, pos.rank]
-            [((blockers & Bitboards.SmallRookMasks[pos.file, pos.rank]) * Bitboards.Lookup.RookBitboardNumbers[pos.file, pos.rank].magicNumber) >> Bitboards.Lookup.RookBitboardNumbers[pos.file, pos.rank].push];
+            [((blockers & Masks.SmallRookMasks[pos.file, pos.rank]) * Bitboards.Lookup.RookBitboardNumbers[pos.file, pos.rank].magicNumber) >> Bitboards.Lookup.RookBitboardNumbers[pos.file, pos.rank].push];
     }
     
     public static int RookMobilityLookup((int file, int rank) pos, ulong blockers)
     {
         return Bitboards.Lookup.RookMobilityLookupArray[pos.file, pos.rank]
-            [((blockers & Bitboards.SmallRookMasks[pos.file, pos.rank]) * Bitboards.Lookup.RookBitboardNumbers[pos.file, pos.rank].magicNumber) >> Bitboards.Lookup.RookBitboardNumbers[pos.file, pos.rank].push];
+            [((blockers & Masks.SmallRookMasks[pos.file, pos.rank]) * Bitboards.Lookup.RookBitboardNumbers[pos.file, pos.rank].magicNumber) >> Bitboards.Lookup.RookBitboardNumbers[pos.file, pos.rank].push];
     }
     
     public static ulong BishopMoveBitboardLookup((int file, int rank) pos, ulong blockers)
     {
         return Bitboards.Lookup.BishopBitboardLookup[pos.file, pos.rank]
-            [((blockers & Bitboards.SmallBishopMasks[pos.file, pos.rank]) * Bitboards.Lookup.BishopBitboardNumbers[pos.file, pos.rank].magicNumber) >> Bitboards.Lookup.BishopBitboardNumbers[pos.file, pos.rank].push];
+            [((blockers & Masks.SmallBishopMasks[pos.file, pos.rank]) * Bitboards.Lookup.BishopBitboardNumbers[pos.file, pos.rank].magicNumber) >> Bitboards.Lookup.BishopBitboardNumbers[pos.file, pos.rank].push];
     }
     
     public static int BishopMobilityLookup((int file, int rank) pos, ulong blockers)
     {
         return Bitboards.Lookup.BishopMobilityLookupArray[pos.file, pos.rank]
-            [((blockers & Bitboards.SmallBishopMasks[pos.file, pos.rank]) * Bitboards.Lookup.BishopBitboardNumbers[pos.file, pos.rank].magicNumber) >> Bitboards.Lookup.BishopBitboardNumbers[pos.file, pos.rank].push];
+            [((blockers & Masks.SmallBishopMasks[pos.file, pos.rank]) * Bitboards.Lookup.BishopBitboardNumbers[pos.file, pos.rank].magicNumber) >> Bitboards.Lookup.BishopBitboardNumbers[pos.file, pos.rank].push];
     }
 
     public static ulong RookPinLineLookup((int file, int rank) pos, ulong blockers)
     {
         return Bitboards.Lookup.RookPinLineBitboardLookup[pos.file, pos.rank]
-            [((blockers & Bitboards.RookMasks[pos.file, pos.rank]) * Bitboards.Lookup.RookMove[pos.file, pos.rank].magicNumber) >> Bitboards.Lookup.RookMove[pos.file, pos.rank].push];
+            [((blockers & Masks.RookMasks[pos.file, pos.rank]) * Bitboards.Lookup.RookMove[pos.file, pos.rank].magicNumber) >> Bitboards.Lookup.RookMove[pos.file, pos.rank].push];
     }
     
     public static ulong BishopPinLineLookup((int file, int rank) pos, ulong blockers)
     {
         return Bitboards.Lookup.BishopPinLineBitboardLookup[pos.file, pos.rank]
-            [((blockers & Bitboards.BishopMasks[pos.file, pos.rank]) * Bitboards.Lookup.BishopMove[pos.file, pos.rank].magicNumber) >> Bitboards.Lookup.BishopMove[pos.file, pos.rank].push];
+            [((blockers & Masks.BishopMasks[pos.file, pos.rank]) * Bitboards.Lookup.BishopMove[pos.file, pos.rank].magicNumber) >> Bitboards.Lookup.BishopMove[pos.file, pos.rank].push];
     }
     
     public static List<BitboardUtils.PinSearchResult> RookPinSearch((int file, int rank) pos, ulong selected)
     {
         return Bitboards.Lookup.RookPinLookup[pos.file, pos.rank]
-            [((selected & Bitboards.RookMasks[pos.file, pos.rank]) * Bitboards.Lookup.RookMove[pos.file, pos.rank].magicNumber) >> Bitboards.Lookup.RookMove[pos.file, pos.rank].push];
+            [((selected & Masks.RookMasks[pos.file, pos.rank]) * Bitboards.Lookup.RookMove[pos.file, pos.rank].magicNumber) >> Bitboards.Lookup.RookMove[pos.file, pos.rank].push];
     }
     
     public static List<BitboardUtils.PinSearchResult> BishopPinSearch((int file, int rank) pos, ulong selected)
     {
         return Bitboards.Lookup.BishopPinLookup[pos.file, pos.rank]
-            [((selected & Bitboards.BishopMasks[pos.file, pos.rank]) * Bitboards.Lookup.BishopMove[pos.file, pos.rank].magicNumber) >> Bitboards.Lookup.BishopMove[pos.file, pos.rank].push];
+            [((selected & Masks.BishopMasks[pos.file, pos.rank]) * Bitboards.Lookup.BishopMove[pos.file, pos.rank].magicNumber) >> Bitboards.Lookup.BishopMove[pos.file, pos.rank].push];
     }
 
     public static Move BlockCaptureLookup((int file, int rank) pos, ulong square)

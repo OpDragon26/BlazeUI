@@ -86,7 +86,7 @@ public static class MoveGenerator
                     index += captures.Length;
                     
                     // if there is an en passant capture available, and it can be made from the current square
-                    if (enPassant && (Bitboards.WhitePawnCaptureMasks[pos.file, pos.rank] & BitboardUtils.GetSquare(board.enPassant)) != 0)
+                    if (enPassant && (Masks.WhitePawnCaptureMasks[pos.file, pos.rank] & BitboardUtils.GetSquare(board.enPassant)) != 0)
                         moveSpan[index++] = MagicLookup.EnPassantLookup(BitboardUtils.GetSquare(pos) | BitboardUtils.GetSquare(board.enPassant));
                     
                 }
@@ -100,7 +100,7 @@ public static class MoveGenerator
                     index += captures.Length;
                     
                     // if there is an en passant capture available, and it can be made from the current square
-                    if (enPassant && (Bitboards.BlackPawnCaptureMasks[pos.file, pos.rank] & BitboardUtils.GetSquare(board.enPassant)) != 0)
+                    if (enPassant && (Masks.BlackPawnCaptureMasks[pos.file, pos.rank] & BitboardUtils.GetSquare(board.enPassant)) != 0)
                         moveSpan[index++] = MagicLookup.EnPassantLookup(BitboardUtils.GetSquare(pos) | BitboardUtils.GetSquare(board.enPassant));
                 }
                 break;
@@ -173,18 +173,18 @@ public static class MoveGenerator
                 // castling
                 if (side == 0) // white
                 {
-                    if ((board.castling & 0b1000) != 0 && ((board.AllPieces() | enemyAttacked) & Bitboards.WhiteShortCastleMask) == 0) // white can castle short
+                    if ((board.castling & 0b1000) != 0 && ((board.AllPieces() | enemyAttacked) & Masks.WhiteShortCastleMask) == 0) // white can castle short
                         moveSpan[index++] = Bitboards.WhiteShortCastle;
                     
-                    if ((board.castling & 0b0100) != 0 && ((board.AllPieces() | enemyAttacked) & Bitboards.WhiteLongCastleMask) == 0) // white can castle long
+                    if ((board.castling & 0b0100) != 0 && ((board.AllPieces() | enemyAttacked) & Masks.WhiteLongCastleMask) == 0) // white can castle long
                         moveSpan[index++] = Bitboards.WhiteLongCastle;
                 }
                 else // black
                 {
-                    if ((board.castling & 0b0010) != 0 && ((board.AllPieces() | enemyAttacked) & Bitboards.BlackShortCastleMask) == 0) // black can castle short
+                    if ((board.castling & 0b0010) != 0 && ((board.AllPieces() | enemyAttacked) & Masks.BlackShortCastleMask) == 0) // black can castle short
                         moveSpan[index++] = Bitboards.BlackShortCastle;
                     
-                    if ((board.castling & 0b0001) != 0 && ((board.AllPieces() | enemyAttacked) & Bitboards.BlackLongCastleMask) == 0) // black can castle long
+                    if ((board.castling & 0b0001) != 0 && ((board.AllPieces() | enemyAttacked) & Masks.BlackLongCastleMask) == 0) // black can castle long
                         moveSpan[index++] = Bitboards.BlackLongCastle;
                 }
                 break;
@@ -230,9 +230,9 @@ public static class MoveGenerator
         }
         else // pawn
         {
-            ulong attacked = side == 0 ? Bitboards.WhitePawnCaptureMasks[pos.file, pos.rank] : Bitboards.BlackPawnCaptureMasks[pos.file, pos.rank];
+            ulong attacked = side == 0 ? Masks.WhitePawnCaptureMasks[pos.file, pos.rank] : Masks.BlackPawnCaptureMasks[pos.file, pos.rank];
             ulong capture = attacked & blockPath & board.GetBitboard(1-side);
-            ulong move = (side == 0 ? Bitboards.WhitePawnMoveMasks[pos.file, pos.rank] : Bitboards.BlackPawnMoveMasks[pos.file, pos.rank]) & blockPath & ~board.GetBitboard(1-side);
+            ulong move = (side == 0 ? Masks.WhitePawnMoveMasks[pos.file, pos.rank] : Masks.BlackPawnMoveMasks[pos.file, pos.rank]) & blockPath & ~board.GetBitboard(1-side);
             
             if (move != 0)
             {
@@ -262,7 +262,7 @@ public static class MoveGenerator
         ulong rookAttack = MagicLookup.RookLookupCaptureBitboards(pos, board.AllPieces()) & (board.GetBitboard(side, Pieces.WhiteRook) | board.GetBitboard(side, Pieces.WhiteQueen));
         ulong bishopAttack = MagicLookup.BishopLookupCaptureBitboards(pos, board.AllPieces()) & (board.GetBitboard(side, Pieces.WhiteBishop) | board.GetBitboard(side, Pieces.WhiteQueen));
         ulong knightAttacks = Bitboards.KnightMasks[pos.file, pos.rank] & board.GetBitboard(side, Pieces.WhiteKnight);
-        ulong pawnAttacks = side == 0 ? Bitboards.BlackPawnCaptureMasks[pos.file, pos.rank] & board.bitboards[Pieces.WhitePawn] : Bitboards.WhitePawnCaptureMasks[pos.file, pos.rank] & board.bitboards[Pieces.BlackPawn];
+        ulong pawnAttacks = side == 0 ? Masks.BlackPawnCaptureMasks[pos.file, pos.rank] & board.bitboards[Pieces.WhitePawn] : Masks.WhitePawnCaptureMasks[pos.file, pos.rank] & board.bitboards[Pieces.BlackPawn];
         ulong kingAttacks = Bitboards.KingMasks[pos.file, pos.rank] & board.GetBitboard(side, Pieces.WhiteKing);
 
         return (rookAttack | bishopAttack | knightAttacks | pawnAttacks | kingAttacks) != 0;
@@ -273,7 +273,7 @@ public static class MoveGenerator
         switch (piece & Pieces.TypeMask)
         {
             case Pieces.WhitePawn:
-                return (side == 0 ? Bitboards.WhitePawnCaptureMasks[pos.file, pos.rank] : Bitboards.BlackPawnCaptureMasks[pos.file, pos.rank]);
+                return (side == 0 ? Masks.WhitePawnCaptureMasks[pos.file, pos.rank] : Masks.BlackPawnCaptureMasks[pos.file, pos.rank]);
             case Pieces.WhiteRook:
                 return MagicLookup.RookMoveBitboardLookup(pos, board.AllPieces());
             case Pieces.WhiteBishop:
@@ -294,7 +294,7 @@ public static class MoveGenerator
         switch (piece & Pieces.TypeMask)
         {
             case Pieces.WhitePawn:
-                return (side == 0 ? Bitboards.WhitePawnCaptureMasks[pos.file, pos.rank] : Bitboards.BlackPawnCaptureMasks[pos.file, pos.rank]);
+                return (side == 0 ? Masks.WhitePawnCaptureMasks[pos.file, pos.rank] : Masks.BlackPawnCaptureMasks[pos.file, pos.rank]);
             case Pieces.WhiteRook:
                 return MagicLookup.RookMoveBitboardLookup(pos, board.AllPieces() & ~BitboardUtils.GetSquare(skipSquare));
             case Pieces.WhiteBishop:
@@ -315,7 +315,7 @@ public static class MoveGenerator
         ulong rookAttack = MagicLookup.RookLookupCaptureBitboards(pos, board.AllPieces()) & (board.GetBitboard(side, Pieces.WhiteRook) | board.GetBitboard(side, Pieces.WhiteQueen));
         ulong bishopAttack = MagicLookup.BishopLookupCaptureBitboards(pos, board.AllPieces()) & (board.GetBitboard(side, Pieces.WhiteBishop) | board.GetBitboard(side, Pieces.WhiteQueen));
         ulong knightAttacks = Bitboards.KnightMasks[pos.file, pos.rank] & board.GetBitboard(side, Pieces.WhiteKnight);
-        ulong pawnAttacks = side == 0 ? Bitboards.BlackPawnCaptureMasks[pos.file, pos.rank] & board.bitboards[Pieces.WhitePawn] : Bitboards.WhitePawnCaptureMasks[pos.file, pos.rank] & board.bitboards[Pieces.BlackPawn];
+        ulong pawnAttacks = side == 0 ? Masks.BlackPawnCaptureMasks[pos.file, pos.rank] & board.bitboards[Pieces.WhitePawn] : Masks.WhitePawnCaptureMasks[pos.file, pos.rank] & board.bitboards[Pieces.BlackPawn];
         ulong kingAttacks = Bitboards.KingMasks[pos.file, pos.rank] & board.GetBitboard(side, Pieces.WhiteKing);
 
         ulong allAttackers = rookAttack | bishopAttack | knightAttacks | pawnAttacks | kingAttacks;

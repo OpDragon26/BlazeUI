@@ -9,7 +9,7 @@ using Board_Representation;
 using Move_Generation;
 using Utils;
 using static Utils.BitboardUtils;
-
+using static Masks;
 public static class Bitboards
 {
     /*
@@ -17,10 +17,7 @@ public static class Bitboards
     The returned moves all land on empty squares, while the bitboard shows moves that land on occupied squares. 
     Select the enemy pieces from those captured using the AND operation and a second magic lookup is initiated using that bitboard, which returns another span of moves
     */
-
-    public static readonly ulong[,] RookMasks = new ulong[8,8];
-    public static readonly ulong[,] BishopMasks = new ulong[8,8];
-
+    
     private static readonly ulong[,][] RookBlockers = new ulong[8,8][];
     private static readonly ulong[,][] BishopBlockers = new ulong[8,8][];
     private static readonly (Move[] moves, ulong captures)[,][] RookMoves = new (Move[] moves, ulong captures)[8,8][];
@@ -33,17 +30,11 @@ public static class Bitboards
     public static readonly ulong[,] KingMasks = new ulong[8,8];
     private static readonly ulong[,][] KingCombinations = new ulong[8,8][];
     
-    public static readonly ulong[,] WhitePawnMoveMasks = new ulong[8,8];
     private static readonly ulong[,][] WhitePawnMoveCombinations = new ulong[8,8][];
-    public static readonly ulong[,] BlackPawnMoveMasks = new ulong[8,8];
     private static readonly ulong[,][] BlackPawnMoveCombinations = new ulong[8,8][];
-    public static readonly ulong[,] WhitePawnCaptureMasks = new ulong[8,8];
     private static readonly ulong[,][] WhitePawnCaptureCombinations = new ulong[8,8][];
-    public static readonly ulong[,] BlackPawnCaptureMasks = new ulong[8,8];
     private static readonly ulong[,][] BlackPawnCaptureCombinations = new ulong[8,8][];
     
-    public static readonly ulong[,] SmallRookMasks = new ulong[8,8];
-    public static readonly ulong[,] SmallBishopMasks = new ulong[8,8];
     private static readonly ulong[,][] SmallRookCombinations = new ulong[8,8][];
     private static readonly ulong[,][] SmallBishopCombinations = new ulong[8,8][];
     public static readonly ulong[,][] SmallRookBitboards = new ulong[8,8][];
@@ -52,28 +43,14 @@ public static class Bitboards
     private static readonly ulong[,][] BlockCaptures = new ulong[8,8][];
     private static ulong[]? BlockMoves;
     
-    private const ulong Frame = 0xFF818181818181FF;
-
-    public const ulong BlackPossibleEnPassant = 0x100000000;
-    public const ulong WhitePossibleEnPassant = 0x1000000;
-    
     private static ulong[]? EnPassantMasks; // contains both the source and the destination
     
-    public static readonly ulong WhiteShortCastleMask = 0x6000000000000000;
-    public static readonly ulong WhiteLongCastleMask = 0xC00000000000000;
-    public static readonly ulong BlackShortCastleMask = 0x60;
-    public static readonly ulong BlackLongCastleMask = 0xC;
     public static readonly Move WhiteShortCastle = new((4,0), (6,0), type: 0b0010, priority: 6);
     public static readonly Move WhiteLongCastle = new((4,0), (2,0), type: 0b0011, priority: 3);
     public static readonly Move BlackShortCastle = new((4,7), (6,7), type: 0b1010, priority: 6);
     public static readonly Move BlackLongCastle = new((4,7), (2,7), type: 0b1011, priority: 3);
     
-    public static readonly ulong[] PassedPawnMasks = new ulong[8];
-    public static readonly ulong[] NeighbourMasks = new ulong[8];
-    public static readonly ulong[] SurroundMasks = new ulong[8];
     public static readonly ulong[,,,] PathLookup =  new ulong[8,8,8,8];
-
-    public const ulong CenterControlMask = 0x3c3c3c3c0000;
     
     public static readonly int[,] PriorityWeights =
     {
@@ -138,21 +115,6 @@ public static class Bitboards
         public static readonly List<PinSearchResult>[,][] BishopPinLookup = new List<PinSearchResult>[8,8][];
     }
 
-    public const ulong File = 0x8080808080808080;
-    public const ulong Rank = 0xFF00000000000000;
-
-    private const ulong UpDiagonal = 0x102040810204080;
-    private const ulong DownDiagonal = 0x8040201008040201;
-
-    private const ulong SmallFile = 0x80808080808000;
-    private const ulong SmallRank = 0x7E00000000000000;
-
-    public const ulong KingSafetyAppliesWhite = 0xC7C7000000000000; 
-    public const ulong KingSafetyAppliesBlack = 0xC7C7;
-
-    public const ulong WhiteSafetyPawns = 0xffff0000000000;
-    public const ulong BlackSafetyPawns = 0xffff00;
-
     public static bool begunInit;
     public static bool init;
     private static bool inProgress;
@@ -168,13 +130,12 @@ public static class Bitboards
         
         //Console.WriteLine("Initializing magic bitboards");
         progress.Set(0, "Generating masks...");
+        Masks.Init();
         // Create the masks for every square on the board
         for (int rank = 0; rank < 8; rank++)
         {
             for (int file = 7; file >= 0; file--)
             {
-                // The last bit also has to be evaluated in every direction, since it matters whether it's blocked or not
-                RookMasks[file, rank] = (Rank >> (rank * 8)) ^ (File >> (7 - file));
                 RookBlockers[file, rank] = Combinations(RookMasks[file, rank]);
                 RookMoves[file, rank] = new (Move[] moves, ulong captures)[RookBlockers[file, rank].Length];
                 
@@ -188,23 +149,6 @@ public static class Bitboards
                 //RookCaptureCombinations[file, rank] = rCombinations.ToArray();
                 //Console.WriteLine(RookCaptureCombinations[file, rank].Length);
                 
-                // bishop masks
-                ulong relativeUD = UpDiagonal;
-                ulong relativeDD = DownDiagonal;
-                
-                int UDPush = rank - file;
-                int DDPush = rank + file - 7;
-                
-                if (UDPush >= 0)
-                    relativeUD >>= UDPush * 8;
-                else // negative
-                    relativeUD <<= -UDPush * 8;
-                if (DDPush >= 0)
-                    relativeDD >>= DDPush * 8;
-                else
-                    relativeDD <<= -DDPush * 8;
-                
-                BishopMasks[file, rank] = relativeUD ^ relativeDD;
                 BishopBlockers[file, rank] = Combinations(BishopMasks[file, rank]);
                 BishopMoves[file, rank] = new (Move[] moves, ulong captures)[BishopBlockers[file, rank].Length];
                 
@@ -216,13 +160,11 @@ public static class Bitboards
                 }
                 BishopCaptureCombinations[file, rank] = bCombinations.Distinct().ToArray();
                 
-                SmallRookMasks[file, rank] = ((SmallRank >> (rank * 8)) ^ (SmallFile >> (7 - file))) & ~GetSquare(file, rank);
                 SmallRookCombinations[file, rank] = Combinations(SmallRookMasks[file, rank]);
                 SmallRookBitboards[file, rank] = new ulong[SmallRookCombinations[file, rank].Length];
                 for (int i = 0; i < SmallRookCombinations[file, rank].Length; i++)
                     SmallRookBitboards[file, rank][i] = GetMoveBitboards(SmallRookCombinations[file, rank][i], (file, rank), Pieces.WhiteRook);
                 
-                SmallBishopMasks[file, rank] = (relativeUD ^ relativeDD) & ~Frame;
                 SmallBishopCombinations[file, rank] = Combinations(SmallBishopMasks[file, rank]);
                 SmallBishopBitboards[file, rank] = new ulong[SmallBishopCombinations[file, rank].Length];
                 for (int i = 0; i < SmallBishopCombinations[file, rank].Length; i++)
@@ -259,6 +201,22 @@ public static class Bitboards
                 BlockCaptures[file, rank] = GetSingleBits(RookMasks[file, rank] | BishopMasks[file, rank] | KnightMasks[file, rank]);
                 
                 // regular moves
+                
+                ulong relativeUD = UpDiagonal;
+                ulong relativeDD = DownDiagonal;
+                
+                int UDPush = rank - file;
+                int DDPush = rank + file - 7;
+                
+                if (UDPush >= 0)
+                    relativeUD >>= UDPush * 8;
+                else // negative
+                    relativeUD <<= -UDPush * 8;
+                if (DDPush >= 0)
+                    relativeDD >>= DDPush * 8;
+                else
+                    relativeDD <<= -DDPush * 8;
+                
                 blockMoveList.AddRange(Combinations(relativeUD, 3));
                 blockMoveList.AddRange(Combinations(relativeDD, 3));
                 blockMoveList.AddRange(Combinations(Rank >> (rank * 8), 3));
@@ -267,38 +225,17 @@ public static class Bitboards
                 
                 // pawn moves
                 
-                // white pawns
-                ulong wpmMask = 0;
-                ulong wpcMask = 0;
-                wpmMask |= GetSquare(file, rank + 1);
-                if (ValidSquare(file + 1, rank + 1)) wpcMask |= GetSquare(file + 1, rank + 1);
-                if (ValidSquare(file - 1, rank + 1)) wpcMask |= GetSquare(file - 1, rank + 1);
+                WhitePawnMoveCombinations[file, rank] = Combinations(WhitePawnMoveMasks[file, rank]);
+                WhitePawnCaptureCombinations[file, rank] = Combinations(WhitePawnCaptureMasks[file, rank]);
                 
-                if (rank == 1) wpmMask |= GetSquare(file, rank + 2);
+                BlackPawnMoveCombinations[file, rank] = Combinations(BlackPawnMoveMasks[file, rank]);
+                BlackPawnCaptureCombinations[file, rank] = Combinations(BlackPawnCaptureMasks[file, rank]);
                 
-                WhitePawnMoveMasks[file, rank] = wpmMask;
-                WhitePawnMoveCombinations[file, rank] = Combinations(wpmMask);
-                WhitePawnCaptureMasks[file, rank] = wpcMask;
-                WhitePawnCaptureCombinations[file, rank] = Combinations(wpcMask);
                 if (rank == 4) // white en passant rank
                 {
                     if (ValidSquare(file + 1, 5)) enPassantBitboards.Add(GetSquare(file, rank) | GetSquare(file + 1, 5));
                     if (ValidSquare(file - 1, 5)) enPassantBitboards.Add(GetSquare(file, rank) | GetSquare(file - 1, 5));
                 }
-                
-                // black pawns
-                ulong bpmMask = 0;
-                ulong bpcMask = 0;
-                bpmMask |= GetSquare(file, rank - 1);
-                if (ValidSquare(file + 1, rank - 1)) bpcMask |= GetSquare(file + 1, rank - 1);
-                if (ValidSquare(file - 1, rank - 1)) bpcMask |= GetSquare(file - 1, rank - 1);
-                
-                if (rank == 6) bpmMask |= GetSquare(file, rank - 2);
-                
-                BlackPawnMoveMasks[file, rank] = bpmMask;
-                BlackPawnMoveCombinations[file, rank] = Combinations(bpmMask);
-                BlackPawnCaptureMasks[file, rank] = bpcMask;
-                BlackPawnCaptureCombinations[file, rank] = Combinations(bpcMask);
                 
                 if (rank == 3) // black en passant rank
                 {
@@ -308,34 +245,6 @@ public static class Bitboards
                 
                 if (rank != 0) // only needs to be checked once per file
                     continue;
-                
-                // passed files
-                // triple files, used to check for passed pawns
-
-                ulong passedMask = ulong.MaxValue;
-                
-                for (int k = 0; k < 8; k++)
-                {
-                    if (!(k == file || k == file - 1 || k == file + 1))
-                    {
-                        passedMask &= ~(File >> (7 - k));
-                    }
-                }
-                
-                PassedPawnMasks[file] = passedMask;
-                
-                ulong neighborMask = ulong.MaxValue;
-                
-                for (int k = 0; k < 8; k++)
-                {
-                    if (!(k == file - 1 || k == file + 1))
-                    {
-                        neighborMask &= ~(File >> (7 - k));
-                    }
-                }
-                
-                NeighbourMasks[file] = neighborMask;
-                SurroundMasks[file] = neighborMask | GetFile(file);
             }
         }
         

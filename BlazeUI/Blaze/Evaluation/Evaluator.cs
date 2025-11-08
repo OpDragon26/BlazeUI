@@ -111,13 +111,13 @@ public static class Evaluator
         }
         
         // check if white's king is in the right spot (likely castled) to have its safety evaluated
-        if ((Bitboards.KingSafetyAppliesWhite & BitboardUtils.GetSquare(board.KingPositions[0])) != 0)
+        if ((Masks.KingSafetyAppliesWhite & BitboardUtils.GetSquare(board.KingPositions[0])) != 0)
             // take from eval if the pawns in front of the king are missing
             eval.MgWhite -= WhiteKingSafetyPenalty(board.KingPositions[0].file, board.bitboards[WhitePawn]);
         else
             eval.MgWhite -= NoCastlingPenalty;
 
-        if ((Bitboards.KingSafetyAppliesBlack & BitboardUtils.GetSquare(board.KingPositions[1])) != 0)
+        if ((Masks.KingSafetyAppliesBlack & BitboardUtils.GetSquare(board.KingPositions[1])) != 0)
             eval.MgWhite -= BlackKingSafetyPenalty(board.KingPositions[1].file, board.bitboards[BlackPawn]);
         else
             eval.MgBlack -= NoCastlingPenalty;

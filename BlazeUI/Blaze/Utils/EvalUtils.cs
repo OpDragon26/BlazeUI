@@ -1,7 +1,7 @@
 namespace BlazeUI.Blaze.Utils;
 using Magic_Lookup;
 using Evaluation;
-
+using static Magic_Lookup.Masks;
 public static class EvalUtils
 {
     public static bool IsPawnPassedWhite(ulong blackPawns, int file, int rank)
@@ -16,7 +16,7 @@ public static class EvalUtils
     
     public static bool IsPawnIsolated(ulong pawns, int file)
     {
-        return (Bitboards.NeighbourMasks[file] & pawns) == 0;
+        return (NeighbourMasks[file] & pawns) == 0;
     }
     
     public static int CountPawns(ulong pawns, int file)
@@ -26,13 +26,13 @@ public static class EvalUtils
     
     public static int WhiteKingSafetyPenalty(int kingFile, ulong pawns)
     {
-        ulong countBitboard = Bitboards.SurroundMasks[kingFile] & Bitboards.WhiteSafetyPawns;
+        ulong countBitboard = SurroundMasks[kingFile] & WhiteSafetyPawns;
         return Weights.KingSafetyPenalty[(int)(ulong.PopCount(countBitboard & pawns))];
     }
     
     public static int BlackKingSafetyPenalty(int kingFile, ulong pawns)
     {
-        ulong countBitboard = Bitboards.SurroundMasks[kingFile] & Bitboards.BlackSafetyPawns;
+        ulong countBitboard = SurroundMasks[kingFile] & BlackSafetyPawns;
         return Weights.KingSafetyPenalty[(int)(ulong.PopCount(countBitboard & pawns))];
     }
 
@@ -40,13 +40,13 @@ public static class EvalUtils
     {
         ulong controlled = Bitboards.SmallRookBitboards[file, rank][index];
         return (int)(ulong.PopCount(controlled) * Weights.MobilityMultiplier
-                     + ulong.PopCount(controlled & Bitboards.CenterControlMask) * Weights.CenterControlMultiplier);
+                     + ulong.PopCount(controlled & CenterControlMask) * Weights.CenterControlMultiplier);
     }
 
     public static int EvaluateBishopMobility(int file, int rank, int index)
     {
         ulong controlled = Bitboards.SmallBishopBitboards[file, rank][index];
         return (int)(ulong.PopCount(controlled) * Weights.MobilityMultiplier
-                     + ulong.PopCount(controlled & Bitboards.CenterControlMask) * Weights.CenterControlMultiplier);
+                     + ulong.PopCount(controlled & CenterControlMask) * Weights.CenterControlMultiplier);
     }
 }

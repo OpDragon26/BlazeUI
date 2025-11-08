@@ -34,11 +34,11 @@ public static class MoveOrdering
         switch (board.GetPiece(move.Source))
         {
             case Pieces.WhitePawn:
-                if ((Bitboards.WhitePawnCaptureMasks[move.Destination.file, move.Destination.rank] & BitboardUtils.GetSquare(board.KingPositions[1])) != 0)
+                if ((Masks.WhitePawnCaptureMasks[move.Destination.file, move.Destination.rank] & BitboardUtils.GetSquare(board.KingPositions[1])) != 0)
                     priority += 50;
                 break;
             case Pieces.BlackPawn:
-                if ((Bitboards.BlackPawnCaptureMasks[move.Destination.file, move.Destination.rank] & BitboardUtils.GetSquare(board.KingPositions[0])) != 0)
+                if ((Masks.BlackPawnCaptureMasks[move.Destination.file, move.Destination.rank] & BitboardUtils.GetSquare(board.KingPositions[0])) != 0)
                     priority += 50;
                 break;
             case Pieces.WhiteRook:

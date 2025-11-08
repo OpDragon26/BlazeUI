@@ -68,7 +68,7 @@ public static class PseudoLegalMoveGen
                     index += captures.Length;
                     
                     // if there is an en passant capture available, and it can be made from the current square
-                    if (enPassant && (Bitboards.WhitePawnCaptureMasks[pos.file, pos.rank] & BitboardUtils.GetSquare(board.enPassant)) != 0)
+                    if (enPassant && (Masks.WhitePawnCaptureMasks[pos.file, pos.rank] & BitboardUtils.GetSquare(board.enPassant)) != 0)
                         moveSpan[index++] = MagicLookup.EnPassantLookup(BitboardUtils.GetSquare(pos) | BitboardUtils.GetSquare(board.enPassant));
                     
                 }
@@ -82,7 +82,7 @@ public static class PseudoLegalMoveGen
                     index += captures.Length;
                     
                     // if there is an en passant capture available, and it can be made from the current square
-                    if (enPassant && (Bitboards.BlackPawnCaptureMasks[pos.file, pos.rank] & BitboardUtils.GetSquare(board.enPassant)) != 0)
+                    if (enPassant && (Masks.BlackPawnCaptureMasks[pos.file, pos.rank] & BitboardUtils.GetSquare(board.enPassant)) != 0)
                         moveSpan[index++] = MagicLookup.EnPassantLookup(BitboardUtils.GetSquare(pos) | BitboardUtils.GetSquare(board.enPassant));
                 }
                 break;
@@ -157,7 +157,7 @@ public static class PseudoLegalMoveGen
                 {
                     int check = 0; // 0: not checked
                     
-                    if ((board.castling & 0b1000) != 0 && (board.AllPieces() & Bitboards.WhiteShortCastleMask) == 0) // white can castle short
+                    if ((board.castling & 0b1000) != 0 && (board.AllPieces() & Masks.WhiteShortCastleMask) == 0) // white can castle short
                     {
                         check = Attacked(board.KingPositions[0], board, 1) ? 1 : 2; // check here whether the king is in check 1 if it is, 2 if it isn't
 
@@ -165,7 +165,7 @@ public static class PseudoLegalMoveGen
                             moveSpan[index++] = Bitboards.WhiteShortCastle;
                     }
 
-                    if ((board.castling & 0b0100) != 0 && (board.AllPieces() & Bitboards.WhiteLongCastleMask) == 0) // white can castle long
+                    if ((board.castling & 0b0100) != 0 && (board.AllPieces() & Masks.WhiteLongCastleMask) == 0) // white can castle long
                     {
                         if (check == 0) // if the king check hasn't been checked before
                             check = Attacked(board.KingPositions[0], board, 1) ? 1 : 2; // check here whether the king is in check 1 if it is, 2 if it isn't
@@ -178,7 +178,7 @@ public static class PseudoLegalMoveGen
                 {
                     int check = 0; // 0: not checked
                     
-                    if ((board.castling & 0b0010) != 0 && (board.AllPieces() & Bitboards.BlackShortCastleMask) == 0) // black can castle short
+                    if ((board.castling & 0b0010) != 0 && (board.AllPieces() & Masks.BlackShortCastleMask) == 0) // black can castle short
                     {
                         check = Attacked(board.KingPositions[1], board, 0) ? 1 : 2; // check here whether the king is in check 1 if it is, 2 if it isn't
 
@@ -186,7 +186,7 @@ public static class PseudoLegalMoveGen
                             moveSpan[index++] = Bitboards.BlackShortCastle;
                     }
 
-                    if ((board.castling & 0b0001) != 0 && (board.AllPieces() & Bitboards.BlackLongCastleMask) == 0) // black can castle long
+                    if ((board.castling & 0b0001) != 0 && (board.AllPieces() & Masks.BlackLongCastleMask) == 0) // black can castle long
                     {
                         if (check == 0) // if the king check hasn't been checked before
                             check = Attacked(board.KingPositions[1], board, 0) ? 1 : 2; // check here whether the king is in check 1 if it is, 2 if it isn't

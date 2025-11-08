@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
+using BlazeUI.Blaze.Magic_Lookup;
 
 namespace BlazeUI.Blaze.Utils;
 using Move_Generation;
-using static Magic_Lookup.Bitboards;
+using static Bitboards;
 using static Board_Representation.Pieces;
 
 public static class BitboardUtils
@@ -538,7 +539,7 @@ public static class BitboardUtils
 
     public static ulong GetPossibleEnPassantSquare(int file, int side)
     {
-        return side == 0 ? WhitePossibleEnPassant << file : BlackPossibleEnPassant << file;
+        return side == 0 ? Masks.WhitePossibleEnPassant << file : Masks.BlackPossibleEnPassant << file;
     }
     
     private const ulong Square = 0x8000000000000000;
@@ -553,21 +554,21 @@ public static class BitboardUtils
 
     public static ulong GetFile(int file)
     {
-        return File >> (7 - file);
+        return Masks.File >> (7 - file);
     }
 
     public static ulong GetRank(int rank)
     {
-        return Rank >> (8 * rank);
+        return Masks.Rank >> (8 * rank);
     }
 
     public static ulong GetWhitePassedPawnMask(int file, int rank)
     {
-        return PassedPawnMasks[file] >> (rank * 8 + 8);
+        return Masks.PassedPawnMasks[file] >> (rank * 8 + 8);
     }
     public static ulong GetBlackPassedPawnMask(int file, int rank)
     {
-        return PassedPawnMasks[file] << ((8 - rank) * 8);
+        return Masks.PassedPawnMasks[file] << ((8 - rank) * 8);
     }
 
     public static bool ValidSquare(int file, int rank)
