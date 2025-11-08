@@ -86,8 +86,6 @@ public static class Bitboards
         {1,2,3,4,4,3,2,1},
         {0,1,2,3,3,2,1,0},
     };
-
-    public static readonly int[][] AdjacentFiles = [[0,1], [0,1,2], [1,2,3], [2,3,4], [3,4,5], [4,5,6], [5,6,7], [6,7]];
     
     public static class Lookup
     {
@@ -107,10 +105,6 @@ public static class Bitboards
         public static readonly (ulong magicNumber, int push, int highest)[,] BlockCaptureNumbers = new (ulong magicNumber, int push, int highest)[8,8];
         public static (ulong magicNumber, int push, int highest) BlockMoveNumber;
         public static (ulong magicNumber, int push, int highest) AttackLineNumber;
-        
-        public static (ulong magicNumber, int push, int highest) RightPawnEvalNumber;
-        public static (ulong magicNumber, int push, int highest) LeftPawnEvalNumber;
-        public static (ulong magicNumber, int push, int highest) CenterPawnEvalNumber;
         
         public static readonly (Move[] moves, ulong captures)[,][] RookLookup = new (Move[] moves, ulong captures)[8,8][];
         public static readonly (Move[] moves, ulong captures)[,][] BishopLookup = new (Move[] moves, ulong captures)[8,8][];
@@ -162,21 +156,19 @@ public static class Bitboards
     public static bool begunInit;
     public static bool init;
     private static bool inProgress;
-    public static CompletionPoint progress;
 
-    public static void Init()
+    public static void Init(General.CompletionPoint progress)
     {
         if (begunInit) return;
         begunInit = true;
         List<ulong> enPassantBitboards = new List<ulong>();
         List<ulong> blockMoveList = new();
-        GeneralUtils.Timer t = new GeneralUtils.Timer();
+        General.Timer t = new General.Timer();
         t.Start();
         
-        Console.WriteLine("Initializing magic bitboards");
-        
+        //Console.WriteLine("Initializing magic bitboards");
+        progress.Set(0, "Generating masks...");
         // Create the masks for every square on the board
-        progress = new(0, "Generating masks...");
         for (int rank = 0; rank < 8; rank++)
         {
             for (int file = 7; file >= 0; file--)
@@ -346,8 +338,9 @@ public static class Bitboards
                 SurroundMasks[file] = neighborMask | GetFile(file);
             }
         }
-
-        progress = new(10, "Generating block moves");
+        
+        progress.Set(30, "Generating block moves...");
+        
         BlockMoves = blockMoveList.Distinct().ToArray();
         Lookup.BlockMoveNumber = (4154364917966041783, 46, 262133); //MagicNumbers.GenerateRepeat(BlockMoves, 1, 46);
         EnPassantMasks = enPassantBitboards.ToArray();
@@ -358,14 +351,13 @@ public static class Bitboards
             Lookup.EnPassantLookupArray[(mask * Lookup.EnPassantNumbers.magicNumber) >> Lookup.EnPassantNumbers.push] = GetEnPassantMoves(mask);
         }
 
-        progress = new(85, "Initializing magic lookup...");
         
         // attack line lookup
         ulong[] attackLines = GetValidCombinations(64, 2).ToArray();
         Lookup.AttackLineNumber = (8710915622236860111, 48, 65530); //MagicNumbers.GenerateRepeat(attackLines.Distinct().ToArray(), 1);
         
         //Console.WriteLine("Generating Magic Numbers");
-        
+        progress.Set(45, "Loading magic lookup...");
         //int done = 0;
         // create magic numbers and add to lookup
         Parallel.For(0, 8, rank =>
@@ -591,8 +583,6 @@ public static class Bitboards
                 }
             });
         });
-
-        progress = new(95, "Generating paths...");
         
         // init pathfinder
         for (int startRank = 0; startRank < 8; startRank++)
@@ -663,8 +653,7 @@ public static class Bitboards
             PathLookup[startFile, startRank, endFile, endRank] = path;
         }
 
-        progress = new(100, "Finished!");
-        Console.WriteLine($"Bitboards initialized in {t.Stop()}ms");
+        //Console.WriteLine($"Bitboards initialized in {t.Stop()}ms");
         Thread.Sleep(20);
         init = true;
     }
@@ -676,7 +665,7 @@ public static class Bitboards
         Thread t = new Thread(() =>
         {
             inProgress = true;
-            Init();
+            Blaze.Init.Start();
             inProgress = false;
         });
         t.Start();
@@ -685,11 +674,5 @@ public static class Bitboards
     public static bool Poll()
     {
         return init;
-    }
-    
-    public readonly struct CompletionPoint(int percentage, string message)
-    {
-        public readonly int percentage = percentage;
-        public readonly string message = message;
     }
 }
