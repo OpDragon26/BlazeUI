@@ -141,6 +141,9 @@ public static class Evaluator
         
         Lookup.BishopEvalLookupWhite(board.bitboards[WhiteBishop], ref eval);
         Lookup.BishopEvalLookupBlack(board.bitboards[BlackBishop], ref eval);
+        
+        Lookup.KnightEvalLookupWhite(board.bitboards[WhiteKnight], ref eval);
+        Lookup.KnightEvalLookupBlack(board.bitboards[BlackKnight], ref eval);
     }
 
     public static int BareBonesEval(Board board)
@@ -154,6 +157,7 @@ public static class Evaluator
     {
         Eval eval = new();
         PieceWiseEvalLookup(board, ref eval);
+        
         eval.MiddleGameWhite += MiddleGameVal[WhiteKing] + GetWhiteMgEval(WhiteKing, board.KingPositions[0].file, board.KingPositions[0].rank);
         eval.EndGameWhite += EndGameVal[WhiteKing] + GetWhiteEgEval(WhiteKing, board.KingPositions[0].file, board.KingPositions[0].rank);
         

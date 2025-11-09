@@ -46,4 +46,13 @@ public static class EvalData
             return GenerateEval<BishopEval, BishopTest>(WhiteBishop, bitboard, slice, false);
         }
     }
+    
+    public class KnightTest() : EvalTest(8, 8) {}
+    public class KnightEval : Evaluation<KnightTest>
+    {
+        public static KnightEval GenerateNew(ulong bitboard, Slice slice)
+        {
+            return GenerateEval<KnightEval, KnightTest>(WhiteKnight, bitboard, slice, false);
+        }
+    }
 }

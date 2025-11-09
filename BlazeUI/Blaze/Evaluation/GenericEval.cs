@@ -7,10 +7,10 @@ using static PestoEval;
 
 public static class GenericEval
 {
-    public static TEval GenerateEval<TEval, TEvalTest>(uint piece, ulong bitboard, Slice slice, bool hasTest, int tMgBonus = 0, int tEgBonus = 0) where TEval : Evaluation<TEvalTest>, new() where TEvalTest : EvalTest, new()
+    public static TEval GenerateEval<TEval, TEvalTest>(uint piece, ulong bitboard, Slice slice, bool hasTest, int tMgBonus = 0, int tEgBonus = 0) 
+        where TEval : Evaluation<TEvalTest>, new() where TEvalTest : EvalTest, new()
     {
-        TEval eval = new TEval();
-        eval.Test = hasTest;
+        TEval eval = new TEval { Test = hasTest };
 
         int startRank = 6 - (int)slice * 2;
         
