@@ -73,7 +73,7 @@ public static class BitboardUtils
                 if (!ValidSquare(target.file, target.rank)) // if the square is outside the bounds of the board
                     break;
                 if ((blockers & GetSquare(target)) == 0) // if the targeted square is empty
-                    moves.Add(new Move(pos, target, priority: 5 + PriorityWeights[target.file, target.rank] * Evaluation.Weights.PriorityWeightMultiplier));
+                    moves.Add(new Move(pos, target, priority: 5 + PriorityWeights[target.file, target.rank] * Weights.PriorityWeightMultiplier));
                 else
                 {
                     captures |= GetSquare(target);
@@ -543,6 +543,16 @@ public static class BitboardUtils
         return Masks.Slice << ((int)slice * 16);
     }
 
+    public static ulong GetSection(EvalData.Section section)
+    {
+        return Masks.Section << (int)section;
+    }
+
+    public static ulong PushSectionToIndex(EvalData.Section section, ulong bitboard)
+    {
+        return bitboard >> 8 + (int)section;
+        
+    }
     
     public static ulong GetPossibleEnPassantSquare(int file, int side)
     {

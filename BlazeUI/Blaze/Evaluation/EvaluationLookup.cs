@@ -9,17 +9,14 @@ using static PestoEval;
 
 public static class EvaluationLookup
 {
-    private static List<ulong> FirstSliceCombinations = [];
-    private static List<ulong> SecondSliceCombinations = [];
-    private static List<ulong> ThirdSliceCombinations = [];
-    private static List<ulong> FourthSliceCombinations = [];
-
     public static SliceGroup[] FirstSliceLookup = [];
     public static SliceGroup[] SecondSliceLookup = [];
     public static SliceGroup[] ThirdSliceLookup = [];
     public static SliceGroup[] FourthSliceLookup = [];
 
-    public static PawnEval[][] PawnEvalLookup = [];
+    //MagicNumbers.GenerateMagicNumberParallel(Combinations(PushSectionToIndex(Section.LeftEdge, Masks.Section), 8).Distinct().ToArray(), 44);
+    private static readonly (ulong magicNumber, int push, int highest) PawnEvalNumber = (5058929296669118257, 44, 1048560);
+    private static readonly PawnEval[,] PawnEvalLookup = new PawnEval[6, PawnEvalNumber.highest + 1];
     
     public class SliceGroup(RookEval rook, BishopEval bishop, KnightEval knight, QueenEval queen)
     {
@@ -31,17 +28,12 @@ public static class EvaluationLookup
     
     public static void Init()
     {
-        FirstSliceCombinations = Combinations(GetSlice(Slice.First), 9);
-        SecondSliceCombinations = Combinations(GetSlice(Slice.Second), 9);
-        ThirdSliceCombinations = Combinations(GetSlice(Slice.Third), 9);
-        FourthSliceCombinations = Combinations(GetSlice(Slice.Fourth), 9);
-
         FirstSliceLookup = new SliceGroup[0xFF81];
         SecondSliceLookup = new SliceGroup[0xFF81];
         ThirdSliceLookup = new SliceGroup[0xFF81];
         FourthSliceLookup = new SliceGroup[0xFF81];
 
-        Batch.ForEach(FirstSliceCombinations, combination =>
+        Batch.ForEach(Combinations(GetSlice(Slice.First), 9), combination =>
         {
             FirstSliceLookup[combination] = new SliceGroup(
                 RookEval.GenerateNew(combination, Slice.First),
@@ -50,7 +42,7 @@ public static class EvaluationLookup
                 QueenEval.GenerateNew(combination, Slice.First));
         });
         
-        Batch.ForEach(SecondSliceCombinations, combination =>
+        Batch.ForEach(Combinations(GetSlice(Slice.Second), 9), combination =>
         {
             SecondSliceLookup[combination >> 16] = new SliceGroup(
                 RookEval.GenerateNew(combination, Slice.Second),
@@ -59,7 +51,7 @@ public static class EvaluationLookup
                 QueenEval.GenerateNew(combination, Slice.Second));
         });
         
-        Batch.ForEach(ThirdSliceCombinations, combination =>
+        Batch.ForEach(Combinations(GetSlice(Slice.Third), 9), combination =>
         {
             ThirdSliceLookup[combination >> 32] = new SliceGroup(
                 RookEval.GenerateNew(combination, Slice.Third),
@@ -68,7 +60,7 @@ public static class EvaluationLookup
                 QueenEval.GenerateNew(combination, Slice.Third));
         });
         
-        Batch.ForEach(FourthSliceCombinations, combination =>
+        Batch.ForEach(Combinations(GetSlice(Slice.Fourth), 9), combination =>
         {
             FourthSliceLookup[combination >> 48] = new SliceGroup(
                 RookEval.GenerateNew(combination, Slice.Fourth),
@@ -76,6 +68,19 @@ public static class EvaluationLookup
                 KnightEval.GenerateNew(combination, Slice.Fourth),
                 QueenEval.GenerateNew(combination, Slice.Fourth));
         });
+        
+        // find a magic number 
+        for (int i = 0; i < 6; i++)
+        {
+            Section section = (Section)i;
+
+            List<ulong> combinations = Combinations(GetSection(section), 8);
+            Batch.ForEach(combinations, combination =>
+            {
+                ulong magicIndex = (PushSectionToIndex(section, combination) * PawnEvalNumber.magicNumber) >> PawnEvalNumber.push;
+                PawnEvalLookup[(int)section, magicIndex] = PawnEval.GenerateNew(combination, section);
+            });
+        }
     }
 
     public static class Lookup
@@ -142,6 +147,31 @@ public static class EvaluationLookup
             MagicLookup.SecondSliceEvalLookup(queens).Queen.EvaluateBlack(ref eval);
             MagicLookup.ThirdSliceEvalLookup(queens).Queen.EvaluateBlack(ref eval);
             MagicLookup.FourthSliceEvalLookup(queens).Queen.EvaluateBlack(ref eval);
+        }
+
+        private static PawnEval SinglePawnEvalLookup(ulong pawns, Section section)
+        {
+            return PawnEvalLookup[(int)section, (PushSectionToIndex(section, pawns & GetSection(section)) * PawnEvalNumber.magicNumber) >> PawnEvalNumber.push];
+        }
+
+        public static void PawnEvalLookupWhite(ulong whitePawns, ulong blackPawns, ref Eval eval)
+        {
+            SinglePawnEvalLookup(whitePawns, Section.AB).EvaluateWhite(blackPawns, ref eval);
+            SinglePawnEvalLookup(whitePawns, Section.C).EvaluateWhite(blackPawns, ref eval);
+            SinglePawnEvalLookup(whitePawns, Section.D).EvaluateWhite(blackPawns, ref eval);
+            SinglePawnEvalLookup(whitePawns, Section.E).EvaluateWhite(blackPawns, ref eval);
+            SinglePawnEvalLookup(whitePawns, Section.F).EvaluateWhite(blackPawns, ref eval);
+            SinglePawnEvalLookup(whitePawns, Section.GH).EvaluateWhite(blackPawns, ref eval);
+        }
+        
+        public static void PawnEvalLookupBlack(ulong blackPawns, ulong whitePawns, ref Eval eval)
+        {
+            SinglePawnEvalLookup(blackPawns, Section.AB).EvaluateBlack(whitePawns, ref eval);
+            SinglePawnEvalLookup(blackPawns, Section.C).EvaluateBlack(whitePawns, ref eval);
+            SinglePawnEvalLookup(blackPawns, Section.D).EvaluateBlack(whitePawns, ref eval);
+            SinglePawnEvalLookup(blackPawns, Section.E).EvaluateBlack(whitePawns, ref eval);
+            SinglePawnEvalLookup(blackPawns, Section.F).EvaluateBlack(whitePawns, ref eval);
+            SinglePawnEvalLookup(blackPawns, Section.GH).EvaluateBlack(whitePawns, ref eval);
         }
     }
 }

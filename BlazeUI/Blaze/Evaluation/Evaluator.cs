@@ -147,6 +147,9 @@ public static class Evaluator
         
         Lookup.QueenEvalLookupWhite(board.bitboards[WhiteQueen], ref eval);
         Lookup.QueenEvalLookupBlack(board.bitboards[BlackQueen], ref eval);
+        
+        Lookup.PawnEvalLookupWhite(board.bitboards[WhitePawn], board.bitboards[BlackPawn], ref eval);
+        Lookup.PawnEvalLookupBlack(board.bitboards[BlackPawn], board.bitboards[WhitePawn], ref eval);
     }
 
     public static int BareBonesEval(Board board)

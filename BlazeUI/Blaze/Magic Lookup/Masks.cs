@@ -51,6 +51,7 @@ public static class Masks
     public const ulong WhitePossibleEnPassant = 0x1000000;
 
     public const ulong Slice = 0xffff;
+    public const ulong Section = 0x7070707070700;
 
     public static void Init()
     {

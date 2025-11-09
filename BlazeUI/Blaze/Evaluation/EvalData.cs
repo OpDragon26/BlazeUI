@@ -18,7 +18,7 @@ public static class EvalData
 
     public enum Section
     {
-        LeftEdge, Left, CenterLeft, CenterRight, Right, RightEdge
+        AB, C, D, E, F, GH
     }
     
     public class RookTest() : EvalTest(8, 8)
@@ -124,7 +124,7 @@ public static class EvalData
             }
         }
 
-        public PawnEval GenerateNew(ulong pawns, Section section)
+        public static PawnEval GenerateNew(ulong pawns, Section section)
         {
             PawnEval eval = new();
             

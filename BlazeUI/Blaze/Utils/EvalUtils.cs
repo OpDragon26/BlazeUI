@@ -30,12 +30,12 @@ public static class EvalUtils
     {
         return section switch
         {
-            EvalData.Section.LeftEdge => (0, 2),
-            EvalData.Section.Left => (2, 3),
-            EvalData.Section.CenterLeft => (3, 4),
-            EvalData.Section.CenterRight => (4, 5),
-            EvalData.Section.Right => (5, 6),
-            EvalData.Section.RightEdge => (6, 8),
+            EvalData.Section.AB => (0, 2),
+            EvalData.Section.C => (2, 3),
+            EvalData.Section.D => (3, 4),
+            EvalData.Section.E => (4, 5),
+            EvalData.Section.F => (5, 6),
+            EvalData.Section.GH => (6, 8),
             _ => throw new Exception("no")
         };
     }
