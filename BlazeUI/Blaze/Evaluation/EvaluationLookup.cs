@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace BlazeUI.Blaze.Evaluation;
@@ -151,17 +152,25 @@ public static class EvaluationLookup
 
         private static PawnEval SinglePawnEvalLookup(ulong pawns, Section section)
         {
+            //Console.WriteLine(section);
+            //CLIUtils.PrintBitboard(pawns & GetSection(section), 0);
             return PawnEvalLookup[(int)section, (PushSectionToIndex(section, pawns & GetSection(section)) * PawnEvalNumber.magicNumber) >> PawnEvalNumber.push];
         }
 
         public static void PawnEvalLookupWhite(ulong whitePawns, ulong blackPawns, ref Eval eval)
         {
             SinglePawnEvalLookup(whitePawns, Section.AB).EvaluateWhite(blackPawns, ref eval);
+            //Console.WriteLine(eval.Calculate());
             SinglePawnEvalLookup(whitePawns, Section.C).EvaluateWhite(blackPawns, ref eval);
+            //Console.WriteLine(eval.Calculate());
             SinglePawnEvalLookup(whitePawns, Section.D).EvaluateWhite(blackPawns, ref eval);
+            //Console.WriteLine(eval.Calculate());
             SinglePawnEvalLookup(whitePawns, Section.E).EvaluateWhite(blackPawns, ref eval);
+            //Console.WriteLine(eval.Calculate());
             SinglePawnEvalLookup(whitePawns, Section.F).EvaluateWhite(blackPawns, ref eval);
+            //Console.WriteLine(eval.Calculate());
             SinglePawnEvalLookup(whitePawns, Section.GH).EvaluateWhite(blackPawns, ref eval);
+            //Console.WriteLine(eval.Calculate());
         }
         
         public static void PawnEvalLookupBlack(ulong blackPawns, ulong whitePawns, ref Eval eval)

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace BlazeUI.Blaze.Evaluation;
@@ -73,6 +74,9 @@ public static class EvalData
 
     private class PassedTest(int file, int rank)
     {
+        public readonly int file = file;
+        public readonly int rank = rank;
+        
         public int MiddleGameWhite(ulong blackPawns)
         {
             return IsPawnPassedWhite(blackPawns, file, rank) ? MiddleGamePassedBonus[rank] : 0;
@@ -101,7 +105,7 @@ public static class EvalData
         public void EvaluateWhite(ulong blackPawns, ref Eval eval)
         {
             eval.MiddleGameWhite += MgWhite;
-            eval.EndGameWhite += MgWhite;
+            eval.EndGameWhite += EgWhite;
             
             // test for passed pawns
             foreach (PassedTest t in Tests)
@@ -157,12 +161,15 @@ public static class EvalData
                 
                 for (int rank = 1; rank < 7; rank++)
                 {
-                    eval.MgWhite += GetWhiteMgEval(WhitePawn, file, rank) + MiddleGameVal[WhitePawn];
-                    eval.EgWhite += GetWhiteEgEval(WhitePawn, file, rank) + EndGameVal[WhitePawn];
-                    eval.MgBlack += GetBlackMgEval(WhitePawn, file, rank) + MiddleGameVal[WhitePawn];
-                    eval.EgBlack += GetBlackEgEval(WhitePawn, file, rank) + EndGameVal[WhitePawn];
-                    
-                    eval.Tests.Add(new(file, rank));
+                    if ((pawns & GetSquare(file, rank)) != 0)
+                    {
+                        eval.MgWhite += GetWhiteMgEval(WhitePawn, file, rank) + MiddleGameVal[WhitePawn];
+                        eval.EgWhite += GetWhiteEgEval(WhitePawn, file, rank) + EndGameVal[WhitePawn];
+                        eval.MgBlack += GetBlackMgEval(WhitePawn, file, rank) + MiddleGameVal[WhitePawn];
+                        eval.EgBlack += GetBlackEgEval(WhitePawn, file, rank) + EndGameVal[WhitePawn];
+                        
+                        eval.Tests.Add(new(file, rank));
+                    }
                 }
             }
             
