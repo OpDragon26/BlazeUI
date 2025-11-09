@@ -14,9 +14,9 @@ public static class Init
     
     public static void Start()
     {
-        EvaluationLookup.Init();
         RefutationTable.Init((int)Math.Pow(2, 20) + 7);
         Bitboards.Init(Progress);
+        EvaluationLookup.Init();
         ZobristHash.Init();
         Progress.Set(75, "Loading book...");
         Book.Book.Init(Books.Standard);

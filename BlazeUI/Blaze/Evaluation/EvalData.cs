@@ -140,15 +140,15 @@ public static class EvalData
                     continue;
 
                 int pawnCount = CountPawns(pawns, file);
-
+                
                 if (pawnCount != 0)
                 {
-                    eval.MgWhite -= (pawnCount * pawnCount - 1) * MgDoublePawnPenalty;
-                    eval.EgWhite -= (pawnCount * pawnCount - 1) * EgDoublePawnPenalty;
+                    eval.MgWhite -= (pawnCount - 1) * MgDoublePawnPenalty;
+                    eval.EgWhite -= (pawnCount - 1) * EgDoublePawnPenalty;
                     
-                    eval.MgBlack -= (pawnCount * pawnCount - 1) * MgDoublePawnPenalty;
-                    eval.EgBlack -= (pawnCount * pawnCount - 1) * EgDoublePawnPenalty;
-                    
+                    eval.MgBlack -= (pawnCount - 1) * MgDoublePawnPenalty;
+                    eval.EgBlack -= (pawnCount - 1) * EgDoublePawnPenalty;
+                
                     if (IsPawnIsolated(pawns, file))
                     {
                         eval.MgWhite -= pawnCount * MgIsolatedPawnPenalty;
@@ -158,6 +158,7 @@ public static class EvalData
                         eval.EgBlack -= pawnCount * EgIsolatedPawnPenalty;
                     }
                 }
+                
                 
                 for (int rank = 1; rank < 7; rank++)
                 {

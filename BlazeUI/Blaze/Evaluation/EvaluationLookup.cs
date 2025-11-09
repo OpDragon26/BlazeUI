@@ -160,17 +160,11 @@ public static class EvaluationLookup
         public static void PawnEvalLookupWhite(ulong whitePawns, ulong blackPawns, ref Eval eval)
         {
             SinglePawnEvalLookup(whitePawns, Section.AB).EvaluateWhite(blackPawns, ref eval);
-            //Console.WriteLine(eval.Calculate());
             SinglePawnEvalLookup(whitePawns, Section.C).EvaluateWhite(blackPawns, ref eval);
-            //Console.WriteLine(eval.Calculate());
             SinglePawnEvalLookup(whitePawns, Section.D).EvaluateWhite(blackPawns, ref eval);
-            //Console.WriteLine(eval.Calculate());
             SinglePawnEvalLookup(whitePawns, Section.E).EvaluateWhite(blackPawns, ref eval);
-            //Console.WriteLine(eval.Calculate());
             SinglePawnEvalLookup(whitePawns, Section.F).EvaluateWhite(blackPawns, ref eval);
-            //Console.WriteLine(eval.Calculate());
             SinglePawnEvalLookup(whitePawns, Section.GH).EvaluateWhite(blackPawns, ref eval);
-            //Console.WriteLine(eval.Calculate());
         }
         
         public static void PawnEvalLookupBlack(ulong blackPawns, ulong whitePawns, ref Eval eval)

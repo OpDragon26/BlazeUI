@@ -15,7 +15,7 @@ public static class DebugInterface
         
         //DebugUtils.TestGameSpeed(15, 6);
         
-        CompareEval("k7/4p3/4p3/4P3/8/3P4/2P5/K7 w - - 0 1");
+        CompareEval("r1bqk1nr/pppp1ppp/2n5/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4");
         
         //Examine("rnbqk1nr/ppppppbp/6p1/8/3PP3/8/PPP2PPP/RNBQKBNR w KQkq - 1 3");
         

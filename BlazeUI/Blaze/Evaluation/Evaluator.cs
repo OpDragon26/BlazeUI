@@ -65,11 +65,12 @@ public static class Evaluator
 
             int whitePawns = CountPawns(board.bitboards[WhitePawn], file);
             int blackPawns = CountPawns(board.bitboards[BlackPawn], file);
-
+            
             if (whitePawns != 0)
             {
-                eval.MiddleGameWhite -= (whitePawns * whitePawns - 1) * MgDoublePawnPenalty;
-                eval.EndGameWhite -= (whitePawns * whitePawns - 1) * EgDoublePawnPenalty;
+                eval.MiddleGameWhite -= (whitePawns - 1) * MgDoublePawnPenalty;
+                eval.EndGameWhite -= (whitePawns - 1) * EgDoublePawnPenalty;
+                
                 if (IsPawnIsolated(board.bitboards[WhitePawn], file))
                 {
                     eval.MiddleGameWhite -= whitePawns * MgIsolatedPawnPenalty;
@@ -79,8 +80,9 @@ public static class Evaluator
 
             if (blackPawns != 0)
             {
-                eval.MiddleGameBlack -= (blackPawns * blackPawns - 1) * MgDoublePawnPenalty;
-                eval.EndGameBlack -= (blackPawns * blackPawns - 1) * EgDoublePawnPenalty;
+                eval.MiddleGameBlack -= (blackPawns - 1) * MgDoublePawnPenalty;
+                eval.EndGameBlack -= (blackPawns - 1) * EgDoublePawnPenalty;
+                
                 if (IsPawnIsolated(board.bitboards[BlackPawn], file))
                 {
                     eval.MiddleGameBlack -= blackPawns * MgIsolatedPawnPenalty;
