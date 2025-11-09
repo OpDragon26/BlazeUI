@@ -68,8 +68,8 @@ public static class Evaluator
 
             if (whitePawns != 0)
             {
-                eval.MiddleGameWhite -= whitePawns * MgDoublePawnPenalty;
-                eval.EndGameWhite -= whitePawns * EgDoublePawnPenalty;
+                eval.MiddleGameWhite -= (whitePawns * whitePawns - 1) * MgDoublePawnPenalty;
+                eval.EndGameWhite -= (whitePawns * whitePawns - 1) * EgDoublePawnPenalty;
                 if (IsPawnIsolated(board.bitboards[WhitePawn], file))
                 {
                     eval.MiddleGameWhite -= whitePawns * MgIsolatedPawnPenalty;
@@ -79,8 +79,8 @@ public static class Evaluator
 
             if (blackPawns != 0)
             {
-                eval.MiddleGameBlack -= blackPawns * MgDoublePawnPenalty;
-                eval.EndGameBlack -= blackPawns * EgDoublePawnPenalty;
+                eval.MiddleGameBlack -= (blackPawns * blackPawns - 1) * MgDoublePawnPenalty;
+                eval.EndGameBlack -= (blackPawns * blackPawns - 1) * EgDoublePawnPenalty;
                 if (IsPawnIsolated(board.bitboards[BlackPawn], file))
                 {
                     eval.MiddleGameBlack -= blackPawns * MgIsolatedPawnPenalty;
@@ -161,11 +161,11 @@ public static class Evaluator
         Eval eval = new();
         PieceWiseEvalLookup(board, ref eval);
         
-        eval.MiddleGameWhite += MiddleGameVal[WhiteKing] + GetWhiteMgEval(WhiteKing, board.KingPositions[0].file, board.KingPositions[0].rank);
-        eval.EndGameWhite += EndGameVal[WhiteKing] + GetWhiteEgEval(WhiteKing, board.KingPositions[0].file, board.KingPositions[0].rank);
+        eval.MiddleGameWhite += GetWhiteMgEval(WhiteKing, board.KingPositions[0].file, board.KingPositions[0].rank);
+        eval.EndGameWhite += GetWhiteEgEval(WhiteKing, board.KingPositions[0].file, board.KingPositions[0].rank);
         
-        eval.MiddleGameBlack += MiddleGameVal[WhiteKing] + GetBlackMgEval(WhiteKing, board.KingPositions[1].file, board.KingPositions[1].rank);
-        eval.EndGameBlack += EndGameVal[WhiteKing] + GetBlackEgEval(WhiteKing, board.KingPositions[1].file, board.KingPositions[1].rank);
+        eval.MiddleGameBlack += GetBlackMgEval(WhiteKing, board.KingPositions[1].file, board.KingPositions[1].rank);
+        eval.EndGameBlack += GetBlackEgEval(WhiteKing, board.KingPositions[1].file, board.KingPositions[1].rank);
         
         return eval.Calculate();
     }

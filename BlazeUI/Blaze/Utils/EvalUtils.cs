@@ -1,3 +1,5 @@
+using System;
+
 namespace BlazeUI.Blaze.Utils;
 using Magic_Lookup;
 using Evaluation;
@@ -22,6 +24,20 @@ public static class EvalUtils
     public static int CountPawns(ulong pawns, int file)
     {
         return (int)ulong.PopCount(pawns & BitboardUtils.GetFile(file));
+    }
+
+    public static (int start, int end) FindRelevantFiles(EvalData.Section section)
+    {
+        return section switch
+        {
+            EvalData.Section.LeftEdge => (0, 2),
+            EvalData.Section.Left => (2, 3),
+            EvalData.Section.CenterLeft => (3, 4),
+            EvalData.Section.CenterRight => (4, 5),
+            EvalData.Section.Right => (5, 6),
+            EvalData.Section.RightEdge => (6, 8),
+            _ => throw new Exception("no")
+        };
     }
     
     public static int WhiteKingSafetyPenalty(int kingFile, ulong pawns)

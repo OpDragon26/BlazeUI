@@ -19,6 +19,8 @@ public static class EvaluationLookup
     public static SliceGroup[] ThirdSliceLookup = [];
     public static SliceGroup[] FourthSliceLookup = [];
 
+    public static PawnEval[][] PawnEvalLookup = [];
+    
     public class SliceGroup(RookEval rook, BishopEval bishop, KnightEval knight, QueenEval queen)
     {
         public readonly RookEval Rook = rook;
