@@ -7,9 +7,10 @@ using static PestoEval;
 
 public static class GenericEval
 {
-    public static TEval GenerateEval<TEval, TEvalTest>(uint piece, ulong bitboard, Slice slice, int tMgBonus = 0, int tEgBonus = 0) where TEval : Evaluation<TEvalTest>, new() where TEvalTest : EvalTest, new()
+    public static TEval GenerateEval<TEval, TEvalTest>(uint piece, ulong bitboard, Slice slice, bool hasTest, int tMgBonus = 0, int tEgBonus = 0) where TEval : Evaluation<TEvalTest>, new() where TEvalTest : EvalTest, new()
     {
         TEval eval = new TEval();
+        eval.Test = hasTest;
 
         int startRank = 6 - (int)slice * 2;
         
@@ -25,8 +26,11 @@ public static class GenericEval
                 eval.MgBlack += GetBlackMgEval(piece, file, rank) + MiddleGameVal[piece];
                 eval.EgBlack += GetBlackEgEval(piece, file, rank) + EndGameVal[piece];
                 
-                eval.WhiteTest.Add(new TEvalTest{file = file , rank = rank , MgBonus = tMgBonus, EgBonus = tEgBonus});
-                eval.BlackTest.Add(new TEvalTest{file = file , rank = rank , MgBonus = tMgBonus, EgBonus = tEgBonus});
+                if (hasTest)
+                {
+                    eval.WhiteTest.Add(new TEvalTest{file = file , rank = rank , MgBonus = tMgBonus, EgBonus = tEgBonus});
+                    eval.BlackTest.Add(new TEvalTest{file = file , rank = rank , MgBonus = tMgBonus, EgBonus = tEgBonus});
+                }
             }
         }
         
@@ -40,10 +44,25 @@ public static class GenericEval
         public int EgWhite;
         public int EgBlack;
         public int PhaseIncrement;
+        public bool Test;
 
         public readonly List<TEvalTest> WhiteTest = new();
         public readonly List<TEvalTest> BlackTest = new();
 
+        public virtual void EvaluateWhite(ref Eval eval)
+        {
+            eval.GamePhase += PhaseIncrement;
+            eval.MiddleGameWhite += MgWhite;
+            eval.EndGameWhite += EgWhite;
+        }
+
+        public virtual void EvaluateBlack(ref Eval eval)
+        {
+            eval.GamePhase += PhaseIncrement;
+            eval.MiddleGameBlack += MgBlack;
+            eval.EndGameBlack += EgBlack;
+        }
+        
         public virtual void EvaluateWhite(ulong bitboard, ref Eval eval)
         {
             eval.GamePhase += PhaseIncrement;

@@ -1,5 +1,3 @@
-using System;
-
 namespace BlazeUI.Blaze.Evaluation;
 using Board_Representation;
 using Magic_Lookup;
@@ -140,6 +138,9 @@ public static class Evaluator
         
         Lookup.RookEvalLookupWhite(board.bitboards[WhiteRook], pawns, ref eval);
         Lookup.RookEvalLookupBlack(board.bitboards[BlackRook], pawns, ref eval);
+        
+        Lookup.BishopEvalLookupWhite(board.bitboards[WhiteBishop], ref eval);
+        Lookup.BishopEvalLookupBlack(board.bitboards[BlackBishop], ref eval);
     }
 
     public static int BareBonesEval(Board board)

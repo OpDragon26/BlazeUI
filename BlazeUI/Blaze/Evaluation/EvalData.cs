@@ -1,9 +1,9 @@
-using BlazeUI.Blaze.Board_Representation;
-
 namespace BlazeUI.Blaze.Evaluation;
 using static Utils.BitboardUtils;
 using static GenericEval;
 using static PestoEval;
+using static Weights;
+using static Board_Representation.Pieces;
 
 public static class EvalData
 {
@@ -34,7 +34,16 @@ public static class EvalData
 
         public static RookEval GenerateNew(ulong bitboard, Slice slice)
         {
-            return GenerateEval<RookEval, RookTest>(Pieces.WhiteRook, bitboard, slice, tMgBonus: Weights.OpenFileAdvantage);
+            return GenerateEval<RookEval, RookTest>(WhiteRook, bitboard, slice, true, tMgBonus: OpenFileAdvantage);
+        }
+    }
+    
+    public class BishopTest() : EvalTest(8, 8) {}
+    public class BishopEval : Evaluation<BishopTest>
+    {
+        public static BishopEval GenerateNew(ulong bitboard, Slice slice)
+        {
+            return GenerateEval<BishopEval, BishopTest>(WhiteBishop, bitboard, slice, false);
         }
     }
 }
