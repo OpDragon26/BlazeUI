@@ -5,6 +5,7 @@ using Move_Generation;
 using Utils;
 using static Masks;
 using static Bitboards.Lookup;
+using static Evaluation.EvaluationLookup;
 
 public static class MagicLookup
 {
@@ -191,5 +192,26 @@ public static class MagicLookup
     {
         return Bitboards.Lookup.AttackLineLookup[pos.file, pos.rank]
             [(attackers * AttackLineNumber.magicNumber) >> AttackLineNumber.push];
+    }
+    
+    // evaluation lookup
+    public static SliceGroup FirstSliceEvalLookup(ulong bitboard)
+    {
+        return FirstSliceLookup[bitboard & Slice];
+    }
+
+    public static SliceGroup SecondSliceEvalLookup(ulong bitboard)
+    {
+        return SecondSliceLookup[(bitboard >> 16) & Slice];
+    }
+
+    public static SliceGroup ThirdSliceEvalLookup(ulong bitboard)
+    {
+        return ThirdSliceLookup[(bitboard >> 32) & Slice];
+    }
+
+    public static SliceGroup FourthSliceEvalLookup(ulong bitboard)
+    {
+        return FourthSliceLookup[(bitboard >> 48) & Slice];
     }
 }

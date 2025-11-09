@@ -6,6 +6,7 @@ using Book;
 using Magic_Lookup;
 using Search;
 using Utils;
+using Evaluation;
 
 public static class Init
 {
@@ -13,6 +14,7 @@ public static class Init
     
     public static void Start()
     {
+        EvaluationLookup.Init();
         RefutationTable.Init((int)Math.Pow(2, 20) + 7);
         Bitboards.Init(Progress);
         ZobristHash.Init();

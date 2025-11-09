@@ -13,7 +13,9 @@ public static class DebugInterface
     {
         Blaze.Init.Start();
         
-        DebugUtils.TestGameSpeed(15, 6);
+        //DebugUtils.TestGameSpeed(15, 6);
+        
+        CompareEval("k7/8/8/8/8/5R2/6R1/K7 w - - 0 1");
         
         //Examine("rnbqk1nr/ppppppbp/6p1/8/3PP3/8/PPP2PPP/RNBQKBNR w KQkq - 1 3");
         
@@ -28,6 +30,14 @@ public static class DebugInterface
         Environment.Exit(0);
     }
 
+    private static void CompareEval(string FEN)
+    {
+        Board toEval = new Board(FEN);
+
+        Console.WriteLine($"standard eval: {Evaluator.BareBonesEval(toEval)}");
+        Console.WriteLine($"lookup eval: {Evaluator.BareBonesEvalLookup(toEval)}");
+    }
+    
     private static void Examine(string FEN)
     {
         DebugUtils.ExamineEval(new Board(FEN), 6);

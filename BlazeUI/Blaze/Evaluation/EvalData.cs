@@ -1,3 +1,5 @@
+using BlazeUI.Blaze.Board_Representation;
+
 namespace BlazeUI.Blaze.Evaluation;
 using static Utils.BitboardUtils;
 using static GenericEval;
@@ -10,15 +12,8 @@ public static class EvalData
         First, Second, Third, Fourth
     }
     
-    public class RookTest : EvalTest
+    public class RookTest() : EvalTest(8, 8)
     {
-        public RookTest() : base(8, 8) {}
-        
-        public RookTest(int file, int rank) : base(file, rank)
-        {
-            MgBonus = Weights.OpenFileAdvantage;
-        }
-        
         public override bool Test(ulong pawns)
         {
             return (pawns & GetFile(file)) == 0;
@@ -37,9 +32,9 @@ public static class EvalData
             base.EvaluateBlack(pawns, ref eval);
         }
 
-        public static RookEval GenerateNew(uint piece, ulong bitboard, Slice slice)
+        public static RookEval GenerateNew(ulong bitboard, Slice slice)
         {
-            return GenerateEval<RookEval, RookTest>(piece, bitboard, slice);
+            return GenerateEval<RookEval, RookTest>(Pieces.WhiteRook, bitboard, slice, tMgBonus: Weights.OpenFileAdvantage);
         }
     }
 }

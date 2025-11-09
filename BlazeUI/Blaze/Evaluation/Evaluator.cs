@@ -1,3 +1,5 @@
+using System;
+
 namespace BlazeUI.Blaze.Evaluation;
 using Board_Representation;
 using Magic_Lookup;
@@ -15,9 +17,49 @@ public static class Evaluator
     {
         Eval eval = new();
         
+        PieceWiseEval(board, ref eval);
+        
+        // add or take eval according to which side has castled
+        if ((board.castled & 0b10) != 0) // white castled
+            eval.MiddleGameWhite += CastlingBonus;
+        else
+        {
+            if ((board.castling & 0b1000) != 0) // can't short castle
+                eval.MiddleGameWhite -= NoCastlingPenalty;
+            if ((board.castling & 0b100) != 0) // can't long castle
+                eval.MiddleGameWhite -= NoCastlingPenalty;
+        }
+            
+        if ((board.castled & 0b1) != 0) // black castled
+            eval.MiddleGameWhite += CastlingBonus;
+        else
+        {
+            if ((board.castling & 0b10) != 0) // can't short castle
+                eval.MiddleGameBlack -= NoCastlingPenalty;
+            if ((board.castling & 0b1) != 0) // can't long castle
+                eval.MiddleGameBlack -= NoCastlingPenalty;
+        }
+        
+        // check if white's king is in the right spot (likely castled) to have its safety evaluated
+        if ((Masks.KingSafetyAppliesWhite & BitboardUtils.GetSquare(board.KingPositions[0])) != 0)
+            // take from eval if the pawns in front of the king are missing
+            eval.MiddleGameWhite -= WhiteKingSafetyPenalty(board.KingPositions[0].file, board.bitboards[WhitePawn]);
+        else
+            eval.MiddleGameWhite -= NoCastlingPenalty;
+
+        if ((Masks.KingSafetyAppliesBlack & BitboardUtils.GetSquare(board.KingPositions[1])) != 0)
+            eval.MiddleGameWhite -= BlackKingSafetyPenalty(board.KingPositions[1].file, board.bitboards[BlackPawn]);
+        else
+            eval.MiddleGameBlack -= NoCastlingPenalty;
+
+        return eval.Calculate();
+    }
+
+    private static void PieceWiseEval(Board board, ref Eval eval)
+    {
         ulong allPieces = board.AllPieces();
         ulong pawns = board.AllPawns();
-
+        
         for (int file = 0; file < 8; file++)
         {
             if ((allPieces & BitboardUtils.GetFile(file)) == 0)
@@ -28,23 +70,23 @@ public static class Evaluator
 
             if (whitePawns != 0)
             {
-                eval.MgWhite -= whitePawns * MgDoublePawnPenalty;
-                eval.EgWhite -= whitePawns * EgDoublePawnPenalty;
+                eval.MiddleGameWhite -= whitePawns * MgDoublePawnPenalty;
+                eval.EndGameWhite -= whitePawns * EgDoublePawnPenalty;
                 if (IsPawnIsolated(board.bitboards[WhitePawn], file))
                 {
-                    eval.MgWhite -= whitePawns * MgIsolatedPawnPenalty;
-                    eval.EgWhite -= whitePawns * EgIsolatedPawnPenalty;
+                    eval.MiddleGameWhite -= whitePawns * MgIsolatedPawnPenalty;
+                    eval.EndGameWhite -= whitePawns * EgIsolatedPawnPenalty;
                 }
             }
 
             if (blackPawns != 0)
             {
-                eval.MgBlack -= blackPawns * MgDoublePawnPenalty;
-                eval.EgBlack -= blackPawns * EgDoublePawnPenalty;
+                eval.MiddleGameBlack -= blackPawns * MgDoublePawnPenalty;
+                eval.EndGameBlack -= blackPawns * EgDoublePawnPenalty;
                 if (IsPawnIsolated(board.bitboards[BlackPawn], file))
                 {
-                    eval.MgBlack -= blackPawns * MgIsolatedPawnPenalty;
-                    eval.EgBlack -= blackPawns * EgIsolatedPawnPenalty;
+                    eval.MiddleGameBlack -= blackPawns * MgIsolatedPawnPenalty;
+                    eval.EndGameBlack -= blackPawns * EgIsolatedPawnPenalty;
                 }
             }
             
@@ -53,76 +95,72 @@ public static class Evaluator
                 if ((allPieces & BitboardUtils.GetSquare(file, rank)) != 0)
                 {
                     uint piece = board.GetPiece(file, rank);
+                    
                     eval.GamePhase += PhaseIncrement[TypeOf(piece)];
                     
                     if (ColorOf(piece) == 0)
                     {
-                        eval.MgWhite += MgValue[piece] + GetWhiteMgEval(piece, file, rank);
-                        eval.EgWhite += EgValue[piece] + GetWhiteEgEval(piece, file, rank);
+                        eval.MiddleGameWhite += MiddleGameVal[piece] + GetWhiteMgEval(piece, file, rank);
+                        eval.EndGameWhite += EndGameVal[piece] + GetWhiteEgEval(piece, file, rank);
 
                         if (piece == WhitePawn &&
                             IsPawnPassedWhite(board.bitboards[BlackPawn], file, rank))
                         {
-                            eval.MgWhite += MgPassedBonus[rank];
-                            eval.EgWhite += EgPassedBonus[rank];
+                            eval.MiddleGameWhite += MgPassedBonus[rank];
+                            eval.EndGameWhite += EgPassedBonus[rank];
                         }
                         
                         else if (piece == WhiteRook && (pawns & BitboardUtils.GetFile(file)) == 0)
-                            eval.MgWhite += OpenFileAdvantage;
+                            eval.MiddleGameWhite += OpenFileAdvantage;
+
+                        Console.WriteLine($"mg: {MiddleGameVal[piece] + GetWhiteMgEval(piece, file, rank)}");
+                        Console.WriteLine($"eg: {EndGameVal[piece] + GetWhiteEgEval(piece, file, rank)}");
                     }
                     else
                     {
                         piece = TypeOf(piece);
-                        eval.MgBlack += MgValue[piece] + GetBlackMgEval(piece, file, rank);
-                        eval.EgBlack += EgValue[piece] + GetBlackEgEval(piece, file, rank);
+                        eval.MiddleGameBlack += MiddleGameVal[piece] + GetBlackMgEval(piece, file, rank);
+                        eval.EndGameBlack += EndGameVal[piece] + GetBlackEgEval(piece, file, rank);
                         
                         if (piece == WhitePawn &&
                             IsPawnPassedBlack(board.bitboards[WhitePawn], file, rank))
                         {
-                            eval.MgBlack += MgPassedBonus[7 - rank];
-                            eval.EgBlack += EgPassedBonus[7 - rank];
+                            eval.MiddleGameBlack += MgPassedBonus[7 - rank];
+                            eval.EndGameBlack += EgPassedBonus[7 - rank];
                         }
                         
                         else if (piece == WhiteRook && (pawns & BitboardUtils.GetFile(file)) == 0)
-                            eval.MgBlack += OpenFileAdvantage;
+                            eval.MiddleGameBlack += OpenFileAdvantage;
                     }
                 }
             }
         }
-        
-        // add or take eval according to which side has castled
-        if ((board.castled & 0b10) != 0) // white castled
-            eval.MgWhite += CastlingBonus;
-        else
-        {
-            if ((board.castling & 0b1000) != 0) // can't short castle
-                eval.MgWhite -= NoCastlingPenalty;
-            if ((board.castling & 0b100) != 0) // can't long castle
-                eval.MgWhite -= NoCastlingPenalty;
-        }
-            
-        if ((board.castled & 0b1) != 0) // black castled
-            eval.MgWhite += CastlingBonus;
-        else
-        {
-            if ((board.castling & 0b10) != 0) // can't short castle
-                eval.MgBlack -= NoCastlingPenalty;
-            if ((board.castling & 0b1) != 0) // can't long castle
-                eval.MgBlack -= NoCastlingPenalty;
-        }
-        
-        // check if white's king is in the right spot (likely castled) to have its safety evaluated
-        if ((Masks.KingSafetyAppliesWhite & BitboardUtils.GetSquare(board.KingPositions[0])) != 0)
-            // take from eval if the pawns in front of the king are missing
-            eval.MgWhite -= WhiteKingSafetyPenalty(board.KingPositions[0].file, board.bitboards[WhitePawn]);
-        else
-            eval.MgWhite -= NoCastlingPenalty;
+    }
 
-        if ((Masks.KingSafetyAppliesBlack & BitboardUtils.GetSquare(board.KingPositions[1])) != 0)
-            eval.MgWhite -= BlackKingSafetyPenalty(board.KingPositions[1].file, board.bitboards[BlackPawn]);
-        else
-            eval.MgBlack -= NoCastlingPenalty;
+    private static void PieceWiseEvalLookup(Board board, ref Eval eval)
+    {
+        ulong pawns = board.AllPawns();
+        
+        EvaluationLookup.Lookup.RookEvalLookupWhite(board.bitboards[WhiteRook], pawns, ref eval);
+    }
 
+    public static int BareBonesEval(Board board)
+    {
+        Eval eval = new();
+        PieceWiseEval(board, ref eval);
+        return eval.Calculate();
+    }
+
+    public static int BareBonesEvalLookup(Board board)
+    {
+        Eval eval = new();
+        PieceWiseEvalLookup(board, ref eval);
+        eval.MiddleGameWhite += MiddleGameVal[WhiteKing] + GetWhiteMgEval(WhiteKing, board.KingPositions[0].file, board.KingPositions[0].rank);
+        eval.EndGameWhite += EndGameVal[WhiteKing] + GetWhiteEgEval(WhiteKing, board.KingPositions[0].file, board.KingPositions[0].rank);
+        
+        eval.MiddleGameBlack += MiddleGameVal[WhiteKing] + GetBlackMgEval(WhiteKing, board.KingPositions[1].file, board.KingPositions[1].rank);
+        eval.EndGameBlack += EndGameVal[WhiteKing] + GetBlackEgEval(WhiteKing, board.KingPositions[1].file, board.KingPositions[1].rank);
+        
         return eval.Calculate();
     }
 }

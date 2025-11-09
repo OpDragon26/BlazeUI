@@ -27,36 +27,36 @@ public static class PestoEval
 {
     public static int GetWhiteMgEval(uint piece, int file, int rank)
     {
-        return MgTable[piece, rank, file];
+        return MiddleGameTable[piece, rank, file];
     }
 
     public static int GetWhiteEgEval(uint piece, int file, int rank)
     {
-        return EgTable[piece, rank, file];
+        return EndGameTable[piece, rank, file];
     }
     
     public static int GetBlackMgEval(uint piece, int file, int rank)
     {
-        return MgTable[piece, 7 - rank, file];
+        return MiddleGameTable[piece, 7 - rank, file];
     }
 
     public static int GetBlackEgEval(uint piece, int file, int rank)
     {
-        return EgTable[piece, 7 - rank, file];
+        return EndGameTable[piece, 7 - rank, file];
     }
     
     public struct Eval
     {
-        public int MgWhite;
-        public int MgBlack;
-        public int EgWhite;
-        public int EgBlack;
+        public int MiddleGameWhite;
+        public int MiddleGameBlack;
+        public int EndGameWhite;
+        public int EndGameBlack;
         public int GamePhase;
 
         public int Calculate()
         {
-            int mgScore = MgWhite - MgBlack;
-            int egScore = EgWhite - EgBlack;
+            int mgScore = MiddleGameWhite - MiddleGameBlack;
+            int egScore = EndGameWhite - EndGameBlack;
             if (GamePhase > 24)
                 GamePhase = 24;
             int egPhase = 24 - GamePhase;
@@ -65,11 +65,11 @@ public static class PestoEval
         }
     }
 
-    public static readonly int[] MgValue = [98, 487, 347, 365, 1025, 0];
-    public static readonly int[] EgValue = [109, 512, 281, 297, 936, 0];
+    public static readonly int[] MiddleGameVal = [98, 487, 347, 365, 1025, 0];
+    public static readonly int[] EndGameVal = [109, 512, 281, 297, 936, 0];
     public static readonly int[] PhaseIncrement = [0, 2, 1, 1, 4, 0];
     
-    private static readonly int[,,] MgTable =
+    private static readonly int[,,] MiddleGameTable =
     {
         { // pawn
             {  0,   0,   0,   0,   0,   0,  0,   0},
@@ -133,7 +133,7 @@ public static class PestoEval
         },
     };
 
-    private static readonly int[,,] EgTable =
+    private static readonly int[,,] EndGameTable =
     {
         { // pawn
             {  0,   0,   0,   0,   0,   0,   0,   0},
