@@ -144,6 +144,9 @@ public static class Evaluator
         
         Lookup.KnightEvalLookupWhite(board.bitboards[WhiteKnight], ref eval);
         Lookup.KnightEvalLookupBlack(board.bitboards[BlackKnight], ref eval);
+        
+        Lookup.QueenEvalLookupWhite(board.bitboards[WhiteQueen], ref eval);
+        Lookup.QueenEvalLookupBlack(board.bitboards[BlackQueen], ref eval);
     }
 
     public static int BareBonesEval(Board board)

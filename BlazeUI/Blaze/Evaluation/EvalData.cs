@@ -55,4 +55,14 @@ public static class EvalData
             return GenerateEval<KnightEval, KnightTest>(WhiteKnight, bitboard, slice, false);
         }
     }
+    
+    public class QueenTest() : EvalTest(8, 8) {}
+
+    public class QueenEval : Evaluation<QueenTest>
+    {
+        public static QueenEval GenerateNew(ulong bitboard, Slice slice)
+        {
+            return GenerateEval<QueenEval, QueenTest>(WhiteQueen, bitboard, slice, false);
+        }
+    }
 }

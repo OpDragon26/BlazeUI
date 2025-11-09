@@ -19,11 +19,12 @@ public static class EvaluationLookup
     public static SliceGroup[] ThirdSliceLookup = [];
     public static SliceGroup[] FourthSliceLookup = [];
 
-    public class SliceGroup(RookEval rook, BishopEval bishop, KnightEval knight)
+    public class SliceGroup(RookEval rook, BishopEval bishop, KnightEval knight, QueenEval queen)
     {
         public readonly RookEval Rook = rook;
         public readonly BishopEval Bishop = bishop;
         public readonly KnightEval Knight = knight;
+        public readonly QueenEval Queen = queen;
     }
     
     public static void Init()
@@ -43,7 +44,8 @@ public static class EvaluationLookup
             FirstSliceLookup[combination] = new SliceGroup(
                 RookEval.GenerateNew(combination, Slice.First),
                 BishopEval.GenerateNew(combination, Slice.First),
-                KnightEval.GenerateNew(combination, Slice.First));
+                KnightEval.GenerateNew(combination, Slice.First),
+                QueenEval.GenerateNew(combination, Slice.First));
         });
         
         Batch.ForEach(SecondSliceCombinations, combination =>
@@ -51,7 +53,8 @@ public static class EvaluationLookup
             SecondSliceLookup[combination >> 16] = new SliceGroup(
                 RookEval.GenerateNew(combination, Slice.Second),
                 BishopEval.GenerateNew(combination, Slice.Second),
-                KnightEval.GenerateNew(combination, Slice.Second));
+                KnightEval.GenerateNew(combination, Slice.Second),
+                QueenEval.GenerateNew(combination, Slice.Second));
         });
         
         Batch.ForEach(ThirdSliceCombinations, combination =>
@@ -59,7 +62,8 @@ public static class EvaluationLookup
             ThirdSliceLookup[combination >> 32] = new SliceGroup(
                 RookEval.GenerateNew(combination, Slice.Third),
                 BishopEval.GenerateNew(combination, Slice.Third),
-                KnightEval.GenerateNew(combination, Slice.Third));
+                KnightEval.GenerateNew(combination, Slice.Third),
+                QueenEval.GenerateNew(combination, Slice.Third));
         });
         
         Batch.ForEach(FourthSliceCombinations, combination =>
@@ -67,7 +71,8 @@ public static class EvaluationLookup
             FourthSliceLookup[combination >> 48] = new SliceGroup(
                 RookEval.GenerateNew(combination, Slice.Fourth),
                 BishopEval.GenerateNew(combination, Slice.Fourth),
-                KnightEval.GenerateNew(combination, Slice.Fourth));
+                KnightEval.GenerateNew(combination, Slice.Fourth),
+                QueenEval.GenerateNew(combination, Slice.Fourth));
         });
     }
 
@@ -119,6 +124,22 @@ public static class EvaluationLookup
             MagicLookup.SecondSliceEvalLookup(knights).Knight.EvaluateBlack(ref eval);
             MagicLookup.ThirdSliceEvalLookup(knights).Knight.EvaluateBlack(ref eval);
             MagicLookup.FourthSliceEvalLookup(knights).Knight.EvaluateBlack(ref eval);
+        }
+        
+        public static void QueenEvalLookupWhite(ulong queens, ref Eval eval)
+        {
+            MagicLookup.FirstSliceEvalLookup(queens).Queen.EvaluateWhite(ref eval);
+            MagicLookup.SecondSliceEvalLookup(queens).Queen.EvaluateWhite(ref eval);
+            MagicLookup.ThirdSliceEvalLookup(queens).Queen.EvaluateWhite(ref eval);
+            MagicLookup.FourthSliceEvalLookup(queens).Queen.EvaluateWhite(ref eval);
+        }
+        
+        public static void QueenEvalLookupBlack(ulong queens, ref Eval eval)
+        {
+            MagicLookup.FirstSliceEvalLookup(queens).Queen.EvaluateBlack(ref eval);
+            MagicLookup.SecondSliceEvalLookup(queens).Queen.EvaluateBlack(ref eval);
+            MagicLookup.ThirdSliceEvalLookup(queens).Queen.EvaluateBlack(ref eval);
+            MagicLookup.FourthSliceEvalLookup(queens).Queen.EvaluateBlack(ref eval);
         }
     }
 }
