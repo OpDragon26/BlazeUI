@@ -6,6 +6,7 @@ using static Weights;
 using static PestoEval;
 using static Board_Representation.Pieces;
 using static Utils.EvalUtils;
+using static EvalData;
 
 public static class Evaluator
 {
@@ -123,25 +124,5 @@ public static class Evaluator
             eval.MgBlack -= NoCastlingPenalty;
 
         return eval.Calculate();
-    }
-
-    private struct Eval
-    {
-        public int MgWhite;
-        public int MgBlack;
-        public int EgWhite;
-        public int EgBlack;
-        public int GamePhase;
-
-        public int Calculate()
-        {
-            int mgScore = MgWhite - MgBlack;
-            int egScore = EgWhite - EgBlack;
-            if (GamePhase > 24)
-                GamePhase = 24;
-            int egPhase = 24 - GamePhase;
-
-            return (mgScore * GamePhase + egScore * egPhase) / 24;
-        }
     }
 }
