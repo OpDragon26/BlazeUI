@@ -50,6 +50,8 @@ public static class Masks
     public const ulong BlackPossibleEnPassant = 0x100000000;
     public const ulong WhitePossibleEnPassant = 0x1000000;
 
+    public const ulong Slice = 0xffff;
+
     public static void Init()
     {
         List<ulong> enPassantBitboards = new();

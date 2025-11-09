@@ -6,6 +6,7 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Threading;
 using BlazeUI.Blaze;
+using BlazeUI.Blaze.Evaluation;
 using BlazeUI.Blaze.Utils;
 
 namespace BlazeUI;

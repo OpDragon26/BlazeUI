@@ -1,6 +1,7 @@
-using System.Collections.Generic;
-
 namespace BlazeUI.Blaze.Evaluation;
+using static Utils.BitboardUtils;
+using static GenericEval;
+using static PestoEval;
 
 public static class EvalData
 {
@@ -9,110 +10,36 @@ public static class EvalData
         First, Second, Third, Fourth
     }
     
-    public abstract class Evaluation<TEvalTest> where TEvalTest : EvalTest
+    public class RookTest : EvalTest
     {
-        public int MgWhite;
-        public int MgBlack;
-        public int EgWhite;
-        public int EgBlack;
-
-        public List<TEvalTest> WhiteTest = new();
-        public List<TEvalTest> BlackTest = new();
-
-        public virtual void EvaluateWhite(ulong bitboard, ref Eval eval)
+        public RookTest() : base(8, 8) {}
+        
+        public RookTest(int file, int rank) : base(file, rank)
         {
-            eval.MgWhite += MgWhite;
-            eval.EgWhite += EgWhite;
-            TestWhite(bitboard, ref eval);
-        }
-
-        public virtual void EvaluateBlack(ulong bitboard, ref Eval eval)
-        {
-            eval.MgBlack += MgBlack;
-            eval.EgBlack += EgBlack;
-            TestBlack(bitboard, ref eval);
+            MgBonus = Weights.OpenFileAdvantage;
         }
         
-        public virtual void EvaluateWhite(ulong white, ulong black, ref Eval eval)
+        public override bool Test(ulong pawns)
         {
-            eval.MgWhite += MgWhite;
-            eval.EgWhite += EgWhite;
-            TestWhite(white, black, ref eval);
-        }
-
-        public virtual void EvaluateBlack(ulong white, ulong black, ref Eval eval)
-        {
-            eval.MgBlack += MgBlack;
-            eval.EgBlack += EgBlack;
-            TestBlack(white, black, ref eval);
-        }
-
-        protected void TestWhite(ulong bitboard, ref Eval eval)
-        {
-            foreach (EvalTest t in WhiteTest)
-                if (t.Test(bitboard))
-                {
-                    eval.MgWhite += t.MgBonus;
-                    eval.EgWhite += t.EgBonus;
-                }
-        }
-
-        protected void TestBlack(ulong bitboard, ref Eval eval)
-        {
-            foreach (TEvalTest t in BlackTest)
-                if (t.Test(bitboard))
-                {
-                    eval.MgBlack += t.MgBonus;
-                    eval.EgBlack += t.EgBonus;
-                }
-        }
-        
-        protected void TestWhite(ulong white, ulong black, ref Eval eval)
-        {
-            foreach (TEvalTest t in WhiteTest)
-                if (t.Test(white, black))
-                {
-                    eval.MgWhite += t.MgBonus;
-                    eval.EgWhite += t.EgBonus;
-                }
-        }
-
-        protected void TestBlack(ulong white, ulong black, ref Eval eval)
-        {
-            foreach (TEvalTest t in BlackTest)
-                if (t.Test(white, black))
-                {
-                    eval.MgBlack += t.MgBonus;
-                    eval.EgBlack += t.EgBonus;
-                }
+            return (pawns & GetFile(file)) == 0;
         }
     }
 
-    public abstract class EvalTest
+    public class RookEval : Evaluation<RookTest>
     {
-        public int MgBonus;
-        public int EgBonus;
-        public virtual bool Test(ulong bitboard) => false;
-        public virtual bool Test(ulong white, ulong black) => false;
-    }
-    
-    public struct Eval
-    {
-        public int MgWhite;
-        public int MgBlack;
-        public int EgWhite;
-        public int EgBlack;
-        public int GamePhase;
-
-        public int Calculate()
+        public override void EvaluateWhite(ulong pawns, ref Eval eval)
         {
-            int mgScore = MgWhite - MgBlack;
-            int egScore = EgWhite - EgBlack;
-            if (GamePhase > 24)
-                GamePhase = 24;
-            int egPhase = 24 - GamePhase;
+            base.EvaluateWhite(pawns, ref eval);
+        }
+        
+        public override void EvaluateBlack(ulong pawns, ref Eval eval)
+        {
+            base.EvaluateBlack(pawns, ref eval);
+        }
 
-            return (mgScore * GamePhase + egScore * egPhase) / 24;
+        public static RookEval GenerateNew(uint piece, ulong bitboard, Slice slice)
+        {
+            return GenerateEval<RookEval, RookTest>(piece, bitboard, slice);
         }
     }
 }

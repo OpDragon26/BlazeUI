@@ -44,6 +44,26 @@ public static class PestoEval
     {
         return EgTable[piece, 7 - rank, file];
     }
+    
+    public struct Eval
+    {
+        public int MgWhite;
+        public int MgBlack;
+        public int EgWhite;
+        public int EgBlack;
+        public int GamePhase;
+
+        public int Calculate()
+        {
+            int mgScore = MgWhite - MgBlack;
+            int egScore = EgWhite - EgBlack;
+            if (GamePhase > 24)
+                GamePhase = 24;
+            int egPhase = 24 - GamePhase;
+
+            return (mgScore * GamePhase + egScore * egPhase) / 24;
+        }
+    }
 
     public static readonly int[] MgValue = [98, 487, 347, 365, 1025, 0];
     public static readonly int[] EgValue = [109, 512, 281, 297, 936, 0];
