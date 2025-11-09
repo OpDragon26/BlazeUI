@@ -11,8 +11,10 @@ public static class GenericEval
     {
         TEval eval = new TEval();
 
+        int startRank = 6 - (int)slice * 2;
+        
         for (int file = 0; file < 8; file++)
-        for (int rank = 0; rank < 8; rank++)
+        for (int rank = startRank; rank < startRank + 2; rank++)
         {
             if ((BitboardUtils.GetSquare(file, rank) & bitboard) != 0)
             {

@@ -106,8 +106,8 @@ public static class Evaluator
                         if (piece == WhitePawn &&
                             IsPawnPassedWhite(board.bitboards[BlackPawn], file, rank))
                         {
-                            eval.MiddleGameWhite += MgPassedBonus[rank];
-                            eval.EndGameWhite += EgPassedBonus[rank];
+                            eval.MiddleGameWhite += MiddleGamePassedBonus[rank];
+                            eval.EndGameWhite += EndGamePassedBonus[rank];
                         }
                         
                         else if (piece == WhiteRook && (pawns & BitboardUtils.GetFile(file)) == 0)
@@ -122,8 +122,8 @@ public static class Evaluator
                         if (piece == WhitePawn &&
                             IsPawnPassedBlack(board.bitboards[WhitePawn], file, rank))
                         {
-                            eval.MiddleGameBlack += MgPassedBonus[7 - rank];
-                            eval.EndGameBlack += EgPassedBonus[7 - rank];
+                            eval.MiddleGameBlack += MiddleGamePassedBonus[7 - rank];
+                            eval.EndGameBlack += EndGamePassedBonus[7 - rank];
                         }
                         
                         else if (piece == WhiteRook && (pawns & BitboardUtils.GetFile(file)) == 0)

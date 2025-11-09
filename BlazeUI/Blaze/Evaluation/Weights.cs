@@ -17,8 +17,8 @@ public static class Weights
     
     public const int PriorityWeightMultiplier = 15;
 
-    public static readonly int[] MgPassedBonus = [0, 10, 10, 25, 35, 45, 50, 0];
-    public static readonly int[] EgPassedBonus = [0, 15, 15, 35, 45, 60, 90, 0];
+    public static readonly int[] MiddleGamePassedBonus = [0, 10, 10, 25, 35, 45, 50, 0];
+    public static readonly int[] EndGamePassedBonus = [0, 15, 15, 35, 45, 60, 90, 0];
     
     public static readonly int[] KingSafetyPenalty = [100, 60, 30, 0, 0, 0];
 }
