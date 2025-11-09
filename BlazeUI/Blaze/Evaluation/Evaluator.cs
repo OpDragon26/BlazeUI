@@ -8,7 +8,7 @@ using static Weights;
 using static PestoEval;
 using static Board_Representation.Pieces;
 using static Utils.EvalUtils;
-using static EvalData;
+using static EvaluationLookup;
 
 public static class Evaluator
 {
@@ -112,9 +112,6 @@ public static class Evaluator
                         
                         else if (piece == WhiteRook && (pawns & BitboardUtils.GetFile(file)) == 0)
                             eval.MiddleGameWhite += OpenFileAdvantage;
-
-                        Console.WriteLine($"mg: {MiddleGameVal[piece] + GetWhiteMgEval(piece, file, rank)}");
-                        Console.WriteLine($"eg: {EndGameVal[piece] + GetWhiteEgEval(piece, file, rank)}");
                     }
                     else
                     {
@@ -141,7 +138,8 @@ public static class Evaluator
     {
         ulong pawns = board.AllPawns();
         
-        EvaluationLookup.Lookup.RookEvalLookupWhite(board.bitboards[WhiteRook], pawns, ref eval);
+        Lookup.RookEvalLookupWhite(board.bitboards[WhiteRook], pawns, ref eval);
+        Lookup.RookEvalLookupBlack(board.bitboards[BlackRook], pawns, ref eval);
     }
 
     public static int BareBonesEval(Board board)

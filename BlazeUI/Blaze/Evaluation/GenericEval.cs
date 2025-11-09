@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using BlazeUI.Blaze.Board_Representation;
 
 namespace BlazeUI.Blaze.Evaluation;
 using static EvalData;
@@ -41,16 +39,14 @@ public static class GenericEval
         public int EgBlack;
         public int PhaseIncrement;
 
-        public List<TEvalTest> WhiteTest = new();
-        public List<TEvalTest> BlackTest = new();
+        public readonly List<TEvalTest> WhiteTest = new();
+        public readonly List<TEvalTest> BlackTest = new();
 
         public virtual void EvaluateWhite(ulong bitboard, ref Eval eval)
         {
             eval.GamePhase += PhaseIncrement;
             eval.MiddleGameWhite += MgWhite;
             eval.EndGameWhite += EgWhite;
-            Console.WriteLine(MgWhite);
-            Console.WriteLine(EgWhite);
             TestWhite(bitboard, ref eval);
         }
 
@@ -78,19 +74,18 @@ public static class GenericEval
             TestBlack(white, black, ref eval);
         }
 
-        protected void TestWhite(ulong bitboard, ref Eval eval)
+        private void TestWhite(ulong bitboard, ref Eval eval)
         {
-            foreach (EvalTest t in WhiteTest)
-            {
+            foreach (TEvalTest t in WhiteTest)
                 if (t.Test(bitboard))
                 {
                     eval.MiddleGameWhite += t.MgBonus;
                     eval.EndGameWhite += t.EgBonus;
                 }
-            }
+            
         }
 
-        protected void TestBlack(ulong bitboard, ref Eval eval)
+        private void TestBlack(ulong bitboard, ref Eval eval)
         {
             foreach (TEvalTest t in BlackTest)
                 if (t.Test(bitboard))
@@ -100,7 +95,7 @@ public static class GenericEval
                 }
         }
         
-        protected void TestWhite(ulong white, ulong black, ref Eval eval)
+        private void TestWhite(ulong white, ulong black, ref Eval eval)
         {
             foreach (TEvalTest t in WhiteTest)
                 if (t.Test(white, black))
@@ -110,7 +105,7 @@ public static class GenericEval
                 }
         }
 
-        protected void TestBlack(ulong white, ulong black, ref Eval eval)
+        private void TestBlack(ulong white, ulong black, ref Eval eval)
         {
             foreach (TEvalTest t in BlackTest)
                 if (t.Test(white, black))

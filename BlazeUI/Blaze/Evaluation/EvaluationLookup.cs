@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using BlazeUI.Blaze.Utils;
 
 namespace BlazeUI.Blaze.Evaluation;
@@ -8,10 +9,10 @@ using static EvalData;
 
 public static class EvaluationLookup
 {
-    public static ulong[] FirstSliceCombinations = [];
-    public static ulong[] SecondSliceCombinations = [];
-    public static ulong[] ThirdSliceCombinations = [];
-    public static ulong[] FourthSliceCombinations = [];
+    private static List<ulong> FirstSliceCombinations = [];
+    private static List<ulong> SecondSliceCombinations = [];
+    private static List<ulong> ThirdSliceCombinations = [];
+    private static List<ulong> FourthSliceCombinations = [];
 
     public static SliceGroup[] FirstSliceLookup = [];
     public static SliceGroup[] SecondSliceLookup = [];
@@ -25,32 +26,39 @@ public static class EvaluationLookup
     
     public static void Init()
     {
-        FirstSliceCombinations = Combinations(GetSlice(Slice.First), 9).ToArray();
-        SecondSliceCombinations = Combinations(GetSlice(Slice.Second), 9).ToArray();
-        ThirdSliceCombinations = Combinations(GetSlice(Slice.Third), 9).ToArray();
-        FourthSliceCombinations = Combinations(GetSlice(Slice.Fourth), 9).ToArray();
+        FirstSliceCombinations = Combinations(GetSlice(Slice.First), 9);
+        SecondSliceCombinations = Combinations(GetSlice(Slice.Second), 9);
+        ThirdSliceCombinations = Combinations(GetSlice(Slice.Third), 9);
+        FourthSliceCombinations = Combinations(GetSlice(Slice.Fourth), 9);
 
         FirstSliceLookup = new SliceGroup[0xFF81];
         SecondSliceLookup = new SliceGroup[0xFF81];
         ThirdSliceLookup = new SliceGroup[0xFF81];
         FourthSliceLookup = new SliceGroup[0xFF81];
 
-        foreach (ulong combination in FirstSliceCombinations)
+        Batch.ForEach(FirstSliceCombinations, combination =>
+        {
             FirstSliceLookup[combination] = new SliceGroup(
                 RookEval.GenerateNew(combination, Slice.First));
-
-        foreach (ulong combination in SecondSliceCombinations)
+        });
+        
+        Batch.ForEach(SecondSliceCombinations, combination =>
+        {
             SecondSliceLookup[combination >> 16] = new SliceGroup(
                 RookEval.GenerateNew(combination, Slice.Second));
+        });
         
-        foreach (ulong combination in ThirdSliceCombinations)
+        Batch.ForEach(ThirdSliceCombinations, combination =>
+        {
             ThirdSliceLookup[combination >> 32] = new SliceGroup(
                 RookEval.GenerateNew(combination, Slice.Third));
+        });
         
-        foreach (ulong combination in FourthSliceCombinations)
+        Batch.ForEach(FourthSliceCombinations, combination =>
+        {
             FourthSliceLookup[combination >> 48] = new SliceGroup(
                 RookEval.GenerateNew(combination, Slice.Fourth));
-        
+        });
     }
 
     public static class Lookup
@@ -61,6 +69,14 @@ public static class EvaluationLookup
             MagicLookup.SecondSliceEvalLookup(rooks).Rook.EvaluateWhite(pawns, ref eval);
             MagicLookup.ThirdSliceEvalLookup(rooks).Rook.EvaluateWhite(pawns, ref eval);
             MagicLookup.FourthSliceEvalLookup(rooks).Rook.EvaluateWhite(pawns, ref eval);
+        }
+
+        public static void RookEvalLookupBlack(ulong rooks, ulong pawns, ref PestoEval.Eval eval)
+        {
+            MagicLookup.FirstSliceEvalLookup(rooks).Rook.EvaluateBlack(pawns, ref eval);
+            MagicLookup.SecondSliceEvalLookup(rooks).Rook.EvaluateBlack(pawns, ref eval);
+            MagicLookup.ThirdSliceEvalLookup(rooks).Rook.EvaluateBlack(pawns, ref eval);
+            MagicLookup.FourthSliceEvalLookup(rooks).Rook.EvaluateBlack(pawns, ref eval);
         }
     }
 }
