@@ -15,7 +15,7 @@ public static class Evaluator
     {
         Eval eval = new();
         
-        PieceWiseEval(board, ref eval);
+        PieceWiseEvalLookup(board, ref eval);
         
         // add or take eval according to which side has castled
         if ((board.castled & 0b10) != 0) // white castled
@@ -136,22 +136,20 @@ public static class Evaluator
 
     private static void PieceWiseEvalLookup(Board board, ref Eval eval)
     {
-        ulong pawns = board.AllPawns();
+        eval.AddWhite(Lookup.RookEvalLookupWhite(board.bitboards[WhiteRook], board.AllPawns()));
+        eval.AddBlack(Lookup.RookEvalLookupBlack(board.bitboards[BlackRook], board.AllPawns()));
         
-        Lookup.RookEvalLookupWhite(board.bitboards[WhiteRook], pawns, ref eval);
-        Lookup.RookEvalLookupBlack(board.bitboards[BlackRook], pawns, ref eval);
+        eval.AddWhite(Lookup.BishopEvalLookupWhite(board.bitboards[WhiteBishop]));
+        eval.AddBlack(Lookup.BishopEvalLookupBlack(board.bitboards[BlackBishop]));
         
-        Lookup.BishopEvalLookupWhite(board.bitboards[WhiteBishop], ref eval);
-        Lookup.BishopEvalLookupBlack(board.bitboards[BlackBishop], ref eval);
+        eval.AddWhite(Lookup.KnightEvalLookupWhite(board.bitboards[WhiteKnight]));
+        eval.AddBlack(Lookup.KnightEvalLookupBlack(board.bitboards[BlackKnight]));
         
-        Lookup.KnightEvalLookupWhite(board.bitboards[WhiteKnight], ref eval);
-        Lookup.KnightEvalLookupBlack(board.bitboards[BlackKnight], ref eval);
+        eval.AddWhite(Lookup.QueenEvalLookupWhite(board.bitboards[WhiteQueen]));
+        eval.AddBlack(Lookup.QueenEvalLookupBlack(board.bitboards[BlackQueen]));
         
-        Lookup.QueenEvalLookupWhite(board.bitboards[WhiteQueen], ref eval);
-        Lookup.QueenEvalLookupBlack(board.bitboards[BlackQueen], ref eval);
-        
-        Lookup.PawnEvalLookupWhite(board.bitboards[WhitePawn], board.bitboards[BlackPawn], ref eval);
-        Lookup.PawnEvalLookupBlack(board.bitboards[BlackPawn], board.bitboards[WhitePawn], ref eval);
+        eval.AddWhite(Lookup.PawnEvalLookupWhite(board.bitboards[WhitePawn], board.bitboards[BlackPawn]));
+        eval.AddBlack(Lookup.PawnEvalLookupBlack(board.bitboards[BlackPawn], board.bitboards[WhitePawn]));
     }
 
     public static int BareBonesEval(Board board)

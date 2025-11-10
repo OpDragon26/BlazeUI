@@ -63,6 +63,45 @@ public static class PestoEval
 
             return (mgScore * GamePhase + egScore * egPhase) / 24;
         }
+
+        public void AddWhite(EvalResult other)
+        {
+            MiddleGameWhite += other.MgScore;
+            EndGameWhite += other.EgScore;
+            GamePhase += other.Increment;
+        }
+
+        public void AddBlack(EvalResult other)
+        {
+            MiddleGameBlack += other.MgScore;
+            EndGameBlack += other.EgScore;
+            GamePhase += other.Increment;
+        }
+    }
+
+    public struct EvalResult(int mgScore, int egScore, int phaseIncrement)
+    {
+        public int MgScore = mgScore;
+        public int EgScore = egScore;
+        public int Increment = phaseIncrement;
+
+        public void Add(EvalResult other)
+        {
+            MgScore += other.MgScore;
+            EgScore += other.EgScore;
+            Increment += other.Increment;
+        }
+    }
+
+    public static int Calculate(int mgWhite, int mgBlack, int egWhite, int egBlack, int gamePhase)
+    {
+        int mgScore = mgWhite - mgBlack;
+        int egScore = egWhite - egBlack;
+        if (gamePhase > 24)
+            gamePhase = 24;
+        int egPhase = 24 - gamePhase;
+
+        return (mgScore * gamePhase + egScore * egPhase) / 24;
     }
 
     public static readonly int[] MiddleGameVal = [98, 487, 347, 365, 1025, 0];

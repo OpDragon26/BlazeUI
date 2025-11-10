@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 namespace BlazeUI.Blaze.Evaluation;
@@ -32,14 +31,14 @@ public static class EvalData
 
     public class RookEval : Evaluation<RookTest>
     {
-        public override void EvaluateWhite(ulong pawns, ref Eval eval)
+        public override EvalResult EvaluateWhite(ulong pawns)
         {
-            base.EvaluateWhite(pawns, ref eval);
+            return base.EvaluateWhite(pawns);
         }
         
-        public override void EvaluateBlack(ulong pawns, ref Eval eval)
+        public override EvalResult EvaluateBlack(ulong pawns)
         {
-            base.EvaluateBlack(pawns, ref eval);
+            return base.EvaluateBlack(pawns);
         }
 
         public static RookEval GenerateNew(ulong bitboard, Slice slice)
@@ -74,8 +73,8 @@ public static class EvalData
 
     private class PassedTest(int file, int rank)
     {
-        public readonly int file = file;
-        public readonly int rank = rank;
+        //public readonly int file = file;
+        //public readonly int rank = rank;
         
         public int MiddleGameWhite(ulong blackPawns)
         {
@@ -102,30 +101,32 @@ public static class EvalData
     {
         private readonly List<PassedTest> Tests = new();
         
-        public void EvaluateWhite(ulong blackPawns, ref Eval eval)
+        public EvalResult EvaluateWhite(ulong blackPawns)
         {
-            eval.MiddleGameWhite += MgWhite;
-            eval.EndGameWhite += EgWhite;
+            EvalResult result = White;
             
             // test for passed pawns
             foreach (PassedTest t in Tests)
             {
-                eval.MiddleGameWhite += t.MiddleGameWhite(blackPawns);
-                eval.EndGameWhite += t.EndGameWhite(blackPawns);
+                result.MgScore += t.MiddleGameWhite(blackPawns);
+                result.EgScore += t.EndGameWhite(blackPawns);
             }
+            
+            return result;
         }
 
-        public void EvaluateBlack(ulong whitePawns, ref Eval eval)
+        public EvalResult EvaluateBlack(ulong whitePawns)
         {
-            eval.MiddleGameBlack += MgBlack;
-            eval.EndGameBlack += EgBlack;
+            EvalResult result = Black;
             
             // test for passed pawns
             foreach (PassedTest t in Tests)
             {
-                eval.MiddleGameBlack += t.MiddleGameBlack(whitePawns);
-                eval.EndGameBlack += t.EndGameBlack(whitePawns);
+                result.MgScore += t.MiddleGameBlack(whitePawns);
+                result.EgScore += t.EndGameBlack(whitePawns);
             }
+            
+            return result;
         }
 
         public static PawnEval GenerateNew(ulong pawns, Section section)
@@ -143,19 +144,19 @@ public static class EvalData
                 
                 if (pawnCount != 0)
                 {
-                    eval.MgWhite -= (pawnCount - 1) * MgDoublePawnPenalty;
-                    eval.EgWhite -= (pawnCount - 1) * EgDoublePawnPenalty;
+                    eval.White.MgScore -= (pawnCount - 1) * MgDoublePawnPenalty;
+                    eval.White.EgScore -= (pawnCount - 1) * EgDoublePawnPenalty;
                     
-                    eval.MgBlack -= (pawnCount - 1) * MgDoublePawnPenalty;
-                    eval.EgBlack -= (pawnCount - 1) * EgDoublePawnPenalty;
+                    eval.Black.MgScore -= (pawnCount - 1) * MgDoublePawnPenalty;
+                    eval.Black.EgScore -= (pawnCount - 1) * EgDoublePawnPenalty;
                 
                     if (IsPawnIsolated(pawns, file))
                     {
-                        eval.MgWhite -= pawnCount * MgIsolatedPawnPenalty;
-                        eval.EgWhite -= pawnCount * EgIsolatedPawnPenalty;
+                        eval.White.MgScore -= pawnCount * MgIsolatedPawnPenalty;
+                        eval.White.EgScore -= pawnCount * EgIsolatedPawnPenalty;
                         
-                        eval.MgBlack -= pawnCount * MgIsolatedPawnPenalty;
-                        eval.EgBlack -= pawnCount * EgIsolatedPawnPenalty;
+                        eval.Black.MgScore -= pawnCount * MgIsolatedPawnPenalty;
+                        eval.Black.EgScore -= pawnCount * EgIsolatedPawnPenalty;
                     }
                 }
                 
@@ -164,10 +165,10 @@ public static class EvalData
                 {
                     if ((pawns & GetSquare(file, rank)) != 0)
                     {
-                        eval.MgWhite += GetWhiteMgEval(WhitePawn, file, rank) + MiddleGameVal[WhitePawn];
-                        eval.EgWhite += GetWhiteEgEval(WhitePawn, file, rank) + EndGameVal[WhitePawn];
-                        eval.MgBlack += GetBlackMgEval(WhitePawn, file, rank) + MiddleGameVal[WhitePawn];
-                        eval.EgBlack += GetBlackEgEval(WhitePawn, file, rank) + EndGameVal[WhitePawn];
+                        eval.White.MgScore += GetWhiteMgEval(WhitePawn, file, rank) + MiddleGameVal[WhitePawn];
+                        eval.White.EgScore += GetWhiteEgEval(WhitePawn, file, rank) + EndGameVal[WhitePawn];
+                        eval.Black.MgScore += GetBlackMgEval(WhitePawn, file, rank) + MiddleGameVal[WhitePawn];
+                        eval.Black.EgScore += GetBlackEgEval(WhitePawn, file, rank) + EndGameVal[WhitePawn];
                         
                         eval.Tests.Add(new(file, rank));
                     }

@@ -19,12 +19,13 @@ public static class GenericEval
         {
             if ((BitboardUtils.GetSquare(file, rank) & bitboard) != 0)
             {
-                eval.PhaseIncrement += PhaseIncrement[piece];
+                eval.White.Increment += PhaseIncrement[piece];
+                eval.Black.Increment += PhaseIncrement[piece];
                 
-                eval.MgWhite += GetWhiteMgEval(piece, file, rank) + MiddleGameVal[piece];
-                eval.EgWhite += GetWhiteEgEval(piece, file, rank) + EndGameVal[piece];
-                eval.MgBlack += GetBlackMgEval(piece, file, rank) + MiddleGameVal[piece];
-                eval.EgBlack += GetBlackEgEval(piece, file, rank) + EndGameVal[piece];
+                eval.White.MgScore += GetWhiteMgEval(piece, file, rank) + MiddleGameVal[piece];
+                eval.White.EgScore += GetWhiteEgEval(piece, file, rank) + EndGameVal[piece];
+                eval.Black.MgScore += GetBlackMgEval(piece, file, rank) + MiddleGameVal[piece];
+                eval.Black.EgScore += GetBlackEgEval(piece, file, rank) + EndGameVal[piece];
                 
 
                 eval.WhiteTest.Add(new TEvalTest{file = file , rank = rank , MgBonus = tMgBonus, EgBonus = tEgBonus});
@@ -48,12 +49,13 @@ public static class GenericEval
         {
             if ((BitboardUtils.GetSquare(file, rank) & bitboard) != 0)
             {
-                eval.PhaseIncrement += PhaseIncrement[piece];
+                eval.White.Increment += PhaseIncrement[piece];
+                eval.Black.Increment += PhaseIncrement[piece];
                 
-                eval.MgWhite += GetWhiteMgEval(piece, file, rank) + MiddleGameVal[piece];
-                eval.EgWhite += GetWhiteEgEval(piece, file, rank) + EndGameVal[piece];
-                eval.MgBlack += GetBlackMgEval(piece, file, rank) + MiddleGameVal[piece];
-                eval.EgBlack += GetBlackEgEval(piece, file, rank) + EndGameVal[piece];
+                eval.White.MgScore += GetWhiteMgEval(piece, file, rank) + MiddleGameVal[piece];
+                eval.White.EgScore += GetWhiteEgEval(piece, file, rank) + EndGameVal[piece];
+                eval.Black.MgScore += GetBlackMgEval(piece, file, rank) + MiddleGameVal[piece];
+                eval.Black.EgScore += GetBlackEgEval(piece, file, rank) + EndGameVal[piece];
             }
         }
         
@@ -62,25 +64,8 @@ public static class GenericEval
 
     public abstract class Evaluation
     {
-        public int MgWhite;
-        public int MgBlack;
-        public int EgWhite;
-        public int EgBlack;
-        public int PhaseIncrement;
-        
-        public void EvaluateWhite(ref Eval eval)
-        {
-            eval.GamePhase += PhaseIncrement;
-            eval.MiddleGameWhite += MgWhite;
-            eval.EndGameWhite += EgWhite;
-        }
-
-        public void EvaluateBlack(ref Eval eval)
-        {
-            eval.GamePhase += PhaseIncrement;
-            eval.MiddleGameBlack += MgBlack;
-            eval.EndGameBlack += EgBlack;
-        }
+        public EvalResult White;
+        public EvalResult Black;
     }
     
     public abstract class Evaluation<TEvalTest> : Evaluation where TEvalTest : EvalTest
@@ -88,41 +73,32 @@ public static class GenericEval
         public readonly List<TEvalTest> WhiteTest = new();
         public readonly List<TEvalTest> BlackTest = new();
         
-        public virtual void EvaluateWhite(ulong bitboard, ref Eval eval)
+        public virtual EvalResult EvaluateWhite(ulong bitboard)
         {
-            eval.GamePhase += PhaseIncrement;
-            eval.MiddleGameWhite += MgWhite;
-            eval.EndGameWhite += EgWhite;
-            TestWhite(bitboard, ref eval);
-        }
-
-        public virtual void EvaluateBlack(ulong bitboard, ref Eval eval)
-        {
-            eval.GamePhase += PhaseIncrement;
-            eval.MiddleGameBlack += MgBlack;
-            eval.EndGameBlack += EgBlack;
-            TestBlack(bitboard, ref eval);
-        }
-
-        private void TestWhite(ulong bitboard, ref Eval eval)
-        {
+            EvalResult result = White;
+            
             foreach (TEvalTest t in WhiteTest)
                 if (t.Test(bitboard))
                 {
-                    eval.MiddleGameWhite += t.MgBonus;
-                    eval.EndGameWhite += t.EgBonus;
+                    result.MgScore += t.MgBonus;
+                    result.EgScore += t.EgBonus;
                 }
             
+            return result;
         }
 
-        private void TestBlack(ulong bitboard, ref Eval eval)
+        public virtual EvalResult EvaluateBlack(ulong bitboard)
         {
+            EvalResult result = Black;
+            
             foreach (TEvalTest t in BlackTest)
                 if (t.Test(bitboard))
                 {
-                    eval.MiddleGameBlack += t.MgBonus;
-                    eval.EndGameBlack += t.EgBonus;
+                    result.MgScore += t.MgBonus;
+                    result.EgScore += t.EgBonus;
                 }
+            
+            return result;
         }
     }
 
@@ -134,6 +110,5 @@ public static class GenericEval
         public int rank = rank;
         
         public virtual bool Test(ulong bitboard) => false;
-        public virtual bool Test(ulong white, ulong black) => false;
     }
 }

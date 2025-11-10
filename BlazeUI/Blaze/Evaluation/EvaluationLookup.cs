@@ -86,68 +86,100 @@ public static class EvaluationLookup
 
     public static class Lookup
     {
-        public static void RookEvalLookupWhite(ulong rooks, ulong pawns, ref Eval eval)
+        public static EvalResult RookEvalLookupWhite(ulong rooks, ulong pawns)
         {
-            MagicLookup.FirstSliceEvalLookup(rooks).Rook.EvaluateWhite(pawns, ref eval);
-            MagicLookup.SecondSliceEvalLookup(rooks).Rook.EvaluateWhite(pawns, ref eval);
-            MagicLookup.ThirdSliceEvalLookup(rooks).Rook.EvaluateWhite(pawns, ref eval);
-            MagicLookup.FourthSliceEvalLookup(rooks).Rook.EvaluateWhite(pawns, ref eval);
+            EvalResult result = new();
+            
+            result.Add(MagicLookup.FirstSliceEvalLookup(rooks).Rook.EvaluateWhite(pawns));
+            result.Add(MagicLookup.SecondSliceEvalLookup(rooks).Rook.EvaluateWhite(pawns));
+            result.Add(MagicLookup.ThirdSliceEvalLookup(rooks).Rook.EvaluateWhite(pawns));
+            result.Add(MagicLookup.FourthSliceEvalLookup(rooks).Rook.EvaluateWhite(pawns));
+
+            return result;
         }
 
-        public static void RookEvalLookupBlack(ulong rooks, ulong pawns, ref Eval eval)
+        public static EvalResult RookEvalLookupBlack(ulong rooks, ulong pawns)
         {
-            MagicLookup.FirstSliceEvalLookup(rooks).Rook.EvaluateBlack(pawns, ref eval);
-            MagicLookup.SecondSliceEvalLookup(rooks).Rook.EvaluateBlack(pawns, ref eval);
-            MagicLookup.ThirdSliceEvalLookup(rooks).Rook.EvaluateBlack(pawns, ref eval);
-            MagicLookup.FourthSliceEvalLookup(rooks).Rook.EvaluateBlack(pawns, ref eval);
+            EvalResult result = new();
+            
+            result.Add(MagicLookup.FirstSliceEvalLookup(rooks).Rook.EvaluateBlack(pawns));
+            result.Add(MagicLookup.SecondSliceEvalLookup(rooks).Rook.EvaluateBlack(pawns));
+            result.Add(MagicLookup.ThirdSliceEvalLookup(rooks).Rook.EvaluateBlack(pawns));
+            result.Add(MagicLookup.FourthSliceEvalLookup(rooks).Rook.EvaluateBlack(pawns));
+            
+            return result;
         }
 
-        public static void BishopEvalLookupWhite(ulong bishops, ref Eval eval)
+        public static EvalResult BishopEvalLookupWhite(ulong bishops)
         {
-            MagicLookup.FirstSliceEvalLookup(bishops).Bishop.EvaluateWhite(ref eval);
-            MagicLookup.SecondSliceEvalLookup(bishops).Bishop.EvaluateWhite(ref eval);
-            MagicLookup.ThirdSliceEvalLookup(bishops).Bishop.EvaluateWhite(ref eval);
-            MagicLookup.FourthSliceEvalLookup(bishops).Bishop.EvaluateWhite(ref eval);
+            EvalResult result = new();
+            
+            result.Add(MagicLookup.FirstSliceEvalLookup(bishops).Bishop.White);
+            result.Add(MagicLookup.SecondSliceEvalLookup(bishops).Bishop.White);
+            result.Add(MagicLookup.ThirdSliceEvalLookup(bishops).Bishop.White);
+            result.Add(MagicLookup.FourthSliceEvalLookup(bishops).Bishop.White);
+            
+            return result;
         }
 
-        public static void BishopEvalLookupBlack(ulong bishops, ref Eval eval)
+        public static EvalResult BishopEvalLookupBlack(ulong bishops)
         {
-            MagicLookup.FirstSliceEvalLookup(bishops).Bishop.EvaluateBlack(ref eval);
-            MagicLookup.SecondSliceEvalLookup(bishops).Bishop.EvaluateBlack(ref eval);
-            MagicLookup.ThirdSliceEvalLookup(bishops).Bishop.EvaluateBlack(ref eval);
-            MagicLookup.FourthSliceEvalLookup(bishops).Bishop.EvaluateBlack(ref eval);
+            EvalResult result = new();
+            
+            result.Add(MagicLookup.FirstSliceEvalLookup(bishops).Bishop.Black);
+            result.Add(MagicLookup.SecondSliceEvalLookup(bishops).Bishop.Black);
+            result.Add(MagicLookup.ThirdSliceEvalLookup(bishops).Bishop.Black);
+            result.Add(MagicLookup.FourthSliceEvalLookup(bishops).Bishop.Black);
+
+            return result;
         }
 
-        public static void KnightEvalLookupWhite(ulong knights, ref Eval eval)
+        public static EvalResult KnightEvalLookupWhite(ulong knights)
         {
-            MagicLookup.FirstSliceEvalLookup(knights).Knight.EvaluateWhite(ref eval);
-            MagicLookup.SecondSliceEvalLookup(knights).Knight.EvaluateWhite(ref eval);
-            MagicLookup.ThirdSliceEvalLookup(knights).Knight.EvaluateWhite(ref eval);
-            MagicLookup.FourthSliceEvalLookup(knights).Knight.EvaluateWhite(ref eval);
+            EvalResult result = new();
+            
+            result.Add(MagicLookup.FirstSliceEvalLookup(knights).Knight.White);
+            result.Add(MagicLookup.SecondSliceEvalLookup(knights).Knight.White);
+            result.Add(MagicLookup.ThirdSliceEvalLookup(knights).Knight.White);
+            result.Add(MagicLookup.FourthSliceEvalLookup(knights).Knight.White);
+            
+            return result;
         }
         
-        public static void KnightEvalLookupBlack(ulong knights, ref Eval eval)
+        public static EvalResult KnightEvalLookupBlack(ulong knights)
         {
-            MagicLookup.FirstSliceEvalLookup(knights).Knight.EvaluateBlack(ref eval);
-            MagicLookup.SecondSliceEvalLookup(knights).Knight.EvaluateBlack(ref eval);
-            MagicLookup.ThirdSliceEvalLookup(knights).Knight.EvaluateBlack(ref eval);
-            MagicLookup.FourthSliceEvalLookup(knights).Knight.EvaluateBlack(ref eval);
+            EvalResult result = new();
+            
+            result.Add(MagicLookup.FirstSliceEvalLookup(knights).Knight.Black);
+            result.Add(MagicLookup.SecondSliceEvalLookup(knights).Knight.Black);
+            result.Add(MagicLookup.ThirdSliceEvalLookup(knights).Knight.Black);
+            result.Add(MagicLookup.FourthSliceEvalLookup(knights).Knight.Black);
+            
+            return result;
         }
         
-        public static void QueenEvalLookupWhite(ulong queens, ref Eval eval)
+        public static EvalResult QueenEvalLookupWhite(ulong queens)
         {
-            MagicLookup.FirstSliceEvalLookup(queens).Queen.EvaluateWhite(ref eval);
-            MagicLookup.SecondSliceEvalLookup(queens).Queen.EvaluateWhite(ref eval);
-            MagicLookup.ThirdSliceEvalLookup(queens).Queen.EvaluateWhite(ref eval);
-            MagicLookup.FourthSliceEvalLookup(queens).Queen.EvaluateWhite(ref eval);
+            EvalResult result = new();
+            
+            result.Add(MagicLookup.FirstSliceEvalLookup(queens).Queen.White);
+            result.Add(MagicLookup.SecondSliceEvalLookup(queens).Queen.White);
+            result.Add(MagicLookup.ThirdSliceEvalLookup(queens).Queen.White);
+            result.Add(MagicLookup.FourthSliceEvalLookup(queens).Queen.White);
+            
+            return result;
         }
         
-        public static void QueenEvalLookupBlack(ulong queens, ref Eval eval)
+        public static EvalResult QueenEvalLookupBlack(ulong queens)
         {
-            MagicLookup.FirstSliceEvalLookup(queens).Queen.EvaluateBlack(ref eval);
-            MagicLookup.SecondSliceEvalLookup(queens).Queen.EvaluateBlack(ref eval);
-            MagicLookup.ThirdSliceEvalLookup(queens).Queen.EvaluateBlack(ref eval);
-            MagicLookup.FourthSliceEvalLookup(queens).Queen.EvaluateBlack(ref eval);
+            EvalResult result = new();
+            
+            result.Add(MagicLookup.FirstSliceEvalLookup(queens).Queen.Black);
+            result.Add(MagicLookup.SecondSliceEvalLookup(queens).Queen.Black);
+            result.Add(MagicLookup.ThirdSliceEvalLookup(queens).Queen.Black);
+            result.Add(MagicLookup.FourthSliceEvalLookup(queens).Queen.Black);
+            
+            return result;
         }
 
         private static PawnEval SinglePawnEvalLookup(ulong pawns, Section section)
@@ -157,24 +189,32 @@ public static class EvaluationLookup
             return PawnEvalLookup[(int)section, (PushSectionToIndex(section, pawns & GetSection(section)) * PawnEvalNumber.magicNumber) >> PawnEvalNumber.push];
         }
 
-        public static void PawnEvalLookupWhite(ulong whitePawns, ulong blackPawns, ref Eval eval)
+        public static EvalResult PawnEvalLookupWhite(ulong whitePawns, ulong blackPawns)
         {
-            SinglePawnEvalLookup(whitePawns, Section.AB).EvaluateWhite(blackPawns, ref eval);
-            SinglePawnEvalLookup(whitePawns, Section.C).EvaluateWhite(blackPawns, ref eval);
-            SinglePawnEvalLookup(whitePawns, Section.D).EvaluateWhite(blackPawns, ref eval);
-            SinglePawnEvalLookup(whitePawns, Section.E).EvaluateWhite(blackPawns, ref eval);
-            SinglePawnEvalLookup(whitePawns, Section.F).EvaluateWhite(blackPawns, ref eval);
-            SinglePawnEvalLookup(whitePawns, Section.GH).EvaluateWhite(blackPawns, ref eval);
+            EvalResult result = new();
+            
+            result.Add(SinglePawnEvalLookup(whitePawns, Section.AB).EvaluateWhite(blackPawns));
+            result.Add(SinglePawnEvalLookup(whitePawns, Section.C).EvaluateWhite(blackPawns));
+            result.Add(SinglePawnEvalLookup(whitePawns, Section.D).EvaluateWhite(blackPawns));
+            result.Add(SinglePawnEvalLookup(whitePawns, Section.E).EvaluateWhite(blackPawns));
+            result.Add(SinglePawnEvalLookup(whitePawns, Section.F).EvaluateWhite(blackPawns));
+            result.Add(SinglePawnEvalLookup(whitePawns, Section.GH).EvaluateWhite(blackPawns));
+            
+            return result;
         }
         
-        public static void PawnEvalLookupBlack(ulong blackPawns, ulong whitePawns, ref Eval eval)
+        public static EvalResult PawnEvalLookupBlack(ulong blackPawns, ulong whitePawns)
         {
-            SinglePawnEvalLookup(blackPawns, Section.AB).EvaluateBlack(whitePawns, ref eval);
-            SinglePawnEvalLookup(blackPawns, Section.C).EvaluateBlack(whitePawns, ref eval);
-            SinglePawnEvalLookup(blackPawns, Section.D).EvaluateBlack(whitePawns, ref eval);
-            SinglePawnEvalLookup(blackPawns, Section.E).EvaluateBlack(whitePawns, ref eval);
-            SinglePawnEvalLookup(blackPawns, Section.F).EvaluateBlack(whitePawns, ref eval);
-            SinglePawnEvalLookup(blackPawns, Section.GH).EvaluateBlack(whitePawns, ref eval);
+            EvalResult result = new();
+            
+            result.Add(SinglePawnEvalLookup(blackPawns, Section.AB).EvaluateWhite(whitePawns));
+            result.Add(SinglePawnEvalLookup(blackPawns, Section.C).EvaluateWhite(whitePawns));
+            result.Add(SinglePawnEvalLookup(blackPawns, Section.D).EvaluateWhite(whitePawns));
+            result.Add(SinglePawnEvalLookup(blackPawns, Section.E).EvaluateWhite(whitePawns));
+            result.Add(SinglePawnEvalLookup(blackPawns, Section.F).EvaluateWhite(whitePawns));
+            result.Add(SinglePawnEvalLookup(blackPawns, Section.GH).EvaluateWhite(whitePawns));
+            
+            return result;
         }
     }
 }
