@@ -8,8 +8,8 @@ public static class Weights
     
     public const int MgIsolatedPawnPenalty = 2;
     public const int EgIsolatedPawnPenalty = 4;
-    public const int MgDoublePawnPenalty = 5;
-    public const int EgDoublePawnPenalty = 8;
+    public const int MgDoublePawnPenalty = 2;
+    public const int EgDoublePawnPenalty = 3;
     
     public const int OpenFileAdvantage = 20;
     public const int NoCastlingPenalty = 20;
@@ -17,8 +17,8 @@ public static class Weights
     
     public const int PriorityWeightMultiplier = 15;
 
-    public static readonly int[] MgPassedBonus = [0, 10, 10, 25, 35, 45, 50, 0];
-    public static readonly int[] EgPassedBonus = [0, 15, 15, 35, 45, 60, 90, 0];
+    public static readonly int[] MiddleGamePassedBonus = [0, 5, 10, 35, 60, 120, 190, 0];
+    public static readonly int[] EndGamePassedBonus = [0, 5, 5, 15, 20, 25, 30, 0];
     
     public static readonly int[] KingSafetyPenalty = [100, 60, 30, 0, 0, 0];
 }
@@ -27,35 +27,94 @@ public static class PestoEval
 {
     public static int GetWhiteMgEval(uint piece, int file, int rank)
     {
-        return MgTable[piece, rank, file];
+        return MiddleGameTable[piece, rank, file];
     }
 
     public static int GetWhiteEgEval(uint piece, int file, int rank)
     {
-        return EgTable[piece, rank, file];
+        return EndGameTable[piece, rank, file];
     }
     
     public static int GetBlackMgEval(uint piece, int file, int rank)
     {
-        return MgTable[piece, 7 - rank, file];
+        return MiddleGameTable[piece, 7 - rank, file];
     }
 
     public static int GetBlackEgEval(uint piece, int file, int rank)
     {
-        return EgTable[piece, 7 - rank, file];
+        return EndGameTable[piece, 7 - rank, file];
+    }
+    
+    public struct Eval
+    {
+        public int MiddleGameWhite;
+        public int MiddleGameBlack;
+        public int EndGameWhite;
+        public int EndGameBlack;
+        public int GamePhase;
+
+        public int Calculate()
+        {
+            int mgScore = MiddleGameWhite - MiddleGameBlack;
+            int egScore = EndGameWhite - EndGameBlack;
+            if (GamePhase > 24)
+                GamePhase = 24;
+            int egPhase = 24 - GamePhase;
+
+            return (mgScore * GamePhase + egScore * egPhase) / 24;
+        }
+
+        public void AddWhite(EvalResult other)
+        {
+            MiddleGameWhite += other.MgScore;
+            EndGameWhite += other.EgScore;
+            GamePhase += other.Increment;
+        }
+
+        public void AddBlack(EvalResult other)
+        {
+            MiddleGameBlack += other.MgScore;
+            EndGameBlack += other.EgScore;
+            GamePhase += other.Increment;
+        }
     }
 
-    public static readonly int[] MgValue = [98, 487, 347, 365, 1025, 0];
-    public static readonly int[] EgValue = [109, 512, 281, 297, 936, 0];
+    public struct EvalResult(int mgScore, int egScore, int phaseIncrement)
+    {
+        public int MgScore = mgScore;
+        public int EgScore = egScore;
+        public int Increment = phaseIncrement;
+
+        public void Add(EvalResult other)
+        {
+            MgScore += other.MgScore;
+            EgScore += other.EgScore;
+            Increment += other.Increment;
+        }
+    }
+
+    public static int Calculate(int mgWhite, int mgBlack, int egWhite, int egBlack, int gamePhase)
+    {
+        int mgScore = mgWhite - mgBlack;
+        int egScore = egWhite - egBlack;
+        if (gamePhase > 24)
+            gamePhase = 24;
+        int egPhase = 24 - gamePhase;
+
+        return (mgScore * gamePhase + egScore * egPhase) / 24;
+    }
+
+    public static readonly int[] MiddleGameVal = [108, 492, 377, 395, 1055, 0];
+    public static readonly int[] EndGameVal = [114, 562, 311, 327, 961, 0];
     public static readonly int[] PhaseIncrement = [0, 2, 1, 1, 4, 0];
     
-    private static readonly int[,,] MgTable =
+    private static readonly int[,,] MiddleGameTable =
     {
         { // pawn
             {  0,   0,   0,   0,   0,   0,  0,   0},
             { 98, 134,  61,  95,  68, 126, 34, -11},
-            { -6,   7,  26,  31,  65,  56, 25, -20},
-            {-14,  13,   6,  31,  33,  12, 17, -23},
+            { -6,   7,  26,  21,  35,  26, 15, -20},
+            {-14,  13,   6,  21,  23,  12, 17, -23},
             {-27,  -2,  -5,  22,  27,   6, 10, -25},
             {-26,  -4,  -4, -10,   3,   3, 33, -12},
             {-35,  -1, -20, -33, -25,  24, 38, -22},
@@ -113,7 +172,7 @@ public static class PestoEval
         },
     };
 
-    private static readonly int[,,] EgTable =
+    private static readonly int[,,] EndGameTable =
     {
         { // pawn
             {  0,   0,   0,   0,   0,   0,   0,   0},
