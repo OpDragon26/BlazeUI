@@ -104,8 +104,8 @@ public static class PestoEval
         return (mgScore * gamePhase + egScore * egPhase) / 24;
     }
 
-    public static readonly int[] MiddleGameVal = [118, 492, 367, 385, 1055, 0];
-    public static readonly int[] EndGameVal = [119, 562, 301, 317, 961, 0];
+    public static readonly int[] MiddleGameVal = [108, 492, 377, 395, 1055, 0];
+    public static readonly int[] EndGameVal = [114, 562, 311, 327, 961, 0];
     public static readonly int[] PhaseIncrement = [0, 2, 1, 1, 4, 0];
     
     private static readonly int[,,] MiddleGameTable =
