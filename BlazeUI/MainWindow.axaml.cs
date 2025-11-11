@@ -41,7 +41,6 @@ public partial class MainWindow : Window
         
         // load a new game from starting position
         _pgnDisplay = new PGNDisplay(PGNPanel, PieceBoard.GridBoard);
-        PieceBoard.SetMatch(null, Side.White);
         
         //DebugInterface.Execute();
         

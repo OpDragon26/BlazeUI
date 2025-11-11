@@ -9,7 +9,7 @@ namespace BlazeUI.Board_Interface;
 public class PieceGrid : Grid
 {
     public BoardUI? Base { get; set; }
-    private readonly List<PieceItem> PieceList = new();
+    public readonly List<PieceItem> PieceList = new();
     public readonly LockState locked = new();
 
     public void LoadBoard(Board board, Side perspective, bool playSound)
@@ -31,6 +31,8 @@ public class PieceGrid : Grid
             MoveablePiece pieceObject = new MoveablePiece { Base = Base! , Source = GetPieceBitmap(board.GetPiece(file, rank)) };
             AddPiece(pieceObject, pieceSide, objectivePos);
         }
+        
+        locked.Lock();
     }
 
     private void Clear()
@@ -39,11 +41,11 @@ public class PieceGrid : Grid
         PieceList.Clear();
     }
     
-    private class PieceItem(MoveablePiece piece, Side side, (int x, int y) pos)
+    public class PieceItem(MoveablePiece piece, Side side, (int x, int y) pos)
     {
         public readonly MoveablePiece piece = piece;
-        public (int x, int y) pos = pos;
-        public Side side = side;
+        public readonly (int x, int y) pos = pos;
+        public readonly Side side = side;
     }
 
     private void AddPiece(MoveablePiece piece, Side side, (int x, int y) at)
@@ -52,44 +54,5 @@ public class PieceGrid : Grid
         SetColumn(piece, at.x);
         SetRow(piece, at.y);
         PieceList.Add(new PieceItem(piece, side, at));
-    }
-
-    public class LockState
-    {
-        private bool White;
-        private bool Black;
-
-        public void Lock()
-        {
-            White = true;
-            Black = true;
-        }
-
-        public void Unlock()
-        {
-            White = false;
-            Black = false;
-        }
-
-        public void Lock(Side side)
-        {
-            if (side == Side.White)
-                White = true;
-            else 
-                Black = true;
-        }
-
-        public void Unlock(Side side)
-        {
-            if (side == Side.White)
-                White = false;
-            else
-                Black = false;
-        }
-
-        public bool IsLocked(Side side)
-        {
-            return side == Side.White ? White : Black;
-        }
     }
 }

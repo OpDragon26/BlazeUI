@@ -11,19 +11,19 @@ public class BoardUI : Grid
     private EmbeddedMatch? Match;
     public Side PlayerSide;
     
-    public readonly PieceGrid GridBoard = new PieceGrid
+    public readonly PieceGrid GridBoard = new()
     {
         ColumnDefinitions = new ColumnDefinitions("*,*,*,*,*,*,*,*"),
         RowDefinitions = new RowDefinitions("*,*,*,*,*,*,*,*"),
     };
 
-    private readonly Grid Highlights = new Grid
+    private readonly Grid Highlights = new()
     {
         ColumnDefinitions = new ColumnDefinitions("*,*,*,*,*,*,*,*"),
         RowDefinitions = new RowDefinitions("*,*,*,*,*,*,*,*")
     };
 
-    private readonly Grid BackgroundBoard = new Grid
+    private readonly Grid BackgroundBoard = new()
     {
         ColumnDefinitions = new ColumnDefinitions("*,*,*,*,*,*,*,*"),
         RowDefinitions = new RowDefinitions("*,*,*,*,*,*,*,*")
@@ -51,9 +51,9 @@ public class BoardUI : Grid
         
         PromotionHandler = promotionHandler;
         
-        Children.Add(GridBoard);
-        Children.Add(Highlights);
         Children.Add(BackgroundBoard);
+        Children.Add(Highlights);
+        Children.Add(GridBoard);
         
         for (int file = 0; file < 8; file++)
         {
@@ -65,6 +65,8 @@ public class BoardUI : Grid
                 BackgroundBoard.Children.Add(rect);
             }
         }
+        
+        SetMatch(null, Side.White);
     }
 
     public void PieceRaised((int x, int y) pos)

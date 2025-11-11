@@ -1,8 +1,10 @@
+using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.VisualTree;
+using BlazeUI.Utils;
 
 namespace BlazeUI.Board_Interface;
 
@@ -13,19 +15,19 @@ public class MoveablePiece : Image
     private Point Position;
     private TranslateTransform? Translate;
     private (int X, int Y) Start;
-    private bool Locked;
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
-        if (Locked || !e.Properties.IsLeftButtonPressed)
+        Position = e.GetPosition(this.GetVisualParent());
+        Point _relPosition = e.GetPosition(this);
+        Position = new(Position.X - _relPosition.X + Bounds.Width / 2, Position.Y - _relPosition.Y + Bounds.Height / 2);
+        Start = GetPositionOnGrid(Position);
+
+        Console.WriteLine(Base.IsLocked(Start));
+        if (Base.IsLocked(Start) || !e.Properties.IsLeftButtonPressed)
             return;
         
         Pressed = true;
-        Position = e.GetPosition(this.GetVisualParent());
-        Point _relPosition = e.GetPosition(this);
-
-        Position = new(Position.X - _relPosition.X + Bounds.Width / 2, Position.Y - _relPosition.Y + Bounds.Height / 2);
-        Start = GetPositionOnGrid(Position);
         Base.PieceRaised(Start);
         
         ZIndex = 10;
@@ -35,6 +37,9 @@ public class MoveablePiece : Image
 
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {
+        if (Base.IsLocked(Start) || !e.Properties.IsLeftButtonPressed)
+            return;
+        
         ZIndex = 0;
         
         Pressed = false;
@@ -46,6 +51,9 @@ public class MoveablePiece : Image
 
     protected override void OnPointerMoved(PointerEventArgs e)
     {
+        if (Base.IsLocked(Start) || !e.Properties.IsLeftButtonPressed)
+            return;
+        
         if (Pressed)
         {
             Point pos = e.GetPosition(this.GetVisualParent());
@@ -58,16 +66,6 @@ public class MoveablePiece : Image
         }
 
         base.OnPointerMoved(e);
-    }
-
-    public void Lock()
-    {
-        Locked = true;
-    }
-
-    public void Unlock()
-    {
-        Locked = false;
     }
 
     private (int X, int Y) GetPositionOnGrid(Point position)

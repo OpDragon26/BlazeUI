@@ -24,6 +24,45 @@ public static class BoardUIUtils
         { 0b100 , "queen" },
         { 0b101 , "king"}
     };
+    
+    public class LockState
+    {
+        private bool White;
+        private bool Black;
+
+        public void Lock()
+        {
+            White = true;
+            Black = true;
+        }
+
+        public void Unlock()
+        {
+            White = false;
+            Black = false;
+        }
+
+        public void Lock(Side side)
+        {
+            if (side == Side.White)
+                White = true;
+            else 
+                Black = true;
+        }
+
+        public void Unlock(Side side)
+        {
+            if (side == Side.White)
+                White = false;
+            else
+                Black = false;
+        }
+
+        public bool IsLocked(Side side)
+        {
+            return side == Side.White ? White : Black;
+        }
+    }
 }
 
 public static class Invert
@@ -35,11 +74,11 @@ public static class Invert
 
     private static (int x, int y) ObjWhite((int x, int y) obj)
     {
-        return (7 - obj.x, obj.y);
+        return (obj.x, 7 - obj.y);
     }
 
     private static (int x, int y) ObjBlack((int x, int y) obj)
     {
-        return (obj.x, 7 - obj.y);
+        return (7 - obj.x, obj.y);
     }
 }
