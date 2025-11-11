@@ -95,9 +95,19 @@ public static class Evaluator
                             eval.MiddleGameWhite += MiddleGamePassedBonus[rank];
                             eval.EndGameWhite += EndGamePassedBonus[rank];
                         }
-                        
-                        else if (piece == WhiteRook && (pawns & BitboardUtils.GetFile(file)) == 0)
-                            eval.MiddleGameWhite += OpenFileAdvantage;
+                        else
+                        {
+                            eval.MiddleGameWhite += piece switch
+                            {
+                                WhiteRook => MagicLookup.RookMobilityLookup((file, rank), allPieces) + (((pawns & BitboardUtils.GetFile(file)) == 0) ? OpenFileAdvantage : 0),
+                                WhiteBishop => MagicLookup.BishopMobilityLookup((file, rank), allPieces),
+                                WhiteQueen => MagicLookup.RookMobilityLookup((file, rank), allPieces) + MagicLookup.BishopMobilityLookup((file, rank), allPieces),
+                                _ => 0
+                            };
+                            
+                            if (piece == WhiteRook && (pawns & BitboardUtils.GetFile(file)) == 0)
+                                eval.MiddleGameWhite += OpenFileAdvantage;
+                        }
                     }
                     else
                     {
@@ -111,9 +121,16 @@ public static class Evaluator
                             eval.MiddleGameBlack += MiddleGamePassedBonus[7 - rank];
                             eval.EndGameBlack += EndGamePassedBonus[7 - rank];
                         }
-                        
-                        else if (piece == WhiteRook && (pawns & BitboardUtils.GetFile(file)) == 0)
-                            eval.MiddleGameBlack += OpenFileAdvantage;
+                        else
+                        {
+                            eval.MiddleGameBlack += piece switch
+                            {
+                                WhiteRook => MagicLookup.RookMobilityLookup((file, rank), allPieces) + (((pawns & BitboardUtils.GetFile(file)) == 0) ? OpenFileAdvantage : 0),
+                                WhiteBishop => MagicLookup.BishopMobilityLookup((file, rank), allPieces),
+                                WhiteQueen => MagicLookup.RookMobilityLookup((file, rank), allPieces) + MagicLookup.BishopMobilityLookup((file, rank), allPieces),
+                                _ => 0
+                            };
+                        }
                     }
                 }
             }

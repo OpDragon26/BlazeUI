@@ -8,8 +8,8 @@ public static class Weights
     
     public const int MgIsolatedPawnPenalty = 2;
     public const int EgIsolatedPawnPenalty = 4;
-    public const int MgDoublePawnPenalty = 5;
-    public const int EgDoublePawnPenalty = 8;
+    public const int MgDoublePawnPenalty = 2;
+    public const int EgDoublePawnPenalty = 3;
     
     public const int OpenFileAdvantage = 20;
     public const int NoCastlingPenalty = 20;
@@ -17,8 +17,8 @@ public static class Weights
     
     public const int PriorityWeightMultiplier = 15;
 
-    public static readonly int[] MiddleGamePassedBonus = [0, 10, 10, 25, 35, 45, 50, 0];
-    public static readonly int[] EndGamePassedBonus = [0, 15, 15, 35, 45, 60, 90, 0];
+    public static readonly int[] MiddleGamePassedBonus = [0, 5, 10, 35, 60, 120, 190, 0];
+    public static readonly int[] EndGamePassedBonus = [0, 5, 5, 15, 20, 25, 30, 0];
     
     public static readonly int[] KingSafetyPenalty = [100, 60, 30, 0, 0, 0];
 }
@@ -104,8 +104,8 @@ public static class PestoEval
         return (mgScore * gamePhase + egScore * egPhase) / 24;
     }
 
-    public static readonly int[] MiddleGameVal = [98, 487, 347, 365, 1025, 0];
-    public static readonly int[] EndGameVal = [109, 512, 281, 297, 936, 0];
+    public static readonly int[] MiddleGameVal = [118, 492, 367, 385, 1055, 0];
+    public static readonly int[] EndGameVal = [119, 562, 301, 317, 961, 0];
     public static readonly int[] PhaseIncrement = [0, 2, 1, 1, 4, 0];
     
     private static readonly int[,,] MiddleGameTable =
@@ -113,8 +113,8 @@ public static class PestoEval
         { // pawn
             {  0,   0,   0,   0,   0,   0,  0,   0},
             { 98, 134,  61,  95,  68, 126, 34, -11},
-            { -6,   7,  26,  31,  65,  56, 25, -20},
-            {-14,  13,   6,  31,  33,  12, 17, -23},
+            { -6,   7,  26,  21,  35,  26, 15, -20},
+            {-14,  13,   6,  21,  23,  12, 17, -23},
             {-27,  -2,  -5,  22,  27,   6, 10, -25},
             {-26,  -4,  -4, -10,   3,   3, 33, -12},
             {-35,  -1, -20, -33, -25,  24, 38, -22},
