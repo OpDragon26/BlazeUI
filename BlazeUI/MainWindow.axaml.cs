@@ -59,7 +59,7 @@ public partial class MainWindow : Window
         _pieceBoard = new GridBoard(this.FindControl<Grid>("pieces")!, this.FindControl<Grid>("highlight")!, _promotionHandler, _pgnDisplay, DepthDisplay, BotMaterial, PlayerMaterial,  this);
         _pieceBoard.SetMatch(null, Side.White);
         
-        DebugInterface.Execute();
+        //DebugInterface.Execute();
         
         StartNewGame();
     }
