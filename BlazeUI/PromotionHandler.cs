@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using BlazeUI.Blaze.API;
+using BlazeUI.Utils;
 
 namespace BlazeUI;
 
@@ -27,10 +28,10 @@ public class PromotionHandler(Grid displayGrid)
 
     public void InitImages(Side side)
     {
-        _queenPromotion.Source = GridBoard.GetPieceBitmap(0b100 | ((uint)side << 3));
-        _rookPromotion.Source = GridBoard.GetPieceBitmap(0b001 | ((uint)side << 3));
-        _knightPromotion.Source = GridBoard.GetPieceBitmap(0b010 | ((uint)side << 3));
-        _bishopPromotion.Source = GridBoard.GetPieceBitmap(0b011 | ((uint)side << 3));
+        _queenPromotion.Source = BoardUIUtils.GetPieceBitmap(0b100 | ((uint)side << 3));
+        _rookPromotion.Source = BoardUIUtils.GetPieceBitmap(0b001 | ((uint)side << 3));
+        _knightPromotion.Source = BoardUIUtils.GetPieceBitmap(0b010 | ((uint)side << 3));
+        _bishopPromotion.Source = BoardUIUtils.GetPieceBitmap(0b011 | ((uint)side << 3));
     }
 
     private static StackPanel GetPanel(Grid grid)

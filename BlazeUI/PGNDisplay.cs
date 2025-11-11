@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using Avalonia.Controls;
 using BlazeUI.Blaze.Board_Representation;
 using BlazeUI.Blaze.Move_Generation;
+using BlazeUI.Board_Interface;
 
 namespace BlazeUI;
 
-public class PGNDisplay(StackPanel panel)
+public class PGNDisplay(StackPanel panel, PieceGrid grid)
 {
     private readonly List<(string moveString, Move move, Board board)> _game = new();
     private Grid? _last;
-    private GridBoard? _board;
+    private readonly PieceGrid Visual = grid;
     private int _lastViewed;
     private readonly List<Button> _buttons = new();
     
@@ -71,13 +72,15 @@ public class PGNDisplay(StackPanel panel)
     {
         to = Math.Clamp(to, 0, _game.Count - 1);
         _lastViewed = to;
-        _board!.LoadBoard(_game[_lastViewed].board, _board.side, true);
+        Visual.LoadBoard(_game[_lastViewed].board, Visual.Base!.PlayerSide, true);
         if (_lastViewed != _game.Count - 1)
-            _board!.LockAll(true);
+            Visual.locked.Lock();
         
-        _board!.ClearHighlight("last-move");
+        /*
+        BoardUi!.ClearHighlight("last-move");
         if (_game[_lastViewed].move.Source.file != 8)
-            _board!.HighlightMove(_game[_lastViewed].move, Colors.HighLightMove);
+            BoardUi!.HighlightMove(_game[_lastViewed].move, Colors.HighLightMove);
+        */
         
         ClearSelected();
         _buttons[_lastViewed].Classes.Add("SelectedEntry");
@@ -89,10 +92,5 @@ public class PGNDisplay(StackPanel panel)
         panel.Children.Clear();
         _buttons.Clear();
         _last = null;
-    }
-
-    public void Init(GridBoard grid)
-    {
-        _board = grid;
     }
 }

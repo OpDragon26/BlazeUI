@@ -1,13 +1,10 @@
 using System;
 using Avalonia.Controls;
-using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Threading;
 using BlazeUI.Blaze;
-using BlazeUI.Blaze.Evaluation;
-using BlazeUI.Blaze.Utils;
 
 namespace BlazeUI;
 using Blaze.Board_Representation;
@@ -16,7 +13,6 @@ using Blaze.Magic_Lookup;
 public partial class MainWindow : Window
 {
     private readonly PromotionHandler _promotionHandler;
-    private readonly GridBoard? _pieceBoard;
     private readonly OverlayHandler _overlay;
     private readonly PGNDisplay _pgnDisplay;
     private DispatcherTimer? _timer;
@@ -36,28 +32,16 @@ public partial class MainWindow : Window
         InitProgress.Init(InitProgressBar);
         InitProgress.SetCompletion(0);
         
-        // init board
-        var BoardBackground = this.FindControl<Grid>("board");
-        for (int file = 0; file < 8; file++)
-        {
-            for (int rank = 0; rank < 8; rank++)
-            {
-                Rectangle rect = new Rectangle { [Shape.FillProperty] = (file + rank) % 2 == 0 ? Colors.LightSquare : Colors.DarkSquare };
-                Grid.SetRow(rect, file);
-                Grid.SetColumn(rect, rank);
-                BoardBackground!.Children.Add(rect);
-            }
-        }
-        
         // set up promotion handler
         _promotionHandler = new PromotionHandler(PromotionGrid);
         _promotionHandler.InitImages(Side.White);
         KeyDownEvent.AddClassHandler<TopLevel>(OnKeyDown, handledEventsToo: true);
         
+        PieceBoard.Initialize(_promotionHandler);
+        
         // load a new game from starting position
-        _pgnDisplay = new PGNDisplay(PGNPanel);
-        _pieceBoard = new GridBoard(this.FindControl<Grid>("pieces")!, this.FindControl<Grid>("highlight")!, _promotionHandler, _pgnDisplay, DepthDisplay, BotMaterial, PlayerMaterial,  this);
-        _pieceBoard.SetMatch(null, Side.White);
+        _pgnDisplay = new PGNDisplay(PGNPanel, PieceBoard.GridBoard);
+        PieceBoard.SetMatch(null, Side.White);
         
         //DebugInterface.Execute();
         
@@ -86,7 +70,7 @@ public partial class MainWindow : Window
     private void StartNewGame()
     {
         if (Bitboards.init)
-            _pieceBoard!.SetMatch(new(new(Presets.StartingBoard), _depth), _lastPlayed);
+            PieceBoard.SetMatch(new(new(Presets.StartingBoard), _depth), _lastPlayed);
         if (Bitboards.begunInit)
             return;
         _overlay.SetActive("init");
@@ -105,7 +89,7 @@ public partial class MainWindow : Window
         {
             _timer!.Stop();
             _overlay.RemoveActive();
-            _pieceBoard!.SetMatch(new(new(Presets.StartingBoard), _depth, delayBook: true), Side.White);
+            PieceBoard.SetMatch(new EmbeddedMatch(new Board(Presets.StartingBoard), _depth, delayBook: true), Side.White);
             //_pieceBoard!.SetMatch(new(new("8/7P/8/5K1k/8/8/8/8 w - - 0 1"), 6), Side.White);
         }
     }
@@ -141,8 +125,8 @@ public partial class MainWindow : Window
         switch (e.Key)
         {
             case Key.Escape:
-                _pieceBoard!.CancelPromotion();
-                _pieceBoard!.LoadLatest();
+                //PieceBoard.CancelPromotion();
+                //PieceBoard.LoadLatest();
                 break;
             case Key.Right:
                 _pgnDisplay.Slide(1);

@@ -3,6 +3,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BlazeUI"
+        xmlns:board="clr-namespace:BlazeUI.Board_Interface"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="BlazeUI.MainWindow"
         Title="BlazeUI">
@@ -25,10 +26,7 @@
                                         <Grid RowDefinitions="100,*,100" Width="800" Height="950">
                                                 <!-- Board -->
                                                 <Border Grid.Row="1" CornerRadius="10" Background="Beige" ClipToBounds="True">
-                                                        <Grid>
-                                                                <Grid RowDefinitions="*,*,*,*,*,*,*,*" ColumnDefinitions="*,*,*,*,*,*,*,*" x:Name="board"></Grid>
-                                                                <Grid RowDefinitions="*,*,*,*,*,*,*,*" ColumnDefinitions="*,*,*,*,*,*,*,*" x:Name="highlight"></Grid>
-                                                                <Grid RowDefinitions="*,*,*,*,*,*,*,*" ColumnDefinitions="*,*,*,*,*,*,*,*" x:Name="pieces"></Grid>
+                                                        <board:BoardUI Name="PieceBoard">
                                                                 <Grid ColumnDefinitions="*,*,*,*,*,*,*,*" x:Name="PromotionGrid" RowDefinitions="Auto" ZIndex="-5">
                                                                         <Border Classes="PromotionSelector">
                                                                                 <StackPanel Classes="PromotionSelectorPanel">
@@ -48,7 +46,7 @@
                                                                                 </StackPanel>
                                                                         </Border>
                                                                 </Grid>
-                                                        </Grid>
+                                                        </board:BoardUI>
                                                 </Border>
                                                 
                                                 <!-- Top row: enemy name, depth, material --> 
