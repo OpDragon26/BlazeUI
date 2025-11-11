@@ -3,7 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.VisualTree;
-using BlazeUI.Blaze.Interface;
+using BlazeUI.Blaze.API;
 
 namespace BlazeUI;
 

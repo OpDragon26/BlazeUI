@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace BlazeUI.Blaze.Utils;
 using Board_Representation;
-using Interface;
+using API;
 
 public static class General
 {

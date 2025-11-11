@@ -1,9 +1,9 @@
 using System;
 using BlazeUI.Blaze.Board_Representation;
 using BlazeUI.Blaze.Evaluation;
-using BlazeUI.Blaze.Interface;
+using BlazeUI.Blaze.API;
 using BlazeUI.Blaze.Utils;
-using Type = BlazeUI.Blaze.Interface.Type;
+using Type = BlazeUI.Blaze.API.Type;
 
 namespace BlazeUI;
 

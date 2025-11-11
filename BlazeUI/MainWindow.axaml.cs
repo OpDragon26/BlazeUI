@@ -11,7 +11,7 @@ using BlazeUI.Blaze.Utils;
 
 namespace BlazeUI;
 using Blaze.Board_Representation;
-using Blaze.Interface;
+using Blaze.API;
 using Blaze.Magic_Lookup;
 public partial class MainWindow : Window
 {

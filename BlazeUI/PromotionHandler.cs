@@ -1,5 +1,5 @@
 using Avalonia.Controls;
-using BlazeUI.Blaze.Interface;
+using BlazeUI.Blaze.API;
 
 namespace BlazeUI;
 
