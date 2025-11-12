@@ -9,15 +9,13 @@ using BlazeUI.Blaze;
 namespace BlazeUI;
 using Blaze.Board_Representation;
 using Blaze.API;
-using Blaze.Magic_Lookup;
 public partial class MainWindow : Window
 {
     private readonly PromotionHandler _promotionHandler;
-    private readonly OverlayHandler _overlay;
-    private readonly PGNDisplay _pgnDisplay;
-    private DispatcherTimer? _timer;
-    private Side _lastPlayed = Side.White;
-    private readonly int _depth = 7;
+    private readonly OverlayHandler OverlayHandler;
+    private readonly PGNDisplay PgnDisplay;
+    private Side LastPlayed = Side.White;
+    private readonly int Depth = 7;
     
     public MainWindow()
     {
@@ -26,7 +24,7 @@ public partial class MainWindow : Window
         Sound.Init();
         
         // init overlay
-        _overlay = new OverlayHandler(OverlayGrid);
+        OverlayHandler = new OverlayHandler(OverlayGrid);
         InitOverlays();
         
         InitProgress.Init(InitProgressBar);
@@ -40,7 +38,7 @@ public partial class MainWindow : Window
         PieceBoard.Initialize(_promotionHandler);
         
         // load a new game from starting position
-        _pgnDisplay = new PGNDisplay(PGNPanel, PieceBoard.GridBoard);
+        PgnDisplay = new PGNDisplay(PGNPanel, PieceBoard.GridBoard);
         
         //DebugInterface.Execute();
         
@@ -49,60 +47,59 @@ public partial class MainWindow : Window
 
     private void InitOverlays()
     {
-        _overlay.AddOverlay(InitOverlay, "init");
-        _overlay.AddOverlay(GameOverOverlay, "game-over");
-        _overlay.AddOverlay(NewGameDropdownOverlay, "new-game");
-        _overlay.Init();
+        OverlayHandler.AddOverlay(InitOverlay, "init");
+        OverlayHandler.AddOverlay(GameOverOverlay, "game-over");
+        OverlayHandler.AddOverlay(NewGameDropdownOverlay, "new-game");
+        OverlayHandler.Init();
     }
     
     private void NewGameOpenDropdown(object sender, RoutedEventArgs e)
     {
-        _overlay.Toggle("new-game");
+        OverlayHandler.Toggle("new-game");
     }
     
     private void PlayButtonClick(object sender, RoutedEventArgs e)
     {
         StartNewGame();
-        _overlay.RemoveActive();
+        OverlayHandler.RemoveActive();
     }
     
     private void StartNewGame()
     {
-        if (Bitboards.init)
-            PieceBoard.SetMatch(new(new(Presets.StartingBoard), _depth), _lastPlayed);
-        if (Bitboards.begunInit)
+        OverlayHandler.RemoveActive();
+        if (Init.init == Init.InitStatus.Complete)
+            PieceBoard.SetMatch(new(new(Presets.StartingBoard), Depth, delayBook: true), LastPlayed);
+        if (Init.init == Init.InitStatus.Waiting)
             return;
-        _overlay.SetActive("init");
-        _timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16) };
-        Bitboards.StartInit();
-        _timer.Tick += Poll;
-        _timer.Start();
-    }
-
-    private void Poll(object? sender, EventArgs e)
-    {
-        InitProgress.SetCompletion(Init.Progress.Percentage);
-        InitStatus.Text = Init.Progress.Message;
         
-        if (Bitboards.Poll())
+        OverlayHandler.SetActive("init");
+        DispatcherTimer timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16) };
+        Init.StartInit();
+        
+        timer.Tick += (_, _) =>
         {
-            _timer!.Stop();
-            _overlay.RemoveActive();
-            PieceBoard.SetMatch(new EmbeddedMatch(new Board(Presets.StartingBoard), _depth, delayBook: true), Side.White);
-            //_pieceBoard!.SetMatch(new(new("8/7P/8/5K1k/8/8/8/8 w - - 0 1"), 6), Side.White);
-        }
+            InitProgress.SetCompletion(Init.Progress.Percentage);
+            InitStatus.Text = Init.Progress.Message;
+            
+            if (Init.init == Init.InitStatus.Complete)
+            {
+                timer.Stop();
+                OverlayHandler.RemoveActive();
+                PieceBoard.SetMatch(new(new(Presets.StartingBoard), Depth, delayBook: true), Side.White);
+            }
+        };
+        
+        timer.Start();
     }
     
     private void StartNewAsWhite(object sender, RoutedEventArgs e)
     {
-        _overlay.RemoveActive();
-        _lastPlayed = Side.White;
+        LastPlayed = Side.White;
         StartNewGame();
     }
     private void StartAsNewBlack(object sender, RoutedEventArgs e)
     {
-        _overlay.RemoveActive();
-        _lastPlayed = Side.Black;
+        LastPlayed = Side.Black;
         StartNewGame();
     }
 
@@ -128,16 +125,16 @@ public partial class MainWindow : Window
                 //PieceBoard.LoadLatest();
                 break;
             case Key.Right:
-                _pgnDisplay.Slide(1);
+                PgnDisplay.Slide(1);
                 break;
             case Key.Left:
-                _pgnDisplay.Slide(-1);
+                PgnDisplay.Slide(-1);
                 break;
             case Key.Down:
-                _pgnDisplay.Slide(2);
+                PgnDisplay.Slide(2);
                 break;
             case Key.Up:
-                _pgnDisplay.Slide(-2);
+                PgnDisplay.Slide(-2);
                 break;
         }
         
@@ -146,7 +143,7 @@ public partial class MainWindow : Window
 
     public void GameOverSplash(Outcome outcome, int moves)
     {
-        _overlay.SetActive("game-over");
+        OverlayHandler.SetActive("game-over");
         GameOverTitle.Text = outcome switch
         {
             Outcome.Draw => "Game is a draw.",
@@ -159,7 +156,7 @@ public partial class MainWindow : Window
 
     private void ClosePopup(object? sender, RoutedEventArgs e)
     {
-        _overlay.RemoveActive();
+        OverlayHandler.RemoveActive();
     }
 }
 

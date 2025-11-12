@@ -4,6 +4,7 @@ using BlazeUI.Blaze.API;
 using BlazeUI.Blaze.Board_Representation;
 using BlazeUI.Blaze.Move_Generation;
 using BlazeUI.Utils;
+using BlazeUI.BotAPI;
 
 namespace BlazeUI.Board_Interface;
 

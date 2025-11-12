@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace BlazeUI.Blaze.Magic_Lookup;
@@ -80,24 +79,10 @@ public static class Bitboards
         public static readonly List<PinSearchResult>[,][] BishopPinLookup = new List<PinSearchResult>[8,8][];
     }
 
-    public static bool begunInit;
-    public static bool init;
-    private static bool inProgress;
-
-    public static void Init(General.CompletionPoint progress)
+    public static void Init()
     {
-        if (begunInit) return;
-        begunInit = true;
         General.Timer t = new General.Timer();
         t.Start();
-        
-        //Console.WriteLine("Initializing magic bitboards");
-        progress.Set(0, "Generating masks...");
-        
-        Masks.Init();
-        Combinations.Init();
-        
-        progress.Set(30, "Generating block moves...");
         
         Lookup.BlockMoveNumber = (4154364917966041783, 46, 262133); //MagicNumbers.GenerateRepeat(BlockMoves, 1, 46);
         Lookup.EnPassantNumbers = (15417481889308385644, 58, 63); // MagicNumbers.GenerateRepeat(EnPassantMasks, 10000);
@@ -113,7 +98,6 @@ public static class Bitboards
         Lookup.AttackLineNumber = (8710915622236860111, 48, 65530); //MagicNumbers.GenerateRepeat(attackLines.Distinct().ToArray(), 1);
         
         //Console.WriteLine("Generating Magic Numbers");
-        progress.Set(45, "Loading magic lookup...");
         //int done = 0;
         // create magic numbers and add to lookup
         Parallel.For(0, 8, rank =>
@@ -341,24 +325,5 @@ public static class Bitboards
         });
 
         //Console.WriteLine($"Bitboards initialized in {t.Stop()}ms");
-        init = true;
-    }
-
-    public static void StartInit()
-    {
-        if (inProgress)
-            return;
-        Thread t = new Thread(() =>
-        {
-            inProgress = true;
-            Blaze.Init.Start();
-            inProgress = false;
-        });
-        t.Start();
-    }
-
-    public static bool Poll()
-    {
-        return init;
     }
 }

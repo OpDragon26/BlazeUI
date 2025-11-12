@@ -1,9 +1,10 @@
 using Avalonia.Threading;
 using BlazeUI.Board_Interface;
+using BlazeUI.Utils;
 
-namespace BlazeUI.Utils;
+namespace BlazeUI.BotAPI;
 
-public static class BotAPI
+public static class MoveAPI
 {
     public static void PlayBotMove(this BoardUI ui)
     {
