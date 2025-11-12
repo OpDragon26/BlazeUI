@@ -7,6 +7,11 @@ namespace BlazeUI.Utils;
 
 public static class ComponentCommunicationHandler
 {
+    public static Side GetSide(this EmbeddedMatch match)
+    {
+        return (Side)match.board.side;
+    }
+    
     public static bool IsLocked(this BoardUI board, (int x, int y) objPos)
     {
         return board.GridBoard.IsLocked(objPos);

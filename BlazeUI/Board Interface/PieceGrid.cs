@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using Avalonia.Controls;
 using BlazeUI.Blaze.API;
 using BlazeUI.Blaze.Board_Representation;
+using BlazeUI.Blaze.Utils;
 using BlazeUI.Utils;
 using static BlazeUI.Utils.BoardUIUtils;
 
@@ -33,6 +35,11 @@ public class PieceGrid : Grid
         }
         
         locked.Lock();
+    }
+
+    public void LoadBoard()
+    {
+        LoadBoard(Base!.Match!.board, Base.PlayerSide, true);
     }
 
     private void Clear()

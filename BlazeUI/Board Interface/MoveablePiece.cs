@@ -1,4 +1,3 @@
-using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -23,13 +22,11 @@ public class MoveablePiece : Image
         Position = new(Position.X - _relPosition.X + Bounds.Width / 2, Position.Y - _relPosition.Y + Bounds.Height / 2);
         Start = GetPositionOnGrid(Position);
 
-        Console.WriteLine(Base.IsLocked(Start));
         if (Base.IsLocked(Start) || !e.Properties.IsLeftButtonPressed)
             return;
         
         Pressed = true;
         Base.PieceRaised(Start);
-        
         ZIndex = 10;
         
         base.OnPointerPressed(e);
@@ -37,12 +34,12 @@ public class MoveablePiece : Image
 
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {
-        if (Base.IsLocked(Start) || !e.Properties.IsLeftButtonPressed)
+        ZIndex = 0;
+        Pressed = false;
+        
+        if (Base.IsLocked(Start))
             return;
         
-        ZIndex = 0;
-        
-        Pressed = false;
         SnapToGrid(e.GetPosition(this.GetVisualParent()));
         Base.PieceReleased();
         
@@ -85,7 +82,7 @@ public class MoveablePiece : Image
 
         if (!InvalidSquare(pos))
         {
-            //Console.WriteLine($"Moving from {_start} to {pos}");
+            //Console.WriteLine($"Moving from {Start} to {pos}");
             Base.CallPieceMove(Start, pos);
         }
     }

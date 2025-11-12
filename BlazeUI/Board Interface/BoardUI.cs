@@ -2,14 +2,17 @@ using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using BlazeUI.Blaze.API;
 using BlazeUI.Blaze.Board_Representation;
+using BlazeUI.Blaze.Move_Generation;
+using BlazeUI.Utils;
 
 namespace BlazeUI.Board_Interface;
 
 public class BoardUI : Grid
 {
     private PromotionHandler? PromotionHandler;
-    private EmbeddedMatch? Match;
+    public EmbeddedMatch? Match;
     public Side PlayerSide;
+    private bool IsPlayerTurn => Match is not null && Match.GetSide() == PlayerSide;
     
     public readonly PieceGrid GridBoard = new()
     {
@@ -29,20 +32,21 @@ public class BoardUI : Grid
         RowDefinitions = new RowDefinitions("*,*,*,*,*,*,*,*")
     };
 
-    public void CallPieceMove((int x, int y) from, (int x, int y) to)
-    {
-        
-    }
-
     public void SetMatch(EmbeddedMatch? match, Side side)
     {
         Match = match;
         PlayerSide = side;
         
-        if (match is null)
+        if (Match is null)
             GridBoard.LoadBoard(new(Presets.StartingBoard), side, false);
         else
-            GridBoard.LoadBoard(match.board, side, true);
+        {
+            GridBoard.LoadBoard(Match.board, side, true);
+            if (IsPlayerTurn)
+                GridBoard.locked.Unlock(PlayerSide);
+            else
+                this.PlayBotMove();
+        }
     }
     
     public void Initialize(PromotionHandler promotionHandler)
