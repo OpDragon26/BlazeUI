@@ -1,10 +1,12 @@
-using BlazeUI.Blaze.Board_Representation;
-using BlazeUI.Blaze.Move_Generation;
-using BlazeUI.Blaze.Utils;
-using BlazeUI.Board_Interface;
-using BlazeUI.BotAPI;
+using System;
+using Avalonia.Threading;
 
 namespace BlazeUI.Utils;
+using Blaze.Board_Representation;
+using Blaze.Move_Generation;
+using Blaze.Utils;
+using Board_Interface;
+using BotAPI;
 
 public static class MoveHandler
 {
@@ -14,8 +16,10 @@ public static class MoveHandler
         
         if (result.Move is null)
             return;
-        
-        ui.HandlePlayerMove(result.Move);
+        if (!result.RequiresPromotion)
+            ui.HandlePlayerMove(result.Move);
+        else
+            ui.AskPromotion(result.Move.Destination.file, result.Move, () => ui.HandlePlayerMove(result.Move));
     }
     
     private static bool HandleMove(this BoardUI ui, Move move)
@@ -43,6 +47,26 @@ public static class MoveHandler
         ui.GridBoard.locked.Unlock(ui.PlayerSide);
     }
 
+    private static void AskPromotion(this BoardUI ui, int file, Move move, Action finished)
+    {
+        if (ui.PromotionHandler is null)
+            return;
+        
+        ui.PromotionHandler.Request(file);
+
+        DispatcherTimer timer = new();
+        timer.Tick += (_, _) =>
+        {
+            if (!ui.PromotionHandler.Active)
+            {
+                move.Promotion = ui.PromotionHandler.Selected;
+                finished();
+                timer.Stop();
+            }
+        };
+        timer.Start();
+    }
+    
     private static MoveHandlingResult GenerateMove(this BoardUI ui, (int x, int y) from, (int x, int y) to)
     {
         (int file, int rank) source = Invert.Switch(from, ui.PlayerSide);
@@ -51,17 +75,17 @@ public static class MoveHandler
         if (ui.Match is null)
             return new(false);
 
+        Move move = new Move($"{MoveUtils.GetSquare(source)}{MoveUtils.GetSquare(destination)}", ui.Match.board);
         if (Pieces.TypeOf(ui.Match.board.GetPiece(source)) == Pieces.WhitePawn && (destination.rank is 0 or 7))
-            return new(true);
+            return new(true, move);
 
         //Console.WriteLine($"{MoveUtils.GetSquare(source)}{MoveUtils.GetSquare(destination)}");
-        Move move = new Move($"{MoveUtils.GetSquare(source)}{MoveUtils.GetSquare(destination)}", ui.Match.board);
         return new(false, move);
     }
 
     private class MoveHandlingResult(bool promotion, Move? move = null)
     {
-        public bool RequiresPromotion = promotion;
-        public Move? Move = move;
+        public readonly bool RequiresPromotion = promotion;
+        public readonly Move? Move = move;
     }
 }

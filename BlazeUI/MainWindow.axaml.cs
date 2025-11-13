@@ -16,7 +16,7 @@ public partial class MainWindow : Window
     private readonly OverlayHandler OverlayHandler;
     private readonly PGNDisplay PgnDisplay;
     private Side LastPlayed = Side.White;
-    private readonly int Depth = 7;
+    private readonly int Depth = 3;
     
     public MainWindow()
     {
@@ -97,7 +97,7 @@ public partial class MainWindow : Window
     private void PromotionSelected(object? sender, RoutedEventArgs e)
     {
         string name = (sender as Button)!.Name!;
-        _promotionHandler._selected = name switch
+        _promotionHandler.Selected = name switch
         {
             "QueenPromotionButton" => 0b100,
             "RookPromotionButton" => 0b001,
@@ -105,6 +105,7 @@ public partial class MainWindow : Window
             "BishopPromotionButton" => 0b011,
             _ => throw new ArgumentOutOfRangeException()
         };
+        _promotionHandler.Cancel();
     }
     
     private void OnKeyDown(TopLevel t, KeyEventArgs e)
@@ -112,8 +113,8 @@ public partial class MainWindow : Window
         switch (e.Key)
         {
             case Key.Escape:
-                //PieceBoard.CancelPromotion();
-                //PieceBoard.LoadLatest();
+                _promotionHandler.Selected = 0b111;
+                _promotionHandler.Cancel();
                 break;
             case Key.Right:
                 PgnDisplay.Slide(1);

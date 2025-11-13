@@ -10,7 +10,7 @@ namespace BlazeUI.Board_Interface;
 
 public class BoardUI : Grid
 {
-    private PromotionHandler? PromotionHandler;
+    public PromotionHandler? PromotionHandler;
     public EmbeddedMatch? Match;
     public Side PlayerSide;
     private bool IsPlayerTurn => Match is not null && Match.GetSide() == PlayerSide;
