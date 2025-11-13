@@ -3,12 +3,13 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
-using Avalonia.Threading;
-using BlazeUI.Blaze;
 
 namespace BlazeUI;
+using Blaze;
 using Blaze.Board_Representation;
 using Blaze.API;
+using BotAPI;
+
 public partial class MainWindow : Window
 {
     private readonly PromotionHandler _promotionHandler;
@@ -73,23 +74,13 @@ public partial class MainWindow : Window
             return;
         
         OverlayHandler.SetActive("init");
-        DispatcherTimer timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16) };
-        Init.StartInit();
-        
-        timer.Tick += (_, _) =>
-        {
+        InitBot.Initialize(() => {
             InitProgress.SetCompletion(Init.Progress.Percentage);
             InitStatus.Text = Init.Progress.Message;
-            
-            if (Init.init == Init.InitStatus.Complete)
-            {
-                timer.Stop();
-                OverlayHandler.RemoveActive();
-                PieceBoard.SetMatch(new(new(Presets.StartingBoard), Depth, delayBook: true), Side.White);
-            }
-        };
-        
-        timer.Start();
+        }, () => {
+            OverlayHandler.RemoveActive();
+            PieceBoard.SetMatch(new(new(Presets.StartingBoard), Depth, delayBook: true), Side.White);
+        });
     }
     
     private void StartNewAsWhite(object sender, RoutedEventArgs e)
