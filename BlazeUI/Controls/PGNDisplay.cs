@@ -5,7 +5,7 @@ using BlazeUI.Blaze.Board_Representation;
 using BlazeUI.Blaze.Move_Generation;
 using BlazeUI.Board_Interface;
 
-namespace BlazeUI;
+namespace BlazeUI.Controls;
 
 public class PGNDisplay(StackPanel panel, PieceGrid grid)
 {

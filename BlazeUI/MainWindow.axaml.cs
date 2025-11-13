@@ -9,6 +9,7 @@ using Blaze;
 using Blaze.Board_Representation;
 using Blaze.API;
 using BotAPI;
+using Controls;
 
 public partial class MainWindow : Window
 {

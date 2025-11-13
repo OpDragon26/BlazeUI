@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Avalonia.Controls;
 
-namespace BlazeUI;
+namespace BlazeUI.Controls;
 
 public class OverlayHandler(Grid overlayGrid)
 {
