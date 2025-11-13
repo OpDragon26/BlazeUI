@@ -4,12 +4,14 @@ using BlazeUI.Blaze.API;
 using BlazeUI.Blaze.Board_Representation;
 using BlazeUI.Utils;
 using BlazeUI.BotAPI;
+using BlazeUI.Controls;
 
 namespace BlazeUI.Board_Interface;
 
 public class BoardUI : Grid
 {
     public PromotionHandler? PromotionHandler;
+    public PGNDisplay? PgnDisplay;
     public EmbeddedMatch? Match;
     public Side PlayerSide;
     private bool IsPlayerTurn => Match is not null && Match.GetSide() == PlayerSide;
@@ -49,12 +51,13 @@ public class BoardUI : Grid
         }
     }
     
-    public void Initialize(PromotionHandler promotionHandler)
+    public void Initialize(PromotionHandler promotionHandler, PGNDisplay pgnDisplay)
     {
         GridBoard.Base = this;
         Highlights.Base = this;
         
         PromotionHandler = promotionHandler;
+        PgnDisplay = pgnDisplay;
         
         Children.Add(BackgroundBoard);
         Children.Add(Highlights);

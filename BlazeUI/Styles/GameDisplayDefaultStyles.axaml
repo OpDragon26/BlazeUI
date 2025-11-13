@@ -1,5 +1,6 @@
 <Styles xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:BlazeUI.Controls">
     <Design.PreviewWith>
         <Border Padding="20">
             <!-- Add Controls for Previewer Here -->
@@ -17,7 +18,7 @@
         <Setter Property="CornerRadius" Value="20"></Setter>
     </Style>
     
-    <Style Selector="Grid.GameEntry">
+    <Style Selector="local|DisplayRow.GameEntry">
         <Setter Property="Height" Value="50"></Setter>
     </Style>
     
@@ -27,12 +28,12 @@
         <Setter Property="VerticalAlignment" Value="Center"></Setter>
     </Style>
     
-    <Style Selector="Button.GameEntryRow">
+    <Style Selector="local|DisplayButton.GameEntryButton">
         <Setter Property="HorizontalAlignment" Value="Stretch"></Setter>
         <Setter Property="VerticalAlignment" Value="Stretch"></Setter>
         <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
-        <Setter Property="CornerRadius" Value="0"></Setter>
         <Setter Property="FontSize" Value="25"></Setter>
+        <Setter Property="CornerRadius" Value="5"></Setter>
         <Setter Property="FontWeight" Value="Light"></Setter>
         
         <Setter Property="Background" Value="Transparent"></Setter>
@@ -45,8 +46,7 @@
         </Style>
     </Style>
     
-    <Style Selector="Button.SelectedEntry">
-        <Setter Property="CornerRadius" Value="5"></Setter>
+    <Style Selector="local|DisplayButton.SelectedEntry">
         <Setter Property="Background" Value="{DynamicResource SecondaryCardBackground}"></Setter>
         <Style Selector="^:pointerover /template/ ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource SecondaryBorder}"></Setter>

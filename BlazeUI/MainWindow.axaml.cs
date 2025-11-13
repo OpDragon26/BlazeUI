@@ -36,7 +36,7 @@ public partial class MainWindow : Window
         _promotionHandler.InitImages(Side.White);
         KeyDownEvent.AddClassHandler<TopLevel>(OnKeyDown, handledEventsToo: true);
         
-        PieceBoard.Initialize(_promotionHandler);
+        PieceBoard.Initialize(_promotionHandler, PGNPanel);
 
         PGNPanel.DisplayBoard = PieceBoard;
         

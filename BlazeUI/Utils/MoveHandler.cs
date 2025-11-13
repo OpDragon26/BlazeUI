@@ -29,6 +29,8 @@ public static class MoveHandler
 
         if (ui.Match.TryMake(move))
         {
+            ui.PgnDisplay!.AddNode(ui.Match!.game.LastMove!);
+            
             ui.GridBoard.LoadBoard(move);
             return true;
         }
@@ -43,6 +45,8 @@ public static class MoveHandler
     
     public static void HandleBotMove(this BoardUI ui, Move move)
     {
+        ui.PgnDisplay!.AddNode(ui.Match!.game.LastMove!);
+        
         ui.GridBoard.LoadBoard(move);
         ui.GridBoard.locked.Unlock(ui.PlayerSide);
     }
