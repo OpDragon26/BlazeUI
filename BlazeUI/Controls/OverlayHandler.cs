@@ -7,7 +7,7 @@ namespace BlazeUI.Controls;
 public class OverlayHandler(Grid overlayGrid)
 {
     private readonly Dictionary<string, Grid> Overlays = new();
-    public string Active = String.Empty;
+    private string Active = String.Empty;
     
     public void AddOverlay(Grid overlay, string name)
     {

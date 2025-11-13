@@ -15,7 +15,6 @@ public partial class MainWindow : Window
 {
     private readonly PromotionHandler _promotionHandler;
     private readonly OverlayHandler OverlayHandler;
-    private readonly PGNDisplay PgnDisplay;
     private Side LastPlayed = Side.White;
     private readonly int Depth = 7;
     
@@ -38,9 +37,8 @@ public partial class MainWindow : Window
         KeyDownEvent.AddClassHandler<TopLevel>(OnKeyDown, handledEventsToo: true);
         
         PieceBoard.Initialize(_promotionHandler);
-        
-        // load a new game from starting position
-        PgnDisplay = new PGNDisplay(PGNPanel, PieceBoard.GridBoard);
+
+        PGNPanel.DisplayBoard = PieceBoard;
         
         //DebugInterface.Execute();
         
@@ -118,16 +116,16 @@ public partial class MainWindow : Window
                 _promotionHandler.Cancel();
                 break;
             case Key.Right:
-                PgnDisplay.Slide(1);
+                //PgnDisplay.Slide(1);
                 break;
             case Key.Left:
-                PgnDisplay.Slide(-1);
+                //PgnDisplay.Slide(-1);
                 break;
             case Key.Down:
-                PgnDisplay.Slide(2);
+                //PgnDisplay.Slide(2);
                 break;
             case Key.Up:
-                PgnDisplay.Slide(-2);
+                //PgnDisplay.Slide(-2);
                 break;
         }
         

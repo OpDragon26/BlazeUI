@@ -1,96 +1,108 @@
-using System;
 using System.Collections.Generic;
 using Avalonia.Controls;
-using BlazeUI.Blaze.Board_Representation;
-using BlazeUI.Blaze.Move_Generation;
+using BlazeUI.Blaze.API;
+using BlazeUI.Blaze.Utils;
 using BlazeUI.Board_Interface;
 
 namespace BlazeUI.Controls;
 
-public class PGNDisplay(StackPanel panel, PieceGrid grid)
+public class PGNDisplay : StackPanel
 {
-    private readonly List<(string moveString, Move move, Board board)> _game = new();
-    private Grid? _last;
-    private readonly PieceGrid Visual = grid;
-    private int _lastViewed;
-    private readonly List<Button> _buttons = new();
-    
-    public void Add(string moveString, Move move, Board board)
+    public BoardUI? DisplayBoard;
+    private readonly List<MoveItem> Moves = new();
+    private int Rows;
+
+    public void AddNode(GameNode node)
     {
-        if (_game.Count % 2 == 0)
+        Moves.Add(new(node));
+        if (Rows == 0)
         {
-            // new row added
-            _last = new Grid { 
-                ColumnDefinitions = new ColumnDefinitions("25,*,*"), 
-                Classes = { "GameEntry" } 
-            };
-            _last.Children.Add(new TextBlock() {
-                Text = Convert.ToString(_game.Count / 2 + 1) + '.', 
+            Children.Add(new DisplayRow { Index = ++Rows , Base = this , DisplayBoard = DisplayBoard! });
+            DisplayRow newRow = (Children[^1] as DisplayRow)!;
+            newRow.Init();
+            
+            newRow.Add(Moves[^1]);
+            return;
+        }
+        
+        DisplayRow lastRow = (Children[^1] as DisplayRow)!;
+        if (!lastRow.IsFilled())
+            lastRow.Add(Moves[^1]);
+        else
+        {
+            lastRow.Finish();
+            Children.Add(new DisplayRow { Index = ++Rows , Base = this , DisplayBoard = DisplayBoard! });
+            lastRow = (Children[^1] as DisplayRow)!;
+            lastRow.Init();
+            lastRow.Add(Moves[^1]);
+        }
+    }
+    
+    private class MoveItem(GameNode node)
+    {
+        public readonly GameNode Node = node;
+        public readonly string Move = node.Notate();
+    }
+
+    private class DisplayRow : Grid
+    {
+        public required int Index;
+        public required PGNDisplay Base;
+        public required BoardUI DisplayBoard;
+        private string Label => $"{Index}. ";
+
+        public void Init()
+        {
+            ColumnDefinitions = new ColumnDefinitions("25,*,*");
+            Classes.Add("GameEntry");
+            Children.Add(new TextBlock()
+            {
+                Text = Label,
                 Classes = { "Indexer" }
             });
+        }
+        
+        public void Add(MoveItem item)
+        {
+            Children.Add(new DisplayButton { Item = item , DisplayBoard = DisplayBoard , Base = Base });
+            if (IsFilled())
+            {
+                DisplayButton lastChild = (Children[1] as DisplayButton)!;
+                lastChild.IsLast = false;
+            }
+        }
+
+        public void Finish()
+        {
+            DisplayButton lastChild = (Children[2] as DisplayButton)!;
+            lastChild.IsLast = false;
+        }
+
+        public bool IsFilled()
+        {
+            return Children.Count > 2;
+        }
+    }
+
+    private class DisplayButton : Button
+    {
+        public required MoveItem Item;
+        public required BoardUI DisplayBoard;
+        public required PGNDisplay Base;
+        public bool IsLast = true;
+
+        public void Init()
+        {
+            Content = Item.Move;
+            Classes.Add("GameEntryRow");
             
-            panel.Children.Add(_last);
+            Click += (_,_) =>
+            {
+                DisplayBoard.GridBoard.LoadBoard(BoardUtils.General.AfterMove(Item.Node.board, Item.Node.move!), DisplayBoard.PlayerSide, false, Item.Node.move);
+                DisplayBoard.GridBoard.locked.Lock();
+                if (IsLast)
+                    DisplayBoard.GridBoard.locked.Unlock(DisplayBoard.PlayerSide);
+            };
         }
-        
-        Button moveText = new Button {
-            Content = moveString, 
-            Classes = { "GameEntryRow" }, 
-            Name = Convert.ToString(_game.Count)
-        };
-        _buttons.Add(moveText);
-        
-        moveText.Click += (sender, _) =>
-        {
-            Button button = (sender as Button)!;
-            JumpTo(int.Parse(button.Name!));
-        };
-        
-        _last!.Children.Add(moveText);
-        Grid.SetColumn(moveText, _game.Count % 2 + 1);
-        
-        _lastViewed = _game.Count;
-        ClearSelected();
-        moveText.Classes.Add("SelectedEntry");
-        _game.Add((moveString, move, board));
-    }
-
-    private void ClearSelected()
-    {
-        foreach (Button button in _buttons)
-        {
-            if (button.Classes.Contains("SelectedEntry"))
-                button.Classes.Remove("SelectedEntry");
-        }
-    }
-    
-    public void Slide(int by)
-    {
-        JumpTo(_lastViewed + by);
-    }
-
-    private void JumpTo(int to)
-    {
-        to = Math.Clamp(to, 0, _game.Count - 1);
-        _lastViewed = to;
-        Visual.LoadBoard(_game[_lastViewed].board, Visual.Base!.PlayerSide, true);
-        if (_lastViewed != _game.Count - 1)
-            Visual.locked.Lock();
-        
-        /*
-        BoardUi!.ClearHighlight("last-move");
-        if (_game[_lastViewed].move.Source.file != 8)
-            BoardUi!.HighlightMove(_game[_lastViewed].move, Colors.HighLightMove);
-        */
-        
-        ClearSelected();
-        _buttons[_lastViewed].Classes.Add("SelectedEntry");
-    }
-
-    public void Clear()
-    {
-        _game.Clear();
-        panel.Children.Clear();
-        _buttons.Clear();
-        _last = null;
     }
 }

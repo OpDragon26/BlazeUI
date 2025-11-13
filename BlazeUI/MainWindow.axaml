@@ -71,7 +71,7 @@
                                 <Border Grid.Column="2" Padding="20">
                                         <Border Classes="GameDisplayWindow">
                                                 <ScrollViewer>
-                                                        <StackPanel x:Name="PGNPanel"></StackPanel>
+                                                        <local:PGNDisplay x:Name="PGNPanel"></local:PGNDisplay>
                                                 </ScrollViewer>
                                         </Border> 
                                 </Border>

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using BlazeUI.Blaze.Move_Generation;
 
 namespace BlazeUI.Blaze.Utils;
 using Board_Representation;
@@ -9,6 +10,13 @@ public static class BoardUtils
     public static class General
     {
         public const uint PieceMask = 0xF; // covers the last 4 bits
+
+        public static Board AfterMove(Board board, Move move)
+        {
+            Board newBoard = new(board);
+            newBoard.MakeMove(move);
+            return newBoard;
+        }
         
         [System.Runtime.CompilerServices.InlineArray(14)]
         public struct BitwiseBoard
