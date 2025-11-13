@@ -2,7 +2,7 @@ using Avalonia.Controls;
 using BlazeUI.Blaze.API;
 using BlazeUI.Utils;
 
-namespace BlazeUI;
+namespace BlazeUI.BotAPI;
 
 public class PromotionHandler(Grid displayGrid)
 {

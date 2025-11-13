@@ -29,7 +29,7 @@ public static class MoveHandler
 
         if (ui.Match.TryMake(move))
         {
-            ui.GridBoard.LoadBoard();
+            ui.GridBoard.LoadBoard(move);
             return true;
         }
         return false;
@@ -43,7 +43,7 @@ public static class MoveHandler
     
     public static void HandleBotMove(this BoardUI ui, Move move)
     {
-        ui.GridBoard.LoadBoard();
+        ui.GridBoard.LoadBoard(move);
         ui.GridBoard.locked.Unlock(ui.PlayerSide);
     }
 

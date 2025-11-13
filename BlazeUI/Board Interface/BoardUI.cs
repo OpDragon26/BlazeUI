@@ -21,7 +21,7 @@ public class BoardUI : Grid
         RowDefinitions = new RowDefinitions("*,*,*,*,*,*,*,*"),
     };
 
-    private readonly HighlightGrid Highlights = new()
+    public readonly HighlightGrid Highlights = new()
     {
         ColumnDefinitions = new ColumnDefinitions("*,*,*,*,*,*,*,*"),
         RowDefinitions = new RowDefinitions("*,*,*,*,*,*,*,*")
@@ -53,6 +53,7 @@ public class BoardUI : Grid
     public void Initialize(PromotionHandler promotionHandler)
     {
         GridBoard.Base = this;
+        Highlights.Base = this;
         
         PromotionHandler = promotionHandler;
         
@@ -76,11 +77,11 @@ public class BoardUI : Grid
 
     public void PieceRaised((int x, int y) pos)
     {
-        
+        Highlights.HighlightLegalMoves(Match!.board, PlayerSide, pos);
     }
 
     public void PieceReleased()
     {
-        
+        Highlights.Clear("moves");
     }
 }

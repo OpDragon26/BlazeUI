@@ -16,7 +16,7 @@ public partial class MainWindow : Window
     private readonly OverlayHandler OverlayHandler;
     private readonly PGNDisplay PgnDisplay;
     private Side LastPlayed = Side.White;
-    private readonly int Depth = 3;
+    private readonly int Depth = 7;
     
     public MainWindow()
     {

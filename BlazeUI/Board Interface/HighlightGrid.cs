@@ -1,15 +1,71 @@
-﻿using System.Collections.Generic;
+﻿using System.Linq;
 using Avalonia.Controls;
+using Avalonia.Controls.Shapes;
+using Avalonia.Media;
+using BlazeUI.Blaze.API;
+using BlazeUI.Blaze.Board_Representation;
+using BlazeUI.Blaze.Move_Generation;
+using BlazeUI.Blaze.Utils;
+using BlazeUI.Utils;
 
 namespace BlazeUI.Board_Interface;
 
 public class HighlightGrid : Grid
 {
-    private List<HighlightItem> highlights = new();
-    
-    private class HighlightItem((int x, int y) pos, string id)
+    public BoardUI? Base;
+
+    public void HighlightLegalMoves(Board board, Side side, (int x, int y) pos)
     {
-        public (int x, int y) Pos = pos;
-        public string ID = id;
+        Clear("moves");
+        if (Base is null || Base.Match is null)
+            return;
+        
+        Highlight(
+            MoveGenerator.SearchBoard(Base.Match.board, false)
+            .ToArray()
+            .Where(move => move.Source == Invert.Switch(pos, side))
+            .Select(move => BitboardUtils.GetSquare(move.Destination))
+            .Aggregate((u1, u2) => u1 | u2), 
+            side, "moves",Colors.HighLight);
     }
+    
+    private void Highlight(ulong bitboard, Side perspective, string id, SolidColorBrush color)
+    {
+        for (int file = 0; file < 8; file++)
+        for (int rank = 0; rank < 8; rank++)
+        {
+            (int file, int rank) square = (file, rank);
+            (int x, int y) pos = Invert.Switch(square, perspective);
+
+            if ((bitboard & BitboardUtils.GetSquare(square)) != 0)
+                HighlightSingle(pos, id, color);
+        }
+    }
+    
+    public void HighlightMove(Move move)
+    {
+        Clear("last-move");
+
+        Side side = Base?.PlayerSide ?? Side.White;
+        HighlightSingle(Invert.Switch(move.Source, side), "last-move", Colors.HighLightMove);
+        HighlightSingle(Invert.Switch(move.Destination, side), "last-move", Colors.HighLightMove);
+    }
+    
+    private void HighlightSingle((int x, int y) pos, string id, SolidColorBrush color)
+    {
+        HighlightRect rect = new HighlightRect { [Shape.FillProperty] = color , ID = id };
+        Children.Add(rect);
+        SetColumn(rect, pos.x);
+        SetRow(rect, pos.y);
+    }
+
+    public void Clear(string id)
+    {
+        Children.RemoveAll(Children.Where(child => (child as HighlightRect)!.ID.Equals(id)));
+    }
+}
+
+file class HighlightRect : Rectangle
+{
+    public required string ID;
 }
