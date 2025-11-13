@@ -17,11 +17,9 @@ public class HighlightGrid : Grid
     public void HighlightLegalMoves(Board board, Side side, (int x, int y) pos)
     {
         Clear("moves");
-        if (Base is null || Base.Match is null)
-            return;
         
         Highlight(
-            MoveGenerator.SearchBoard(Base.Match.board, false)
+            MoveGenerator.SearchBoard(board, false)
             .ToArray()
             .Where(move => move.Source == Invert.Switch(pos, side))
             .Select(move => BitboardUtils.GetSquare(move.Destination))
