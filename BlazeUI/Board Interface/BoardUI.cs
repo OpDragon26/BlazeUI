@@ -21,7 +21,7 @@ public class BoardUI : Grid
         RowDefinitions = new RowDefinitions("*,*,*,*,*,*,*,*"),
     };
 
-    private readonly Grid Highlights = new()
+    private readonly HighlightGrid Highlights = new()
     {
         ColumnDefinitions = new ColumnDefinitions("*,*,*,*,*,*,*,*"),
         RowDefinitions = new RowDefinitions("*,*,*,*,*,*,*,*")
