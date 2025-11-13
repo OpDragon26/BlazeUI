@@ -64,14 +64,12 @@ public class BoardUI : Grid
         Children.Add(GridBoard);
         
         for (int file = 0; file < 8; file++)
+        for (int rank = 0; rank < 8; rank++)
         {
-            for (int rank = 0; rank < 8; rank++)
-            {
-                Rectangle rect = new Rectangle { [Shape.FillProperty] = (file + rank) % 2 == 0 ? Colors.LightSquare : Colors.DarkSquare };
-                SetRow(rect, file);
-                SetColumn(rect, rank);
-                BackgroundBoard.Children.Add(rect);
-            }
+            Rectangle rect = new Rectangle { [Shape.FillProperty] = (file + rank) % 2 == 0 ? Colors.LightSquare : Colors.DarkSquare };
+            SetRow(rect, file);
+            SetColumn(rect, rank);
+            BackgroundBoard.Children.Add(rect);
         }
         
         SetMatch(null, Side.White);
