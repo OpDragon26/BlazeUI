@@ -20,12 +20,15 @@ public class PopupHandler : Grid
     public void SetActive(string name)
     {
         ClearActive();
+        
+        ZIndex = 15;
         Active = name;
         Children.Add(Popups[name]);
     }
 
     public void ClearActive()
     {
+        ZIndex = -5;
         Children.Clear();
         Active = null;
     }
