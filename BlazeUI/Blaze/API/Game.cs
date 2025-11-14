@@ -11,6 +11,7 @@ public class Game(Board board) : IEnumerable<GameNode>
     private readonly List<GameNode> nodes = [new(board, null)];
     private Outcome outcome = Outcome.Ongoing;
     public int Count => nodes.Count - 1;
+    public int Length => nodes.Count / 2;
     public GameNode? LastMove => Count == 0 ? null : nodes[^2];
     
     public GameNode this[Index i] => nodes[i];

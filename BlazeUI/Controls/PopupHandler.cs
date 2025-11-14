@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Avalonia.Controls;
 
-namespace BlazeUI.Popups;
+namespace BlazeUI.Controls;
 
 public class PopupHandler : Grid
 {

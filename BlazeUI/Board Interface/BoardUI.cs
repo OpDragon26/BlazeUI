@@ -10,10 +10,12 @@ namespace BlazeUI.Board_Interface;
 
 public class BoardUI : Grid
 {
+    private MainWindow? Window;
     public PromotionHandler? PromotionHandler;
     public PGNDisplay? PgnDisplay;
     public EmbeddedMatch? Match;
     public Side PlayerSide;
+    
     private bool IsPlayerTurn => Match is not null && Match.GetSide() == PlayerSide;
     
     public readonly PieceGrid GridBoard = new()
@@ -50,14 +52,29 @@ public class BoardUI : Grid
                 this.PlayBotMove();
         }
     }
+
+    public void CheckGameOver()
+    {
+        if (Match is null)
+            return;
+        
+        Outcome outcome = Match.GetOutcome();
+
+        if (outcome != Outcome.Ongoing)
+        {
+            GridBoard.locked.Lock();
+            Window!.GameOverSplash(outcome, Match.game.Length);
+        }
+    }
     
-    public void Initialize(PromotionHandler promotionHandler, PGNDisplay pgnDisplay)
+    public void Initialize(PromotionHandler promotionHandler, PGNDisplay pgnDisplay, MainWindow window)
     {
         GridBoard.Base = this;
         Highlights.Base = this;
         
         PromotionHandler = promotionHandler;
         PgnDisplay = pgnDisplay;
+        Window = window;
         
         Children.Add(BackgroundBoard);
         Children.Add(Highlights);

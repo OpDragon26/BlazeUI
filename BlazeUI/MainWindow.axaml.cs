@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using BlazeUI.Blaze.Utils;
 
 namespace BlazeUI;
 using Blaze;
@@ -12,7 +13,7 @@ using BotAPI;
 
 public partial class MainWindow : Window
 {
-    private readonly PromotionHandler _promotionHandler;
+    private readonly PromotionHandler Promotion;
     private Side LastPlayed = Side.White;
     private readonly int Depth = 7;
     
@@ -29,11 +30,11 @@ public partial class MainWindow : Window
         InitProgress.SetCompletion(0);
         
         // set up promotion handler
-        _promotionHandler = new PromotionHandler(PromotionGrid);
-        _promotionHandler.InitImages(Side.White);
+        Promotion = new PromotionHandler(PromotionGrid);
+        Promotion.InitImages(Side.White);
         KeyDownEvent.AddClassHandler<TopLevel>(OnKeyDown, handledEventsToo: true);
         
-        PieceBoard.Initialize(_promotionHandler, PGNPanel);
+        PieceBoard.Initialize(Promotion, PGNPanel, this);
 
         PGNPanel.DisplayBoard = PieceBoard;
         
@@ -85,7 +86,7 @@ public partial class MainWindow : Window
     private void PromotionSelected(object? sender, RoutedEventArgs e)
     {
         string name = (sender as Button)!.Name!;
-        _promotionHandler.Selected = name switch
+        Promotion.Selected = name switch
         {
             "QueenPromotionButton" => 0b100,
             "RookPromotionButton" => 0b001,
@@ -93,7 +94,7 @@ public partial class MainWindow : Window
             "BishopPromotionButton" => 0b011,
             _ => throw new ArgumentOutOfRangeException()
         };
-        _promotionHandler.Cancel();
+        Promotion.Cancel();
     }
     
     private void OnKeyDown(TopLevel t, KeyEventArgs e)
@@ -101,8 +102,8 @@ public partial class MainWindow : Window
         switch (e.Key)
         {
             case Key.Escape:
-                _promotionHandler.Selected = 0b111;
-                _promotionHandler.Cancel();
+                Promotion.Selected = 0b111;
+                Promotion.Cancel();
                 break;
             case Key.Right:
                 //PgnDisplay.Slide(1);
@@ -131,6 +132,8 @@ public partial class MainWindow : Window
             Outcome.BlackWin => "Black won!",
             _ => throw new ArgumentOutOfRangeException()
         };
+        
+        Sound.PlaySound(General.SideWon(PieceBoard.PlayerSide, outcome) ? "game-won" : "game-lost");
         GameOverMoves.Text = $"moves: {moves}";
     }
 

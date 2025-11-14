@@ -30,8 +30,9 @@ public static class MoveHandler
         if (ui.Match.TryMake(move))
         {
             ui.PgnDisplay!.AddNode(ui.Match!.game.LastMove!);
-            
             ui.GridBoard.LoadBoard(move);
+            ui.CheckGameOver();
+            
             return true;
         }
         return false;
@@ -46,8 +47,8 @@ public static class MoveHandler
     public static void HandleBotMove(this BoardUI ui, Move move)
     {
         ui.PgnDisplay!.AddNode(ui.Match!.game.LastMove!);
-        
         ui.GridBoard.LoadBoard(move);
+        ui.CheckGameOver();
         ui.GridBoard.locked.Unlock(ui.PlayerSide);
     }
 
