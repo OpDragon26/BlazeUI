@@ -7,7 +7,7 @@
         <Application.Styles>
                 <FluentTheme />
                 <StyleInclude Source="Styles/AppDefaultStyles.axaml"></StyleInclude>
-                <StyleInclude Source="Styles/OverlayDefaultStyles.axaml"></StyleInclude>
+                <StyleInclude Source="Styles/PopupDefaultStyles.axaml"></StyleInclude>
                 <StyleInclude Source="Styles/GameDisplayDefaultStyles.axaml"></StyleInclude>
         </Application.Styles>
              

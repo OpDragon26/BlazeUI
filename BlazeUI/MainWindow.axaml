@@ -4,6 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BlazeUI.Controls"
         xmlns:board="clr-namespace:BlazeUI.Board_Interface"
+        xmlns:popup="clr-namespace:BlazeUI.Popups"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="BlazeUI.MainWindow"
         Title="BlazeUI">
@@ -77,7 +78,7 @@
                                 </Border>
                         </Grid>
                 </Grid>
-                <Grid x:Name="OverlayGrid" ZIndex="-5">
+                <popup:PopupHandler x:Name="OverlayGrid">
                         <Grid ColumnDefinitions="*,600,*" RowDefinitions="*,250,*" Classes="OverlayBackground" x:Name="InitOverlay">
                                 <Grid Grid.Row="1" Grid.Column="1">
                                         <Border Classes="OverlayPopup" x:Name="InitializingPopup">
@@ -127,6 +128,6 @@
                                         </Border>
                                 </StackPanel>
                         </Grid>
-                </Grid>
+                </popup:PopupHandler>
         </Grid>
 </Window>
