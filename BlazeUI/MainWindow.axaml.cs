@@ -9,12 +9,10 @@ using Blaze;
 using Blaze.Board_Representation;
 using Blaze.API;
 using BotAPI;
-using Controls;
 
 public partial class MainWindow : Window
 {
     private readonly PromotionHandler _promotionHandler;
-    private readonly OverlayHandler OverlayHandler;
     private Side LastPlayed = Side.White;
     private readonly int Depth = 7;
     
@@ -25,8 +23,7 @@ public partial class MainWindow : Window
         Sound.Init();
         
         // init overlay
-        OverlayHandler = new OverlayHandler(OverlayGrid);
-        InitOverlays();
+        PopupHandlerGrid.Initialize();
         
         InitProgress.Init(InitProgressBar);
         InitProgress.SetCompletion(0);
@@ -44,40 +41,32 @@ public partial class MainWindow : Window
         
         StartNewGame();
     }
-
-    private void InitOverlays()
-    {
-        OverlayHandler.AddOverlay(InitOverlay, "init");
-        OverlayHandler.AddOverlay(GameOverOverlay, "game-over");
-        OverlayHandler.AddOverlay(NewGameDropdownOverlay, "new-game");
-        OverlayHandler.Init();
-    }
     
     private void NewGameOpenDropdown(object sender, RoutedEventArgs e)
     {
-        OverlayHandler.Toggle("new-game");
+        PopupHandlerGrid.Toggle("NewGameDropdownPopup");
     }
     
     private void PlayButtonClick(object sender, RoutedEventArgs e)
     {
         StartNewGame();
-        OverlayHandler.RemoveActive();
+        PopupHandlerGrid.ClearActive();
     }
     
     private void StartNewGame()
     {
-        OverlayHandler.RemoveActive();
+        PopupHandlerGrid.ClearActive();
         if (Init.init == Init.InitStatus.Complete)
             PieceBoard.SetMatch(new(new(Presets.StartingBoard), Depth, delayBook: true), LastPlayed);
         if (Init.init == Init.InitStatus.Waiting)
             return;
         
-        OverlayHandler.SetActive("init");
+        PopupHandlerGrid.SetActive("InitPopup");
         InitBot.Initialize(() => {
             InitProgress.SetCompletion(Init.Progress.Percentage);
             InitStatus.Text = Init.Progress.Message;
         }, () => {
-            OverlayHandler.RemoveActive();
+            PopupHandlerGrid.ClearActive();
             PieceBoard.SetMatch(new(new(Presets.StartingBoard), Depth, delayBook: true), Side.White);
         });
     }
@@ -134,7 +123,7 @@ public partial class MainWindow : Window
 
     public void GameOverSplash(Outcome outcome, int moves)
     {
-        OverlayHandler.SetActive("game-over");
+        PopupHandlerGrid.SetActive("GameOverPopup");
         GameOverTitle.Text = outcome switch
         {
             Outcome.Draw => "Game is a draw.",
@@ -147,7 +136,7 @@ public partial class MainWindow : Window
 
     private void ClosePopup(object? sender, RoutedEventArgs e)
     {
-        OverlayHandler.RemoveActive();
+        PopupHandlerGrid.ClearActive();
     }
 }
 

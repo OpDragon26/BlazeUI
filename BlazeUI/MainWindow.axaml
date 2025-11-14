@@ -78,8 +78,8 @@
                                 </Border>
                         </Grid>
                 </Grid>
-                <popup:PopupHandler x:Name="OverlayGrid">
-                        <Grid ColumnDefinitions="*,600,*" RowDefinitions="*,250,*" Classes="OverlayBackground" x:Name="InitOverlay">
+                <popup:PopupHandler x:Name="PopupHandlerGrid">
+                        <Grid ColumnDefinitions="*,600,*" RowDefinitions="*,250,*" Classes="OverlayBackground" x:Name="InitPopup">
                                 <Grid Grid.Row="1" Grid.Column="1">
                                         <Border Classes="OverlayPopup" x:Name="InitializingPopup">
                                                 <Grid RowDefinitions="50,*">
@@ -98,9 +98,9 @@
                                         </Border>
                                 </Grid>
                         </Grid>
-                        <Grid ColumnDefinitions="*,600,*" RowDefinitions="*,250,*" Classes="OverlayBackground" x:Name="GameOverOverlay">
+                        <Grid ColumnDefinitions="*,600,*" RowDefinitions="*,250,*" Classes="OverlayBackground" x:Name="GameOverPopup">
                                 <Grid Grid.Row="1" Grid.Column="1">
-                                        <Border Classes="OverlayPopup" x:Name="GameOverPopup">
+                                        <Border Classes="OverlayPopup">
                                                 <Grid RowDefinitions="80,*">
                                                         <Border Grid.Row="0" Classes="PopupCardTop">
                                                                 <TextBlock Classes="PopupCardTitle GameOverTitle" x:Name="GameOverTitle">Game Over</TextBlock>
@@ -118,7 +118,7 @@
                                         </Border>
                                 </Grid> 
                         </Grid>
-                        <Grid x:Name="NewGameDropdownOverlay">
+                        <Grid x:Name="NewGameDropdownPopup">
                                 <StackPanel Orientation="Horizontal" Margin="75,0,0,0">
                                         <Border Classes="DropDownMenu">
                                                 <StackPanel Orientation="Vertical" Classes="DropDownPanel">
