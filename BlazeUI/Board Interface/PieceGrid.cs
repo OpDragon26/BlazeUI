@@ -1,10 +1,9 @@
-using System;
 using System.Collections.Generic;
 using Avalonia.Controls;
+using BlazeUI.Blaze;
 using BlazeUI.Blaze.API;
 using BlazeUI.Blaze.Board_Representation;
 using BlazeUI.Blaze.Move_Generation;
-using BlazeUI.Blaze.Utils;
 using BlazeUI.Utils;
 using static BlazeUI.Utils.BoardUIUtils;
 
@@ -23,6 +22,8 @@ public class PieceGrid : Grid
         
         if (lastMove is not null)
             Base!.Highlights.HighlightMove(lastMove);
+        if (Init.init == Init.InitStatus.Complete)
+            Base!.Highlights.HighlightCheck(board, perspective);
         
         for (int file = 0; file < 8; file++)
         for (int rank = 0; rank < 8; rank++)

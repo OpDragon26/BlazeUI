@@ -21,22 +21,17 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
-        Sound.Init();
+        KeyDownEvent.AddClassHandler<TopLevel>(OnKeyDown, handledEventsToo: true);
         
-        // init overlay
+        Sound.Init();
         PopupHandlerGrid.Initialize();
+        Promotion = new PromotionHandler(PromotionGrid);
+        Promotion.InitImages(Side.White);
+        PGNPanel.DisplayBoard = PieceBoard;
+        PieceBoard.Initialize(Promotion, PGNPanel, this);
         
         InitProgress.Init(InitProgressBar);
         InitProgress.SetCompletion(0);
-        
-        // set up promotion handler
-        Promotion = new PromotionHandler(PromotionGrid);
-        Promotion.InitImages(Side.White);
-        KeyDownEvent.AddClassHandler<TopLevel>(OnKeyDown, handledEventsToo: true);
-        
-        PieceBoard.Initialize(Promotion, PGNPanel, this);
-
-        PGNPanel.DisplayBoard = PieceBoard;
         
         //DebugInterface.Execute();
         

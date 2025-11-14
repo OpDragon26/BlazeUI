@@ -14,9 +14,21 @@ public class HighlightGrid : Grid
 {
     public BoardUI? Base;
 
+    public void HighlightCheck(Board board, Side side)
+    {
+        Clear("check");
+        
+        if (board.KingInCheck(0))
+            HighlightSingle(Invert.Switch(board.KingPositions[0], side), "check", Colors.HighLightCheck);
+        else if (board.KingInCheck(1))
+            HighlightSingle(Invert.Switch(board.KingPositions[1], side), "check", Colors.HighLightCheck);
+    }
+    
     public void HighlightLegalMoves(Board board, Side side, (int x, int y) pos)
     {
         Clear("moves");
+        if (board.GetOutcome() != Outcome.Ongoing)
+            return;
         
         Highlight(
             MoveGenerator.SearchBoard(board, false)
