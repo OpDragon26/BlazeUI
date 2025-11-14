@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Avalonia.Controls;
 using BlazeUI.Blaze.API;
@@ -10,7 +11,9 @@ public class PGNDisplay : StackPanel
     public BoardUI? DisplayBoard;
     private readonly List<MoveItem> Moves = new();
     public readonly List<DisplayButton> Buttons = new();
+    public readonly List<Action> Jumps = new();
     private int Rows;
+    private int LastSelectedIndex;
 
     public void AddNode(GameNode node)
     {
@@ -36,6 +39,8 @@ public class PGNDisplay : StackPanel
             lastRow.Init();
             lastRow.Add(Moves[^1]);
         }
+
+        LastSelectedIndex = Buttons.Count - 1;
     }
 
     public void ClearSelected()
@@ -47,5 +52,17 @@ public class PGNDisplay : StackPanel
     {
         public readonly GameNode Node = node;
         public readonly string Move = node.Notate();
+    }
+
+    private void JumpTo(int to)
+    {
+        to = Math.Clamp(to, 0, Buttons.Count - 1);
+        LastSelectedIndex = to;
+        Buttons[to].RaiseEvent(new(Button.ClickEvent));
+    }
+
+    public void Slide(int by)
+    {
+        JumpTo(LastSelectedIndex + by);
     }
 }

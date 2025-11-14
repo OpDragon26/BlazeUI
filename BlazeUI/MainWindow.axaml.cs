@@ -101,16 +101,16 @@ public partial class MainWindow : Window
                 Promotion.Cancel();
                 break;
             case Key.Right:
-                //PgnDisplay.Slide(1);
+                PGNPanel.Slide(1);
                 break;
             case Key.Left:
-                //PgnDisplay.Slide(-1);
+                PGNPanel.Slide(-1);
                 break;
             case Key.Down:
-                //PgnDisplay.Slide(2);
+                PGNPanel.Slide(2);
                 break;
             case Key.Up:
-                //PgnDisplay.Slide(-2);
+                PGNPanel.Slide(-2);
                 break;
         }
         
