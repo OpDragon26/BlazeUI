@@ -107,8 +107,7 @@ public static class ZobristHash
 
         public void Update(Move move, uint source, uint target, int side, byte castling, int enPassantFile)
         {
-            if (side == 1)
-                Modify(BlackToMove);
+            Modify(BlackToMove);
             
             // update pieces
             UpdatePiece(source, move.Source);

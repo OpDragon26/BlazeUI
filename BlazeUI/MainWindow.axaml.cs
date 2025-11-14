@@ -1,132 +1,87 @@
 using System;
 using Avalonia.Controls;
-using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
-using Avalonia.Threading;
-using BlazeUI.Blaze;
-using BlazeUI.Blaze.Evaluation;
 using BlazeUI.Blaze.Utils;
 
 namespace BlazeUI;
+using Blaze;
 using Blaze.Board_Representation;
 using Blaze.API;
-using Blaze.Magic_Lookup;
+using BotAPI;
+
 public partial class MainWindow : Window
 {
-    private readonly PromotionHandler _promotionHandler;
-    private readonly GridBoard? _pieceBoard;
-    private readonly OverlayHandler _overlay;
-    private readonly PGNDisplay _pgnDisplay;
-    private DispatcherTimer? _timer;
-    private Side _lastPlayed = Side.White;
-    private readonly int _depth = 7;
+    private readonly PromotionHandler Promotion;
+    private Side LastPlayed = Side.White;
+    private readonly int Depth = 7;
     
     public MainWindow()
     {
         InitializeComponent();
 
-        Sound.Init();
+        KeyDownEvent.AddClassHandler<TopLevel>(OnKeyDown, handledEventsToo: true);
         
-        // init overlay
-        _overlay = new OverlayHandler(OverlayGrid);
-        InitOverlays();
+        Sound.Init();
+        PopupHandlerGrid.Initialize();
+        Promotion = new PromotionHandler(PromotionGrid);
+        Promotion.InitImages(Side.White);
+        PGNPanel.DisplayBoard = PieceBoard;
+        PieceBoard.Initialize(Promotion, PGNPanel, this);
         
         InitProgress.Init(InitProgressBar);
         InitProgress.SetCompletion(0);
-        
-        // init board
-        var BoardBackground = this.FindControl<Grid>("board");
-        for (int file = 0; file < 8; file++)
-        {
-            for (int rank = 0; rank < 8; rank++)
-            {
-                Rectangle rect = new Rectangle { [Shape.FillProperty] = (file + rank) % 2 == 0 ? Colors.LightSquare : Colors.DarkSquare };
-                Grid.SetRow(rect, file);
-                Grid.SetColumn(rect, rank);
-                BoardBackground!.Children.Add(rect);
-            }
-        }
-        
-        // set up promotion handler
-        _promotionHandler = new PromotionHandler(PromotionGrid);
-        _promotionHandler.InitImages(Side.White);
-        KeyDownEvent.AddClassHandler<TopLevel>(OnKeyDown, handledEventsToo: true);
-        
-        // load a new game from starting position
-        _pgnDisplay = new PGNDisplay(PGNPanel);
-        _pieceBoard = new GridBoard(this.FindControl<Grid>("pieces")!, this.FindControl<Grid>("highlight")!, _promotionHandler, _pgnDisplay, DepthDisplay, BotMaterial, PlayerMaterial,  this);
-        _pieceBoard.SetMatch(null, Side.White);
         
         //DebugInterface.Execute();
         
         StartNewGame();
     }
-
-    private void InitOverlays()
-    {
-        _overlay.AddOverlay(InitOverlay, "init");
-        _overlay.AddOverlay(GameOverOverlay, "game-over");
-        _overlay.AddOverlay(NewGameDropdownOverlay, "new-game");
-        _overlay.Init();
-    }
     
     private void NewGameOpenDropdown(object sender, RoutedEventArgs e)
     {
-        _overlay.Toggle("new-game");
+        PopupHandlerGrid.Toggle("NewGameDropdownPopup");
     }
     
     private void PlayButtonClick(object sender, RoutedEventArgs e)
     {
         StartNewGame();
-        _overlay.RemoveActive();
+        PopupHandlerGrid.ClearActive();
     }
     
     private void StartNewGame()
     {
-        if (Bitboards.init)
-            _pieceBoard!.SetMatch(new(new(Presets.StartingBoard), _depth), _lastPlayed);
-        if (Bitboards.begunInit)
+        PopupHandlerGrid.ClearActive();
+        if (Init.init == Init.InitStatus.Complete)
+            PieceBoard.SetMatch(new(new(Presets.StartingBoard), Depth, delayBook: true), LastPlayed);
+        if (Init.init == Init.InitStatus.Waiting)
             return;
-        _overlay.SetActive("init");
-        _timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16) };
-        Bitboards.StartInit();
-        _timer.Tick += Poll;
-        _timer.Start();
-    }
-
-    private void Poll(object? sender, EventArgs e)
-    {
-        InitProgress.SetCompletion(Init.Progress.Percentage);
-        InitStatus.Text = Init.Progress.Message;
         
-        if (Bitboards.Poll())
-        {
-            _timer!.Stop();
-            _overlay.RemoveActive();
-            _pieceBoard!.SetMatch(new(new(Presets.StartingBoard), _depth, delayBook: true), Side.White);
-            //_pieceBoard!.SetMatch(new(new("8/7P/8/5K1k/8/8/8/8 w - - 0 1"), 6), Side.White);
-        }
+        PopupHandlerGrid.SetActive("InitPopup");
+        InitBot.Initialize(() => {
+            InitProgress.SetCompletion(Init.Progress.Percentage);
+            InitStatus.Text = Init.Progress.Message;
+        }, () => {
+            PopupHandlerGrid.ClearActive();
+            PieceBoard.SetMatch(new(new(Presets.StartingBoard), Depth, delayBook: true), Side.White);
+        });
     }
     
     private void StartNewAsWhite(object sender, RoutedEventArgs e)
     {
-        _overlay.RemoveActive();
-        _lastPlayed = Side.White;
+        LastPlayed = Side.White;
         StartNewGame();
     }
     private void StartAsNewBlack(object sender, RoutedEventArgs e)
     {
-        _overlay.RemoveActive();
-        _lastPlayed = Side.Black;
+        LastPlayed = Side.Black;
         StartNewGame();
     }
 
     private void PromotionSelected(object? sender, RoutedEventArgs e)
     {
         string name = (sender as Button)!.Name!;
-        _promotionHandler._selected = name switch
+        Promotion.Selected = name switch
         {
             "QueenPromotionButton" => 0b100,
             "RookPromotionButton" => 0b001,
@@ -134,6 +89,7 @@ public partial class MainWindow : Window
             "BishopPromotionButton" => 0b011,
             _ => throw new ArgumentOutOfRangeException()
         };
+        Promotion.Cancel();
     }
     
     private void OnKeyDown(TopLevel t, KeyEventArgs e)
@@ -141,20 +97,20 @@ public partial class MainWindow : Window
         switch (e.Key)
         {
             case Key.Escape:
-                _pieceBoard!.CancelPromotion();
-                _pieceBoard!.LoadLatest();
+                Promotion.Selected = 0b111;
+                Promotion.Cancel();
                 break;
             case Key.Right:
-                _pgnDisplay.Slide(1);
+                PGNPanel.Slide(1);
                 break;
             case Key.Left:
-                _pgnDisplay.Slide(-1);
+                PGNPanel.Slide(-1);
                 break;
             case Key.Down:
-                _pgnDisplay.Slide(2);
+                PGNPanel.Slide(2);
                 break;
             case Key.Up:
-                _pgnDisplay.Slide(-2);
+                PGNPanel.Slide(-2);
                 break;
         }
         
@@ -163,7 +119,7 @@ public partial class MainWindow : Window
 
     public void GameOverSplash(Outcome outcome, int moves)
     {
-        _overlay.SetActive("game-over");
+        PopupHandlerGrid.SetActive("GameOverPopup");
         GameOverTitle.Text = outcome switch
         {
             Outcome.Draw => "Game is a draw.",
@@ -171,12 +127,14 @@ public partial class MainWindow : Window
             Outcome.BlackWin => "Black won!",
             _ => throw new ArgumentOutOfRangeException()
         };
+        
+        Sound.PlaySound(General.SideWon(PieceBoard.PlayerSide, outcome) ? "game-won" : "game-lost");
         GameOverMoves.Text = $"moves: {moves}";
     }
 
     private void ClosePopup(object? sender, RoutedEventArgs e)
     {
-        _overlay.RemoveActive();
+        PopupHandlerGrid.ClearActive();
     }
 }
 

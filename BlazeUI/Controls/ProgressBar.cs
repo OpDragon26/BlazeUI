@@ -1,7 +1,7 @@
 using System;
 using Avalonia.Controls;
 
-namespace BlazeUI;
+namespace BlazeUI.Controls;
 
 public class ProgressBar : Border
 {

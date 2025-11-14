@@ -9,7 +9,7 @@ public class Move : IComparable<Move>
 {
     public readonly (int file, int rank) Source;
     public readonly (int file, int rank) Destination;
-    public readonly uint Promotion;
+    public uint Promotion;
     public readonly int Type;
     public readonly int Priority;
     public byte CastlingBan;

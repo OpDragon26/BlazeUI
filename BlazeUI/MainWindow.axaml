@@ -2,7 +2,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:BlazeUI"
+        xmlns:local="clr-namespace:BlazeUI.Controls"
+        xmlns:board="clr-namespace:BlazeUI.Board_Interface"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="BlazeUI.MainWindow"
         Title="BlazeUI">
@@ -25,10 +26,7 @@
                                         <Grid RowDefinitions="100,*,100" Width="800" Height="950">
                                                 <!-- Board -->
                                                 <Border Grid.Row="1" CornerRadius="10" Background="Beige" ClipToBounds="True">
-                                                        <Grid>
-                                                                <Grid RowDefinitions="*,*,*,*,*,*,*,*" ColumnDefinitions="*,*,*,*,*,*,*,*" x:Name="board"></Grid>
-                                                                <Grid RowDefinitions="*,*,*,*,*,*,*,*" ColumnDefinitions="*,*,*,*,*,*,*,*" x:Name="highlight"></Grid>
-                                                                <Grid RowDefinitions="*,*,*,*,*,*,*,*" ColumnDefinitions="*,*,*,*,*,*,*,*" x:Name="pieces"></Grid>
+                                                        <board:BoardUI Name="PieceBoard">
                                                                 <Grid ColumnDefinitions="*,*,*,*,*,*,*,*" x:Name="PromotionGrid" RowDefinitions="Auto" ZIndex="-5">
                                                                         <Border Classes="PromotionSelector">
                                                                                 <StackPanel Classes="PromotionSelectorPanel">
@@ -48,7 +46,7 @@
                                                                                 </StackPanel>
                                                                         </Border>
                                                                 </Grid>
-                                                        </Grid>
+                                                        </board:BoardUI>
                                                 </Border>
                                                 
                                                 <!-- Top row: enemy name, depth, material --> 
@@ -73,14 +71,14 @@
                                 <Border Grid.Column="2" Padding="20">
                                         <Border Classes="GameDisplayWindow">
                                                 <ScrollViewer>
-                                                        <StackPanel x:Name="PGNPanel"></StackPanel>
+                                                        <local:PGNDisplay x:Name="PGNPanel"></local:PGNDisplay>
                                                 </ScrollViewer>
                                         </Border> 
                                 </Border>
                         </Grid>
                 </Grid>
-                <Grid x:Name="OverlayGrid" ZIndex="-5">
-                        <Grid ColumnDefinitions="*,600,*" RowDefinitions="*,250,*" Classes="OverlayBackground" x:Name="InitOverlay">
+                <local:PopupHandler x:Name="PopupHandlerGrid">
+                        <Grid ColumnDefinitions="*,600,*" RowDefinitions="*,250,*" Classes="OverlayBackground" x:Name="InitPopup">
                                 <Grid Grid.Row="1" Grid.Column="1">
                                         <Border Classes="OverlayPopup" x:Name="InitializingPopup">
                                                 <Grid RowDefinitions="50,*">
@@ -99,9 +97,9 @@
                                         </Border>
                                 </Grid>
                         </Grid>
-                        <Grid ColumnDefinitions="*,600,*" RowDefinitions="*,250,*" Classes="OverlayBackground" x:Name="GameOverOverlay">
+                        <Grid ColumnDefinitions="*,600,*" RowDefinitions="*,250,*" Classes="OverlayBackground" x:Name="GameOverPopup">
                                 <Grid Grid.Row="1" Grid.Column="1">
-                                        <Border Classes="OverlayPopup" x:Name="GameOverPopup">
+                                        <Border Classes="OverlayPopup">
                                                 <Grid RowDefinitions="80,*">
                                                         <Border Grid.Row="0" Classes="PopupCardTop">
                                                                 <TextBlock Classes="PopupCardTitle GameOverTitle" x:Name="GameOverTitle">Game Over</TextBlock>
@@ -119,7 +117,7 @@
                                         </Border>
                                 </Grid> 
                         </Grid>
-                        <Grid x:Name="NewGameDropdownOverlay">
+                        <Grid x:Name="NewGameDropdownPopup">
                                 <StackPanel Orientation="Horizontal" Margin="75,0,0,0">
                                         <Border Classes="DropDownMenu">
                                                 <StackPanel Orientation="Vertical" Classes="DropDownPanel">
@@ -129,6 +127,6 @@
                                         </Border>
                                 </StackPanel>
                         </Grid>
-                </Grid>
+                </local:PopupHandler>
         </Grid>
 </Window>

@@ -229,6 +229,11 @@ public class Board
         return Outcome.Ongoing;
     }
 
+    public bool KingInCheck(int checkedSide)
+    {
+        return MoveGenerator.Attacked(KingPositions[checkedSide], this, 1 - checkedSide);
+    }
+    
     private void InitBoard()
     {
         bitboards = new BitwiseBoard(board);

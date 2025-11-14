@@ -13,12 +13,12 @@ public static class MoveOrdering
         int[] keys = new int[moveSpan.Length];
             
         for (int i = 0; i < moveSpan.Length; i++)
-            keys[i] = Reevaluate(board, moveSpan[i], previous);
+            keys[i] = RateMove(board, moveSpan[i], previous);
 
         new Span<int>(keys).Sort(moveSpan, (x, y) => y.CompareTo(x));
     }
     
-    private static int Reevaluate(Board board, Move move, Move? previous)
+    private static int RateMove(Board board, Move move, Move? previous)
     {
         int priority = move.Priority;
         

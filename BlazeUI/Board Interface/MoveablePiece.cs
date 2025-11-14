@@ -3,33 +3,30 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.VisualTree;
-using BlazeUI.Blaze.API;
+using BlazeUI.Utils;
 
-namespace BlazeUI;
+namespace BlazeUI.Board_Interface;
 
 public class MoveablePiece : Image
 {
-    public required GridBoard PieceGrid;
-    private bool _pressed;
-    private Point _position;
-    private TranslateTransform? _translate;
-    private (int X, int Y) _start;
-    private bool _locked;
-    public Side Side;
+    public required BoardUI Base;
+    private bool Pressed;
+    private Point Position;
+    private TranslateTransform? Translate;
+    private (int X, int Y) Start;
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
-        if (_locked || !e.Properties.IsLeftButtonPressed)
+        Position = e.GetPosition(this.GetVisualParent());
+        Point _relPosition = e.GetPosition(this);
+        Position = new(Position.X - _relPosition.X + Bounds.Width / 2, Position.Y - _relPosition.Y + Bounds.Height / 2);
+        Start = GetPositionOnGrid(Position);
+
+        if (Base.IsLocked(Start) || !e.Properties.IsLeftButtonPressed)
             return;
         
-        _pressed = true;
-        _position = e.GetPosition(this.GetVisualParent());
-        Point _relPosition = e.GetPosition(this);
-
-        _position = new(_position.X - _relPosition.X + Bounds.Width / 2, _position.Y - _relPosition.Y + Bounds.Height / 2);
-        _start = GetPositionOnGrid(_position);
-        PieceGrid.PieceRaised(_start);
-        
+        Pressed = true;
+        Base.PieceRaised(Start);
         ZIndex = 10;
         
         base.OnPointerPressed(e);
@@ -38,43 +35,39 @@ public class MoveablePiece : Image
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {
         ZIndex = 0;
+        Pressed = false;
         
-        _pressed = false;
+        if (Base.IsLocked(Start))
+            return;
+        
         SnapToGrid(e.GetPosition(this.GetVisualParent()));
-        PieceGrid.PieceReleased();
+        Base.PieceReleased();
         
         base.OnPointerReleased(e);
     }
 
     protected override void OnPointerMoved(PointerEventArgs e)
     {
-        if (_pressed)
+        if (Base.IsLocked(Start) || !e.Properties.IsLeftButtonPressed)
+            return;
+        
+        if (Pressed)
         {
             Point pos = e.GetPosition(this.GetVisualParent());
 
-            double offsetX = pos.X - _position.X;
-            double offsetY = pos.Y - _position.Y;
+            double offsetX = pos.X - Position.X;
+            double offsetY = pos.Y - Position.Y;
 
-            _translate = new TranslateTransform(offsetX, offsetY);
-            RenderTransform = _translate;
+            Translate = new TranslateTransform(offsetX, offsetY);
+            RenderTransform = Translate;
         }
 
         base.OnPointerMoved(e);
     }
 
-    public void Lock()
-    {
-        _locked = true;
-    }
-
-    public void Unlock()
-    {
-        _locked = false;
-    }
-
     private (int X, int Y) GetPositionOnGrid(Point position)
     {
-        double squareSize = PieceGrid.InnerGrid.Bounds.Width / 8;
+        double squareSize = Base.GridBoard.Bounds.Width / 8;
         int x = (int)(position.X / squareSize);
         int y = (int)(position.Y / squareSize);
         return (x, y);
@@ -84,13 +77,13 @@ public class MoveablePiece : Image
     {
         (int X, int Y) pos = GetPositionOnGrid(position);
         
-        _translate = null;
+        Translate = null;
         RenderTransform = null;
 
         if (!InvalidSquare(pos))
         {
-            //Console.WriteLine($"Moving from {_start} to {pos}");
-            PieceGrid.MovePiece(_start, pos);
+            //Console.WriteLine($"Moving from {Start} to {pos}");
+            Base.CallPieceMove(Start, pos);
         }
     }
 
