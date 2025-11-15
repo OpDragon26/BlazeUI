@@ -16,8 +16,8 @@ public class PieceGrid : Grid
 
     public void LoadBoard(Board board, Side perspective, bool playSound, Move? lastMove = null)
     {
-        if (playSound)
-            Sound.PlaySound("move");
+        //if (playSound)
+            //Sound.PlaySound("move");
         Clear();
         
         if (lastMove is not null)

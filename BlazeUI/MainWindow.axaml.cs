@@ -3,7 +3,6 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
-using BlazeUI.Blaze.Utils;
 
 namespace BlazeUI;
 using Blaze;
@@ -23,7 +22,7 @@ public partial class MainWindow : Window
 
         KeyDownEvent.AddClassHandler<TopLevel>(OnKeyDown, handledEventsToo: true);
         
-        Sound.Init();
+        //Sound.Init();
         PopupHandlerGrid.Initialize();
         Promotion = new PromotionHandler(PromotionGrid);
         Promotion.InitImages(Side.White);
@@ -128,7 +127,7 @@ public partial class MainWindow : Window
             _ => throw new ArgumentOutOfRangeException()
         };
         
-        Sound.PlaySound(General.SideWon(PieceBoard.PlayerSide, outcome) ? "game-won" : "game-lost");
+        //Sound.PlaySound(General.SideWon(PieceBoard.PlayerSide, outcome) ? "game-won" : "game-lost");
         GameOverMoves.Text = $"moves: {moves}";
     }
 
