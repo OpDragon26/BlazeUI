@@ -12,7 +12,9 @@
         <entry key="BlazeUI/Styles/GameDisplayDefaultStyles.axaml" value="BlazeUI/BlazeUI.csproj" />
         <entry key="BlazeUI/Styles/OverlayDefaultStyles.axaml" value="BlazeUI/BlazeUI.csproj" />
         <entry key="BlazeUI/Styles/PGNDisplayDefaultStyles.axaml" value="BlazeUI/BlazeUI.csproj" />
+        <entry key="BlazeUI/Styles/PopupDefaultStyles.axaml" value="BlazeUI/BlazeUI.csproj" />
         <entry key="BlazeUI/Styles/PopupStyles.axaml" value="BlazeUI/BlazeUI.csproj" />
+        <entry key="BlazeUI/Styles/TerminalStyles.axaml" value="BlazeUI/BlazeUI.csproj" />
       </map>
     </option>
   </component>

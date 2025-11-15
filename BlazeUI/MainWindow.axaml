@@ -1,132 +1,161 @@
 <Window xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:BlazeUI.Controls"
-        xmlns:board="clr-namespace:BlazeUI.Board_Interface"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        x:Class="BlazeUI.MainWindow"
-        Title="BlazeUI">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="clr-namespace:BlazeUI.Controls"
+    xmlns:board="clr-namespace:BlazeUI.Board_Interface"
+    mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+    x:Class="BlazeUI.MainWindow"
+    Title="BlazeUI">
         
-        <Grid>
-                <Grid RowDefinitions="50,*" Background="{DynamicResource PrimaryBackgroundGradient}">
-                        <Border Grid.Row="0" BorderBrush="{DynamicResource SecondaryBorder}" BorderThickness="0,0,0,2">
-                                <!-- Top row -->
-                                <StackPanel Orientation="Horizontal" Margin="75,0,0,0">
-                                        <Button Content="PLAY" Click="NewGameOpenDropdown" Classes="HeaderButton"></Button>
-                                        <Button Content="SETTINGS" Classes="HeaderButton"></Button>
-                                        <Button Content="ANALYSIS" Classes="HeaderButton"></Button>
-                                        <Button Content="DEBUG TERMINAL" Classes="HeaderButton"></Button>
-                                </StackPanel>
-                        </Border>
+    <Grid>
+        <Grid RowDefinitions="50,*" Background="{DynamicResource PrimaryBackgroundGradient}">
+            <Border Grid.Row="0" BorderBrush="{DynamicResource SecondaryBorder}" BorderThickness="0,0,0,2">
+                <!-- Top row -->
+                <StackPanel Orientation="Horizontal" Margin="75,0,0,0">
+                    <Button Content="PLAY" Click="NewGameOpenDropdown" Classes="HeaderButton"></Button>
+                    <Button Content="SETTINGS" Classes="HeaderButton"></Button>
+                    <Button Content="ANALYSIS" Classes="HeaderButton"></Button>
+                    <Button Content="DEBUG TERMINAL" Click="OpenTerminal" Classes="HeaderButton"></Button>
+                </StackPanel>
+            </Border>
                 
-                        <!-- Main body -->
-                        <Grid Grid.Row="1" ColumnDefinitions="*,2*,*">
-                                <Viewbox Grid.Column="1" Stretch="Uniform">
-                                        <Grid RowDefinitions="100,*,100" Width="800" Height="950">
-                                                <!-- Board -->
-                                                <Border Grid.Row="1" CornerRadius="10" Background="Beige" ClipToBounds="True">
-                                                        <board:BoardUI Name="PieceBoard">
-                                                                <Grid ColumnDefinitions="*,*,*,*,*,*,*,*" x:Name="PromotionGrid" RowDefinitions="Auto" ZIndex="-5">
-                                                                        <Border Classes="PromotionSelector">
-                                                                                <StackPanel Classes="PromotionSelectorPanel">
-                                                                                        <Button Click="PromotionSelected" x:Name="QueenPromotionButton" Classes="PromotionSelectorButton"><Image x:Name="QueenPromotion">
-                                                                                                <Image.RenderTransform><ScaleTransform ScaleX="1.2" ScaleY="1.2"></ScaleTransform></Image.RenderTransform>
-                                                                                        </Image></Button>
-                                                                                        <Button Click="PromotionSelected" x:Name="RookPromotionButton" Classes="PromotionSelectorButton"><Image x:Name="RookPromotion">
-                                                                                                <Image.RenderTransform><ScaleTransform ScaleX="1.2" ScaleY="1.2"></ScaleTransform></Image.RenderTransform>
-                                                                                        </Image></Button>
-                                                                                        <Button Click="PromotionSelected" x:Name="KnightPromotionButton" Classes="PromotionSelectorButton"><Image x:Name="KnightPromotion">
-                                                                                                <Image.RenderTransform><ScaleTransform ScaleX="1.2" ScaleY="1.2"></ScaleTransform></Image.RenderTransform>
-                                                                                        </Image></Button>
-                                                                                        <Button Click="PromotionSelected" x:Name="BishopPromotionButton" Classes="PromotionSelectorButton"><Image x:Name="BishopPromotion">
-                                                                                                <Image.RenderTransform><ScaleTransform ScaleX="1.2" ScaleY="1.2"></ScaleTransform></Image.RenderTransform>
-                                                                                        </Image></Button>
-                                                                                        <TextBlock Classes="PromotionSelector">ESC</TextBlock>
-                                                                                </StackPanel>
-                                                                        </Border>
-                                                                </Grid>
-                                                        </board:BoardUI>
-                                                </Border>
-                                                
-                                                <!-- Top row: enemy name, depth, material --> 
-                                                <Border Grid.Row="0">
-                                                        <Grid ColumnDefinitions="*,Auto" Classes="InfoBarTopGrid">
-                                                                <StackPanel Grid.Column="0" Classes="InfoBarTop">
-                                                                        <TextBlock Classes="InfoBarName">BLAZE</TextBlock>
-                                                                        <TextBlock Classes="InfoBarDepth" Name="DepthDisplay">depth</TextBlock>
-                                                                </StackPanel>
-                                                                <TextBlock Name="BotMaterial" Classes="InfoBarMaterialTop InfoBarMaterial" Grid.Column="1">material</TextBlock>
-                                                        </Grid>
-                                                </Border>
-                                        
-                                                <!-- Bottom row: friendly material --> 
-                                                <Border Grid.Row="2">
-                                                        <TextBlock Name="PlayerMaterial" Classes="InfoBarMaterialBottom InfoBarMaterial">material</TextBlock>
-                                                </Border>
-                                        </Grid>
-                                </Viewbox>
-                                
-                                <!-- Right sidebar: PGN -->
-                                <Border Grid.Column="2" Padding="20">
-                                        <Border Classes="GameDisplayWindow">
-                                                <ScrollViewer>
-                                                        <local:PGNDisplay x:Name="PGNPanel"></local:PGNDisplay>
-                                                </ScrollViewer>
-                                        </Border> 
-                                </Border>
-                        </Grid>
-                </Grid>
-                <local:PopupHandler x:Name="PopupHandlerGrid">
-                        <Grid ColumnDefinitions="*,600,*" RowDefinitions="*,250,*" Classes="OverlayBackground" x:Name="InitPopup">
-                                <Grid Grid.Row="1" Grid.Column="1">
-                                        <Border Classes="OverlayPopup" x:Name="InitializingPopup">
-                                                <Grid RowDefinitions="50,*">
-                                                        <Border Grid.Row="0" Classes="PopupCardTop">
-                                                                <TextBlock Classes="PopupCardTitle">Initializing Engine</TextBlock>
-                                                        </Border>
-                                                        <Border Grid.Row="1" Classes="PopupCardBody">
-                                                                <StackPanel Classes="InitializeProgressBarContainer">
-                                                                        <TextBlock Classes="PopupSecondary" x:Name="InitStatus">Status</TextBlock>
-                                                                        <local:ProgressBar x:Name="InitProgress" Classes="InitializeProgressBar" Width="500" Height="10">
-                                                                                <Border x:Name="InitProgressBar" Classes="InitializeProgressBarFilled"></Border>
-                                                                        </local:ProgressBar>
-                                                                </StackPanel>
-                                                        </Border>
-                                                </Grid>
-                                        </Border>
+            <!-- Main body -->
+            <Grid Grid.Row="1" ColumnDefinitions="*,2*,*">
+                <Viewbox Grid.Column="1" Stretch="Uniform">
+                    <Grid RowDefinitions="100,*,100" Width="800" Height="950">
+                        <!-- Board -->
+                        <Border Grid.Row="1" CornerRadius="10" Background="Beige" ClipToBounds="True">
+                            <board:BoardUI Name="PieceBoard">
+                                <Grid ColumnDefinitions="*,*,*,*,*,*,*,*" x:Name="PromotionGrid" RowDefinitions="Auto" ZIndex="-5">
+                                    <Border Classes="PromotionSelector">
+                                        <StackPanel Classes="PromotionSelectorPanel">
+                                            
+                                            <Button Click="PromotionSelected" x:Name="QueenPromotionButton" Classes="PromotionSelectorButton"><Image x:Name="QueenPromotion">
+                                                <Image.RenderTransform><ScaleTransform ScaleX="1.2" ScaleY="1.2"></ScaleTransform></Image.RenderTransform>
+                                            </Image></Button>
+                                                <Button Click="PromotionSelected" x:Name="RookPromotionButton" Classes="PromotionSelectorButton"><Image x:Name="RookPromotion">
+                                                    <Image.RenderTransform><ScaleTransform ScaleX="1.2" ScaleY="1.2"></ScaleTransform></Image.RenderTransform>
+                                                </Image></Button>
+                                                <Button Click="PromotionSelected" x:Name="KnightPromotionButton" Classes="PromotionSelectorButton"><Image x:Name="KnightPromotion">
+                                                    <Image.RenderTransform><ScaleTransform ScaleX="1.2" ScaleY="1.2"></ScaleTransform></Image.RenderTransform>
+                                                </Image></Button>
+                                                <Button Click="PromotionSelected" x:Name="BishopPromotionButton" Classes="PromotionSelectorButton"><Image x:Name="BishopPromotion">
+                                                    <Image.RenderTransform><ScaleTransform ScaleX="1.2" ScaleY="1.2"></ScaleTransform></Image.RenderTransform>
+                                                </Image></Button>
+                                            
+                                                <TextBlock Classes="PromotionSelector">ESC</TextBlock>
+                                            
+                                        </StackPanel>
+                                    </Border>
                                 </Grid>
-                        </Grid>
-                        <Grid ColumnDefinitions="*,600,*" RowDefinitions="*,250,*" Classes="OverlayBackground" x:Name="GameOverPopup">
-                                <Grid Grid.Row="1" Grid.Column="1">
-                                        <Border Classes="OverlayPopup">
-                                                <Grid RowDefinitions="80,*">
-                                                        <Border Grid.Row="0" Classes="PopupCardTop">
-                                                                <TextBlock Classes="PopupCardTitle GameOverTitle" x:Name="GameOverTitle">Game Over</TextBlock>
-                                                        </Border>
-                                                        <Border Grid.Row="1" Classes="PopupCardBody">
-                                                                <StackPanel>
-                                                                        <TextBlock Classes="PopupSecondary" x:Name="GameOverMoves">moves</TextBlock>
-                                                                        <Grid ColumnDefinitions="*,*">
-                                                                                <Button Grid.Column="0" Classes="GameOverPopupButton" Click="PlayButtonClick">PLAY AGAIN</Button>
-                                                                                <Button Grid.Column="1" Classes="GameOverPopupButton" Click="ClosePopup">CLOSE</Button>
-                                                                        </Grid>
-                                                                </StackPanel>
-                                                        </Border>
-                                                </Grid>
-                                        </Border>
-                                </Grid> 
-                        </Grid>
-                        <Grid x:Name="NewGameDropdownPopup">
-                                <StackPanel Orientation="Horizontal" Margin="75,0,0,0">
-                                        <Border Classes="DropDownMenu">
-                                                <StackPanel Orientation="Vertical" Classes="DropDownPanel">
-                                                        <Button Classes="DropDownButton" Click="StartNewAsWhite">White</Button>
-                                                        <Button Classes="DropDownButton" Click="StartAsNewBlack">Black</Button>
-                                                </StackPanel>
-                                        </Border>
+                            </board:BoardUI>
+                        </Border>
+                                                
+                        <!-- Top row: enemy name, depth, material --> 
+                        <Border Grid.Row="0">
+                            <Grid ColumnDefinitions="*,Auto" Classes="InfoBarTopGrid">
+                                <StackPanel Grid.Column="0" Classes="InfoBarTop">
+                                    <TextBlock Classes="InfoBarName">BLAZE</TextBlock>
+                                    <TextBlock Classes="InfoBarDepth" Name="DepthDisplay">depth</TextBlock>
                                 </StackPanel>
-                        </Grid>
-                </local:PopupHandler>
+                                <TextBlock Name="BotMaterial" Classes="InfoBarMaterialTop InfoBarMaterial" Grid.Column="1">material</TextBlock>
+                            </Grid>
+                        </Border>
+                                        
+                        <!-- Bottom row: friendly material --> 
+                        <Border Grid.Row="2">
+                            <TextBlock Name="PlayerMaterial" Classes="InfoBarMaterialBottom InfoBarMaterial">material</TextBlock>
+                        </Border>
+                        
+                    </Grid>
+                </Viewbox>
+                                
+                <!-- Right sidebar: PGN -->
+                <Border Grid.Column="2" Padding="20">
+                    <Border Classes="GameDisplayWindow">
+                        <ScrollViewer>
+                            <local:PGNDisplay x:Name="PGNPanel"></local:PGNDisplay>
+                        </ScrollViewer>
+                    </Border> 
+                </Border>
+                
+            </Grid>
         </Grid>
+        <local:PopupHandler x:Name="PopupHandlerGrid">
+                        
+            <Grid ColumnDefinitions="*,600,*" RowDefinitions="*,250,*" Classes="OverlayBackground" x:Name="InitPopup">
+                <Grid Grid.Row="1" Grid.Column="1">
+                    <Border Classes="OverlayPopup" x:Name="InitializingPopup">
+                        <Grid RowDefinitions="50,*">
+                            
+                            <Border Grid.Row="0" Classes="PopupCardTop">
+                                <TextBlock Classes="PopupCardTitle">Initializing Engine</TextBlock>
+                            </Border>
+                            
+                            <Border Grid.Row="1" Classes="PopupCardBody">
+                                <StackPanel Classes="InitializeProgressBarContainer">
+                                    <TextBlock Classes="PopupSecondary" x:Name="InitStatus">Status</TextBlock>
+                                    <local:ProgressBar x:Name="InitProgress" Classes="InitializeProgressBar" Width="500" Height="10">
+                                        <Border x:Name="InitProgressBar" Classes="InitializeProgressBarFilled"></Border>
+                                    </local:ProgressBar>
+                                </StackPanel>
+                            </Border>
+                            
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Grid>
+                        
+            <Grid ColumnDefinitions="*,600,*" RowDefinitions="*,250,*" Classes="OverlayBackground" x:Name="GameOverPopup">
+                <Grid Grid.Row="1" Grid.Column="1">
+                    <Border Classes="OverlayPopup">
+                        <Grid RowDefinitions="80,*">
+                            
+                            <Border Grid.Row="0" Classes="PopupCardTop">
+                                <TextBlock Classes="PopupCardTitle GameOverTitle" x:Name="GameOverTitle">Game Over</TextBlock>
+                            </Border>
+                            
+                            <Border Grid.Row="1" Classes="PopupCardBody">
+                                <StackPanel>
+                                    <TextBlock Classes="PopupSecondary" x:Name="GameOverMoves">moves</TextBlock>
+                                    <Grid ColumnDefinitions="*,*">
+                                        <Button Grid.Column="0" Classes="GameOverPopupButton" Click="PlayButtonClick">PLAY AGAIN</Button>
+                                        <Button Grid.Column="1" Classes="GameOverPopupButton" Click="ClosePopup">CLOSE</Button>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                            
+                        </Grid>
+                    </Border>
+                </Grid> 
+            </Grid>
+                        
+            <Grid x:Name="NewGameDropdownPopup">
+                <StackPanel Orientation="Horizontal" Margin="75,0,0,0">
+                    <Border Classes="DropDownMenu">
+                        <StackPanel Orientation="Vertical" Classes="DropDownPanel">
+                            <Button Classes="DropDownButton" Click="StartNewAsWhite">White</Button>
+                            <Button Classes="DropDownButton" Click="StartAsNewBlack">Black</Button>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+                        
+            <Grid x:Name="TerminalPopup" RowDefinitions="50,*">
+                <Grid Grid.Row="1" RowDefinitions="27,*">
+                    
+                    <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Classes="TerminalHeader">
+                        <Button Grid.Column="1" Click="ClosePopup">X</Button>
+                    </Grid>
+                    
+                    <StackPanel Grid.Row="1" Classes="TerminalBody">
+                        
+                    </StackPanel>
+                    
+                </Grid>
+            </Grid>
+                        
+        </local:PopupHandler>
+    </Grid>
 </Window>

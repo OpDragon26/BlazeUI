@@ -9,6 +9,7 @@
                 <StyleInclude Source="Styles/AppDefaultStyles.axaml"></StyleInclude>
                 <StyleInclude Source="Styles/PopupDefaultStyles.axaml"></StyleInclude>
                 <StyleInclude Source="Styles/GameDisplayDefaultStyles.axaml"></StyleInclude>
+                <StyleInclude Source="Styles/TerminalStyles.axaml"></StyleInclude>
         </Application.Styles>
              
                 <Application.Resources>
@@ -33,5 +34,7 @@
                         
                         <SolidColorBrush x:Key="PrimaryProgressBarBackground">#121314</SolidColorBrush>
                         <SolidColorBrush x:Key="PrimaryHighlightColor">#29689E</SolidColorBrush>
+                        
+                        <SolidColorBrush x:Key="TerminalHeaderBackground">#2e2d2d</SolidColorBrush>
                 </Application.Resources>
 </Application>
