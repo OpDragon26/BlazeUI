@@ -6,11 +6,11 @@ namespace BlazeUI.Blaze.Board_Representation;
 
 public static class ZobristHash
 {
-    private static readonly int[,,] PieceNumbers = new int[14,8,8];
-    private static readonly int[] CastlingNumbers = new int[16];
-    private static readonly int[] EnPassantFiles = new int[9];
+    private static readonly ulong[,,] PieceNumbers = new ulong[14,8,8];
+    private static readonly ulong[] CastlingNumbers = new ulong[16];
+    private static readonly ulong[] EnPassantFiles = new ulong[9];
     private static readonly Random random = new(69420);
-    private static int BlackToMove;
+    private static ulong BlackToMove;
     
     public static void Init()
     {
@@ -22,20 +22,25 @@ public static class ZobristHash
             // for every square
             for (int rank = 0; rank < 8; rank++)
             for (int file = 7; file >= 0; file--)
-                PieceNumbers[i, file, rank] = random.Next();
+                PieceNumbers[i, file, rank] = RandomUlong();
         }
         
         // indicates that the side to move is black
-        BlackToMove = random.Next();
+        BlackToMove = RandomUlong();
         
         // for every combination of white and black castling
         for (int i = 0; i < 16; i++)
-            CastlingNumbers[i] = random.Next();
+            CastlingNumbers[i] = RandomUlong();
         
         // for every file 
         for (int i = 0; i < 8; i++)
-            EnPassantFiles[i] = random.Next();
+            EnPassantFiles[i] = RandomUlong();
         EnPassantFiles[8] = 0;
+    }
+
+    private static ulong RandomUlong()
+    {
+        return (ulong)random.Next() * (ulong)random.Next();
     }
 
     public static Zobrist HashBoard(Board board)
@@ -60,11 +65,11 @@ public static class ZobristHash
 
     public struct Zobrist : IEquatable<Zobrist>
     {
-        public int key;
+        public ulong key;
 
         public override int GetHashCode()
         {
-            return key;
+            return key.GetHashCode();
         }
 
         public bool Equals(Zobrist other)
@@ -72,7 +77,7 @@ public static class ZobristHash
             return key == other.key;
         }
 
-        public void Modify(int component)
+        public void Modify(ulong component)
         {
             key ^= component;
         }

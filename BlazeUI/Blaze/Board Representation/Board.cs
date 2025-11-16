@@ -43,7 +43,7 @@ public class Board
     private int halfMoveClock;
     private int pawns;
     private ValuePair values;
-    private readonly Dictionary<int, int> repeat = new();
+    private readonly Dictionary<ulong, int> repeat = new();
     public ZobristHash.Zobrist hashKey;
 
     public byte castled;
@@ -274,7 +274,7 @@ public class Board
 
     public override int GetHashCode()
     {
-        return ZobristHash.HashBoard(this).key;
+        return ZobristHash.HashBoard(this).key.GetHashCode();
     }
     
     public ulong AllPieces()

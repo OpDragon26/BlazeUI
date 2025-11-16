@@ -53,13 +53,13 @@ public static class Counter
 public static class RefutationTable
 {
     private static HashEntry[] Table = [];
-    private static int Size;
+    private static ulong Size;
     private static bool init;
 
     public static void Init(int size)
     {
         init = true;
-        Size = size;
+        Size = (ulong)size;
         Table = new HashEntry[size];
     }
 

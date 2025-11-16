@@ -4,12 +4,12 @@ using Move_Generation;
 
 public static class TranspositionTable
 {
-    private static int Size;
+    private static ulong Size;
     private static TTEntry[] Table = [];
 
     public static void Init(int size)
     {
-        Size = size;
+        Size = (ulong)size;
         Table = new TTEntry[size];
     }
 
