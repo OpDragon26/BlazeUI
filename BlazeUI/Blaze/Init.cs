@@ -20,6 +20,7 @@ public static class Init
             return;
         init = InitStatus.Waiting;
         
+        TranspositionTable.Init((int)Math.Pow(2, 20) + 7);
         RefutationTable.Init((int)Math.Pow(2, 20) + 7);
         Progress.Set(0, "Generating Masks...");
         Masks.Init();

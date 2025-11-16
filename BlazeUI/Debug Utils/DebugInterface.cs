@@ -14,7 +14,9 @@ public static class DebugInterface
         //Blaze.Init.Start();
         ZobristHash.Init();
 
-        TestHash();
+        //TestHash();
+        //DebugUtils.TestGameSpeed(15, 6);
+        SingleGame();
         
         Environment.Exit(0);
     }

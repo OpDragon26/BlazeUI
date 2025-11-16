@@ -71,11 +71,19 @@ public static class Searcher
     
     public static int Minimax(Board board, int depth, int alpha, int beta, Move? previous = null)
     {
+        int val = TranspositionTable.Retrieve(board.hashKey, depth, alpha, beta, board.side);
+        if (val != 0)
+            return val;
+        
         if (board.IsDraw())
             return 0;
 
         if (depth == 0) // return heuristic evaluation
-            return Evaluator.StaticEvaluate(board);
+        {
+            int eval = Evaluator.StaticEvaluate(board);
+            TranspositionTable.Record(board.hashKey, 0, eval, Flag.Exact);
+            return eval;
+        }
         
         Board moveBoard;
         if (board.side == 0)
@@ -104,6 +112,7 @@ public static class Searcher
                 
                 if (eval >= beta) // beta cutoff
                 {
+                    TranspositionTable.Record(board.hashKey, depth, beta, Flag.Beta, move);
                     RefutationTable.Set(board.hashKey, move, 100);
                     Counter.Set(previous, move, depth * depth);
                     History.Set(move, 0, depth * depth);
@@ -138,6 +147,7 @@ public static class Searcher
                 
                 if (eval <= alpha) // alpha cutoff
                 {
+                    TranspositionTable.Record(board.hashKey, depth, alpha, Flag.Alpha, move);
                     RefutationTable.Set(board.hashKey, move, 100);
                     Counter.Set(previous, move, depth * depth);
                     History.Set(move, 1, depth * depth);

@@ -74,7 +74,7 @@ public class Board
         halfMoveClock = board.halfMoveClock;
         pawns = board.pawns;
         values = board.values;
-        if (considerRepetition)
+        if (board.considerRepetition)
             repeat = new(board.repeat);
         hashKey = board.hashKey;
         castled = board.castled;
