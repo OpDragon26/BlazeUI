@@ -135,11 +135,6 @@ public partial class MainWindow : Window
     {
         PopupHandlerGrid.ClearActive();
     }
-
-    private void OpenTerminal(object? sender, RoutedEventArgs e)
-    {
-        PopupHandlerGrid.SetActive("TerminalPopup");
-    }
 }
 
 public static class Colors

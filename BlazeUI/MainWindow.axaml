@@ -16,7 +16,7 @@
                     <Button Content="PLAY" Click="NewGameOpenDropdown" Classes="HeaderButton"></Button>
                     <Button Content="SETTINGS" Classes="HeaderButton"></Button>
                     <Button Content="ANALYSIS" Classes="HeaderButton"></Button>
-                    <Button Content="DEBUG TERMINAL" Click="OpenTerminal" Classes="HeaderButton"></Button>
+                    <Button Content="DEBUG TERMINAL" Classes="HeaderButton"></Button>
                 </StackPanel>
             </Border>
                 
@@ -141,21 +141,7 @@
                     </Border>
                 </StackPanel>
             </Grid>
-                        
-            <Grid x:Name="TerminalPopup" RowDefinitions="50,*">
-                <Grid Grid.Row="1" RowDefinitions="27,*">
-                    
-                    <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Classes="TerminalHeader">
-                        <Button Grid.Column="1" Click="ClosePopup">X</Button>
-                    </Grid>
-                    
-                    <StackPanel Grid.Row="1" Classes="TerminalBody">
-                        
-                    </StackPanel>
-                    
-                </Grid>
-            </Grid>
-                        
+            
         </local:PopupHandler>
     </Grid>
 </Window>
