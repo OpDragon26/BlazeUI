@@ -11,13 +11,9 @@ public static class ZobristHash
     private static readonly int[] EnPassantFiles = new int[9];
     private static readonly Random random = new(69420);
     private static int BlackToMove;
-    private static bool init;
     
     public static void Init()
     {
-        if (init) return;
-        init = true;
-        
         // for every piece
         for (int i = 0; i < 14; i++)
         {
@@ -25,12 +21,8 @@ public static class ZobristHash
             
             // for every square
             for (int rank = 0; rank < 8; rank++)
-            {
-                for (int file = 7; file >= 0; file--)
-                {
-                    PieceNumbers[i, file, rank] = random.Next();
-                }
-            }
+            for (int file = 7; file >= 0; file--)
+                PieceNumbers[i, file, rank] = random.Next();
         }
         
         // indicates that the side to move is black
@@ -38,15 +30,11 @@ public static class ZobristHash
         
         // for every combination of white and black castling
         for (int i = 0; i < 16; i++)
-        {
             CastlingNumbers[i] = random.Next();
-        }
         
         // for every file 
         for (int i = 0; i < 8; i++)
-        {
             EnPassantFiles[i] = random.Next();
-        }
         EnPassantFiles[8] = 0;
     }
 
@@ -57,7 +45,7 @@ public static class ZobristHash
         for (int rank = 0; rank < 8; rank++)
         for (int file = 0; file < 8; file++)
             if ((board.AllPieces() & BitboardUtils.GetSquare(file, rank)) != 0) // if there is a piece on the square
-                hash.Modify(PieceNumbers[board.GetPiece(file, rank), file, rank]);
+                hash.UpdatePiece(board.GetPiece(file, rank), file, rank);
         
         if (board.side == 1)
             hash.Modify(BlackToMove);
@@ -89,7 +77,7 @@ public static class ZobristHash
             key ^= component;
         }
 
-        private void UpdatePiece(uint piece, int file, int rank)
+        public void UpdatePiece(uint piece, int file, int rank)
         {
             Modify(PieceNumbers[piece, file, rank]);
         }
@@ -106,9 +94,7 @@ public static class ZobristHash
             // update pieces
             UpdatePiece(source, move.Source);
             if (target != Pieces.Empty) // if capture, remove captured piece
-            {
                 UpdatePiece(target, move.Destination);
-            }
             UpdatePiece(move.IsPromotion() ? move.Promotion : source, move.Destination);
             
             // remove en passant and castling
@@ -117,7 +103,6 @@ public static class ZobristHash
             
             Modify(CastlingNumbers[castling]);
             Modify(EnPassantFiles[enPassantFile]);
-            
             Modify(CastlingNumbers[castling & move.CastlingBan]);
 
             switch (move.Type & 0b0111) // independent of side
