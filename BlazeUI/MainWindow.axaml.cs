@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using BlazeUI.Debug_Utils;
 
 namespace BlazeUI;
 using Blaze;
@@ -20,6 +21,8 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
+        DebugInterface.Execute();
+        
         KeyDownEvent.AddClassHandler<TopLevel>(OnKeyDown, handledEventsToo: true);
         
         //Sound.Init();
@@ -31,8 +34,6 @@ public partial class MainWindow : Window
         
         InitProgress.Init(InitProgressBar);
         InitProgress.SetCompletion(0);
-        
-        //DebugInterface.Execute();
         
         StartNewGame();
     }

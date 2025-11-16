@@ -90,9 +90,9 @@ public class Board
         castling = Parsing.ParseCastling(fields[2]);
         enPassant = fields[3] == "-" ? (8, 8) : MoveUtils.ParseSquare(fields[3]);
         halfMoveClock = int.Parse(fields[4]);
-        hashKey = ZobristHash.HashBoard(this);
-
+        
         InitBoard();
+        hashKey = ZobristHash.HashBoard(this);
         
         this.considerRepetition = considerRepetition;
     }

@@ -9,7 +9,6 @@
                 <StyleInclude Source="Styles/AppDefaultStyles.axaml"></StyleInclude>
                 <StyleInclude Source="Styles/PopupDefaultStyles.axaml"></StyleInclude>
                 <StyleInclude Source="Styles/GameDisplayDefaultStyles.axaml"></StyleInclude>
-                <StyleInclude Source="Styles/TerminalStyles.axaml"></StyleInclude>
         </Application.Styles>
              
                 <Application.Resources>

@@ -9,7 +9,7 @@ public static class ZobristHash
     private static readonly int[,,] PieceNumbers = new int[14,8,8];
     private static readonly int[] CastlingNumbers = new int[16];
     private static readonly int[] EnPassantFiles = new int[9];
-    private static readonly Random random = new();
+    private static readonly Random random = new(69420);
     private static int BlackToMove;
     private static bool init;
     
@@ -55,15 +55,9 @@ public static class ZobristHash
         Zobrist hash = new();
         
         for (int rank = 0; rank < 8; rank++)
-        {
-            for (int file = 7; file >= 0; file--)
-            {
-                if ((board.AllPieces() & BitboardUtils.GetSquare(file, rank)) != 0) // if there is a piece on the square
-                {
-                    hash.Modify(PieceNumbers[board.GetPiece(file, rank), file, rank]);
-                }
-            }
-        }
+        for (int file = 0; file < 8; file++)
+            if ((board.AllPieces() & BitboardUtils.GetSquare(file, rank)) != 0) // if there is a piece on the square
+                hash.Modify(PieceNumbers[board.GetPiece(file, rank), file, rank]);
         
         if (board.side == 1)
             hash.Modify(BlackToMove);
@@ -112,12 +106,15 @@ public static class ZobristHash
             // update pieces
             UpdatePiece(source, move.Source);
             if (target != Pieces.Empty) // if capture, remove captured piece
+            {
                 UpdatePiece(target, move.Destination);
+            }
             UpdatePiece(move.IsPromotion() ? move.Promotion : source, move.Destination);
             
             // remove en passant and castling
             // the EP file only needs to be re-added if the next move changes the file, since if there isn't an EP file
             // the hash will remain unchanged
+            
             Modify(CastlingNumbers[castling]);
             Modify(EnPassantFiles[enPassantFile]);
             
