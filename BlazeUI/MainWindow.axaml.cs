@@ -21,7 +21,7 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
-        DebugInterface.Execute();
+        //DebugInterface.Execute();
         
         KeyDownEvent.AddClassHandler<TopLevel>(OnKeyDown, handledEventsToo: true);
         
