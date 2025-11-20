@@ -35,7 +35,7 @@ public class HighlightGrid : Grid
             .ToArray()
             .Where(move => move.Source == Invert.Switch(pos, side))
             .Select(move => BitboardUtils.GetSquare(move.Destination))
-            .Aggregate((u1, u2) => u1 | u2), 
+            .Aggregate(0UL, (u1, u2) => u1 | u2),
             side, "moves",Colors.HighLight);
     }
     
